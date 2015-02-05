@@ -1,0 +1,104 @@
+<resources>
+
+    <!--
+        Base application theme, dependent on API level. This theme is replaced
+        by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
+    -->
+    <style name="AppBaseTheme" parent="android:Theme.Light">
+        <!--
+            Theme customizations available in newer API levels can go in
+            res/values-vXX/styles.xml, while customizations related to
+            backward-compatibility can go here.
+        -->
+    </style>
+
+    <!-- Application theme. -->
+    <style name="AppTheme" parent="AppBaseTheme">
+        <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+    </style>
+    <style name="Animations" />
+
+	<!-- PopDownMenu -->
+	<style name="Animations.PopDownMenu" />
+	
+	<style name="Animations.PopDownMenu.Center">
+		<item name="@android:windowEnterAnimation">@anim/grow_from_top</item>
+		<item name="@android:windowExitAnimation">@anim/shrink_from_bottom</item>
+	</style>
+	
+	<style name="Animations.PopDownMenu.Left">
+		<item name="@android:windowEnterAnimation">@anim/grow_from_topleft_to_bottomright</item>
+		<item name="@android:windowExitAnimation">@anim/shrink_from_bottomright_to_topleft</item>
+	</style>
+	
+	<style name="Animations.PopDownMenu.Right">
+		<item name="@android:windowEnterAnimation">@anim/grow_from_topright_to_bottomleft</item>
+		<item name="@android:windowExitAnimation">@anim/shrink_from_bottomleft_to_topright</item>
+	</style>
+	
+	<style name="Animations.PopDownMenu.Reflect">
+		<item name="@android:windowEnterAnimation">@anim/pump_top</item>
+		<item name="@android:windowExitAnimation">@anim/disappear</item>
+	</style>
+	
+	<!-- PopUpMenu -->
+	<style name="Animations.PopUpMenu" />
+	
+	<style name="Animations.PopUpMenu.Center">
+		<item name="@android:windowEnterAnimation">@anim/grow_from_bottom</item>
+		<item name="@android:windowExitAnimation">@anim/shrink_from_top</item>
+	</style>
+	
+	<style name="Animations.PopUpMenu.Left">
+		<item name="@android:windowEnterAnimation">@anim/grow_from_bottomleft_to_topright</item>
+		<item name="@android:windowExitAnimation">@anim/shrink_from_topright_to_bottomleft</item>
+	</style>
+	
+	<style name="Animations.PopUpMenu.Right">
+		<item name="@android:windowEnterAnimation">@anim/grow_from_bottomright_to_topleft</item>
+		<item name="@android:windowExitAnimation">@anim/shrink_from_topleft_to_bottomright</item>
+	</style>
+	
+	<style name="Animations.PopUpMenu.Reflect">
+		<item name="@android:windowEnterAnimation">@anim/pump_bottom</item>
+		<item name="@android:windowExitAnimation">@anim/disappear</item>
+	</style>
+    
+	<style name="Help.Title" parent="@android:style/TextAppearance">
+    	<item name="android:textSize">17sp</item>
+    	<item name="android:textStyle">bold</item>
+    	<item name="android:textColor">#000</item>
+    	<item name="android:gravity">center_horizontal</item>
+    	<!-- <item name="android:layout_marginBottom">6dp</item>
+    	<item name="android:layout_marginLeft">10dp</item>
+    	<item name="android:layout_marginRight">10dp</item>-->
+    	<item name="android:layout_margin">4dp</item>
+    </style>
+    
+	<style name="Help.Text" parent="@android:style/TextAppearance">
+    	<item name="android:textSize">13sp</item>
+    	<item name="android:textStyle">normal</item>
+    	<item name="android:textColor">#000</item>
+    	<item name="android:gravity">center_horizontal</item>
+    	<item name="android:layout_marginBottom">11dp</item>
+    	<item name="android:singleLine">false</item>
+    </style>
+    
+    <style name="Help.Image" parent="@android:style/Widget">
+    	<item name="android:adjustViewBounds">true</item>
+    </style>
+	<style name="OverlayText">
+    	<item name="android:textStyle">bold</item>
+    	<item name="android:textColor">#ffffffff</item>
+    	<item name="android:textSize">20sp</item>
+    	
+    	<item name="android:gravity">center_horizontal</item>
+  	</style>
+  	<style name="Shadow">
+    	<item name="android:shadowColor">#000000</item>
+    	<item name="android:shadowDx">3</item>
+    	<item name="android:shadowDy">3</item>
+    	<item name="android:shadowRadius">3</item>
+    	<item name="android:gravity">center_horizontal</item>
+  	</style>
+</resources>

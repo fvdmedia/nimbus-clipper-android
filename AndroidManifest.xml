@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.fvd.nimbus"
+    android:versionCode="23"
+    android:versionName="2.3" >
+
+    <uses-sdk android:minSdkVersion="8"
+        android:targetSdkVersion="10"
+        />
+
+    <uses-permission android:name="android.permission.INTERNET" />   
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+	<uses-permission android:name="android.permission.CAMERA"/>
+	<uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
+	<uses-permission android:name="com.android.launcher.permission.UNINSTALL_SHORTCUT" />
+	
+	<supports-screens
+        android:smallScreens="true"
+        android:normalScreens="true"
+        android:largeScreens="true"
+        android:xlargeScreens="true"
+        android:anyDensity="true" />
+    <application
+        android:allowBackup="true"
+        android:launchMode="singleTask"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name="com.fvd.nimbus.MainActivity"
+            android:configChanges="orientation"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name="com.fvd.nimbus.Paint"
+            android:configChanges="orientation|screenSize"
+		    android:label="@string/app_name">
+            <intent-filter>
+        		<action android:name="android.intent.action.VIEW" />
+        		<category android:name="android.intent.category.DEFAULT" />
+        		<data android:mimeType="image/*" />
+    		</intent-filter>
+    		<intent-filter>
+        	<action android:name="android.intent.action.SEND" />
+        		<category android:name="android.intent.category.DEFAULT" />
+        		<data android:mimeType="image/*" />
+    		</intent-filter>
+		</activity>
+		<activity
+            android:name="com.fvd.nimbus.BrowseActivity"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/app_name" >
+            <intent-filter>
+  				<action android:name="android.intent.action.VIEW"></action>
+  				<category android:name="android.intent.category.DEFAULT"></category>
+  				<category android:name="android.intent.category.BROWSABLE"></category>
+  				<data android:scheme="http"></data>
+			</intent-filter>
+			<intent-filter>
+        	<action android:name="android.intent.action.SEND" />
+        		<category android:name="android.intent.category.DEFAULT" />
+        		<data android:mimeType="text/plain" />
+    		</intent-filter>
+        </activity>
+        <activity 
+    		android:name=".LoginDlg"
+    		android:label="@string/login" 
+    		
+            >
+		</activity>
+		<activity 
+    		android:name=".RegisterDlg"
+    		android:label="@string/register"
+    		
+            >
+		</activity>
+		<activity 
+    		android:name=".helpActivity"
+    		android:label="@string/help"
+    		android:screenOrientation="portrait"
+    		android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+    		>
+		</activity>
+        <activity 
+    		android:name=".previewActivity"
+    		android:label="@string/preview"
+    		android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+    		>
+		</activity>
+		
+        <activity 
+    		android:name=".ArticleDlg"
+    		android:label="@string/login" 
+    		
+            >
+		</activity>
+		
+        <activity 
+    		android:name=".ArticleSuccess"
+    		android:label="@string/login" 
+    		
+            >
+		</activity>
+		
+        <activity 
+    		android:name=".ShotSuccess"
+    		android:label="@string/login"
+    		
+            >
+		</activity>
+        
+		<activity 
+    		android:name=".loginActivity"
+    		android:label="@string/login">
+		</activity>
+		
+		<activity 
+    		android:name=".tagsActivity"
+    		android:label="@string/preview"
+    		android:windowSoftInputMode="stateHidden"
+    		>
+		</activity>
+		
+		<activity 
+    		android:name=".RestoreActivity"
+    		android:label="@string/restore">
+		</activity>
+		
+		<activity 
+    		android:name=".PrefsActivity"
+    		android:label="@string/action_settings">
+		</activity>
+		
+		<activity 
+    		android:name=".SettingsActivity"
+    		android:label="@string/action_settings">
+		</activity>
+		
+		<activity 
+    		android:name=".ChoosePDFActivity"
+    		android:label="@string/restore"
+    		android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
+		</activity>
+		
+		<activity 
+    		android:name=".MuPDFActivity"
+    		android:label="@string/restore"
+    		android:windowSoftInputMode="stateHidden">
+		</activity>
+		<activity 
+    		android:name=".OutlineActivity"
+    		android:label="@string/restore"
+    		android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
+		</activity>
+		<!-- <receiver android:name="com.fvd.nimbus.PackageReplacedReceiver">
+    		<intent-filter>
+        		<action android:name="android.intent.action.PACKAGE_REPLACED" />
+        		<data android:scheme="package" android:path="com.fvd.nimbus" />
+    		</intent-filter>
+		</receiver>-->
+    </application>
+
+</manifest>

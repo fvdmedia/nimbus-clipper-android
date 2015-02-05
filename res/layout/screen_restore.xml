@@ -1,0 +1,68 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rlMain"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/ltBack"
+    >
+	<LinearLayout
+	    android:id="@+id/linearLayout1"
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+	    android:layout_margin="@dimen/activity_vertical_margin"
+	    android:background="@color/ltBack"
+	    android:gravity="center"
+	    android:orientation="vertical" >
+
+		    <TextView
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_marginBottom="10dp"
+		        android:gravity="center_horizontal"
+		        
+		        android:text="@string/restore_pass"
+		        android:textColor="@color/text_normal"
+		        android:textSize="@dimen/welcome_text"
+		        />
+
+		    <EditText
+		        android:id="@+id/etRestoreMail"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_margin="@dimen/password_text"
+		        android:gravity="center_horizontal"
+		        android:hint="@string/username_hint"
+		        android:textColorHint="@color/text_normal"
+		        android:padding="@dimen/password_text"
+		        android:inputType="textEmailAddress"
+		        android:textColor="@color/text_normal"
+		        android:textSize="@dimen/password_text"/>
+		        
+		    
+		    
+		    <Button
+		        android:id="@+id/bRestore"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_gravity="center_horizontal"
+		        android:layout_marginBottom="4sp"
+		        android:layout_marginLeft="@dimen/password_text"
+		        android:layout_marginRight="@dimen/password_text"
+		        android:layout_marginTop="4sp"
+		        android:background="@drawable/button_selector"
+		        android:paddingLeft="@dimen/button_padding"
+		        android:paddingRight="@dimen/button_padding"
+		        android:text="@string/restore"
+		        android:textColor="@android:color/white"
+		        android:textSize="@dimen/input_text"
+		        />
+	</LinearLayout>
+ <!-- <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:adjustViewBounds="true"
+        android:src="@drawable/ic_launcher"
+        android:contentDescription="@string/app_name" />-->
+</RelativeLayout>

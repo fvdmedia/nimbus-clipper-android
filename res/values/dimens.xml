@@ -1,0 +1,28 @@
+<resources>
+
+    <!-- Large screen margins, per the Android Design guidelines. -->
+    <dimen name="login_horizontal_margin">16dp</dimen>
+    <dimen name="login_vertical_margin">24dp</dimen>
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>    
+    <dimen name="drawable_padding">18dp</dimen>
+    <dimen name="drawable_subpadding">5dp</dimen>
+    <dimen name="shadow_margin">1dp</dimen>
+    
+    <dimen name="container_radius">4dp</dimen>
+    <dimen name="base_radius">8dp</dimen>
+    <dimen name="btn_radius">24dp</dimen>
+    <dimen name="thin_btn_radius">18dp</dimen>
+    
+    <dimen name="browser_panel_height">48dp</dimen>
+    
+    <dimen name="button_padding">34dp</dimen>
+    <dimen name="address_height">60dp</dimen>
+    <dimen name="welcome_text">24sp</dimen>
+    <dimen name="input_text">20dp</dimen>
+    <dimen name="password_text">16sp</dimen>
+	<dimen name="tab_text">10sp</dimen>
+	<dimen name="tool_height">48dp</dimen>
+	
+	<dimen name="divider_selector">0dp</dimen>
+</resources>

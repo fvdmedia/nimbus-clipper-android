@@ -1,0 +1,72 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@android:color/white" >
+    <Button
+        android:id="@+id/bssSettings"
+        android:layout_width="match_parent"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/drawable_subpadding"
+        android:text="@string/action_settings"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/password_text"
+        android:background="@drawable/button_solid_selector"
+        android:drawableLeft="@drawable/setting_gear_active"
+        android:drawablePadding = "2dp"
+		/>
+    <Button
+        android:id="@+id/bssRegister"
+        android:layout_width="match_parent"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+		android:padding="@dimen/drawable_subpadding"
+        android:text="@string/register"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/password_text"
+        android:background="@drawable/button_solid_selector"
+        android:drawableLeft="@drawable/login"
+        android:drawablePadding = "2dp"
+		/>
+    <Button
+        android:id="@+id/bssLogin"
+        android:layout_width="match_parent"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+		android:padding="@dimen/drawable_subpadding"
+        android:text="@string/login"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/password_text"
+        android:background="@drawable/button_solid_selector"
+        android:drawableLeft="@drawable/login"
+        android:drawablePadding = "2dp"
+		/>
+	<Button
+        android:id="@+id/bssRateUs"
+        android:layout_width="match_parent"
+        android:layout_weight="1"
+        android:layout_height="match_parent"
+		android:padding="@dimen/drawable_subpadding"
+        android:text="@string/rate_us"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/password_text"
+        android:background="@drawable/button_solid_selector"
+        android:drawableLeft="@drawable/thumbs_up"
+        android:drawablePadding = "2dp"
+        />
+	
+	<Button
+        android:id="@+id/bssHelp"
+        android:layout_width="match_parent"
+        android:layout_weight="1"
+        android:layout_height="match_parent"
+		android:padding="@dimen/drawable_subpadding"
+        android:text="@string/help"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/password_text"
+        android:background="@drawable/button_solid_selector"
+        android:drawableLeft="@drawable/icon_help"
+        android:drawablePadding = "2dp"
+        />
+</LinearLayout>

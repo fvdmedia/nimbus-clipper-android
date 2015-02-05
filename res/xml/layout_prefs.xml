@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent" >
+
+	<!-- <EditTextPreference
+		 android:key="remoteFolder"
+		 android:summary="Folder for clips"
+		 android:title="My Notes">
+	</EditTextPreference>-->
+<ListPreference
+ 	android:key="remoteFolder"
+ 	android:summary="@string/select_default_folder"
+ 	android:entries="@array/dirs"
+ 	android:entryValues="@array/dirs_values"
+ 	android:title="@string/select_folder">
+</ListPreference>
+<ListPreference
+ 	android:entries="@array/entries"
+ 	android:entryValues="@array/entry_values"
+ 	android:key="clipStyle"
+ 	android:summary="@string/how_to_clip"
+ 	android:title="@string/select_option">
+</ListPreference>
+<ListPreference
+ 	android:entries="@array/user_agents"
+ 	android:entryValues="@array/entry_values"
+ 	android:key="userAgent"
+ 	android:summary="@string/user_agent"
+ 	android:title="@string/select_default_user_agent">
+</ListPreference>
+
+<ListPreference
+ 	android:entries="@array/save_formats"
+ 	android:entryValues="@array/entry_values"
+ 	android:key="saveFormat"
+ 	android:summary="@string/format_to_upload"
+ 	android:title="@string/select_format">
+</ListPreference>
+<CheckBoxPreference 
+          android:key="check_fast" 
+          android:title="Fast sending"
+          android:summary="@string/dontask"/>
+</PreferenceScreen>

@@ -1,0 +1,242 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+<LinearLayout 
+    android:id="@+id/lBrowser"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#00838f"
+     >
+	<ProgressBar
+	       android:id="@+id/progressbar"
+	       style="?android:attr/progressBarStyleHorizontal"
+	       android:layout_width="fill_parent"
+	       android:layout_height="5dp"
+	       android:layout_marginLeft="-5dp"
+	       android:layout_marginRight="-5dp"
+	       android:max="100"
+	       android:visibility="visible" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/base_radius"
+        android:orientation="horizontal"
+        android:background="#00838f" >
+        <AutoCompleteTextView
+            android:id="@+id/etAddess"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:paddingRight="@dimen/base_radius"
+            android:inputType="textUri"
+            android:imeOptions="actionGo"
+            android:textSize="@dimen/password_text"
+            android:textColor="@color/text_normal"
+            android:completionThreshold="1"
+            android:singleLine="true"
+            android:background="@drawable/address">
+
+            <requestFocus android:layout_width="match_parent" />
+
+        </AutoCompleteTextView>
+        <ImageButton
+            android:id="@+id/ibReloadWebPage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/transparent"
+            android:contentDescription="@string/app_name"
+            android:onClick="onReloadWebPage"
+            android:scaleType="fitCenter"
+            android:src="@drawable/button_reload" />
+    </LinearLayout>
+	<View 
+		       android:layout_height="1dp"
+		       android:layout_width="fill_parent"
+		       android:background="@color/grey_shadow"/>
+    <FrameLayout
+        		android:id="@+id/wvWrapper"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                >
+                <com.fvd.browser.fvdWebView
+                    android:id="@+id/wv"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    />
+    </FrameLayout>
+</LinearLayout>
+<View 
+    android:id="@+id/vShadow"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#88000000"
+    android:visibility="gone"
+    />
+			<LinearLayout
+                    android:id="@+id/bZoomStack"
+        			android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+        			android:layout_marginRight="16dp"
+    	    		android:layout_marginBottom="45dp"
+    	    		android:layout_gravity="right|bottom"
+        			android:orientation="vertical"
+        			android:visibility="gone" >
+	                <ImageButton
+    		    		android:id="@+id/bZoomIn"
+    		    		android:layout_width="56dp"
+	                    android:layout_height="56dp"
+    	    			android:src="@drawable/btn_plus"
+    	    			android:background="@drawable/action_button_selector"/>
+                
+                	<ImageButton
+	    	    		android:id="@+id/bZoomOut"
+	    	    		android:layout_marginTop="56dp"
+    		    		android:layout_width="56dp"
+	                    android:layout_height="56dp"
+    	    			android:src="@drawable/btn_minus"
+    	    			android:background="@drawable/action_button_selector"/>
+            	</LinearLayout>  
+            	  
+                <Button
+		        android:id="@+id/bDone"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_gravity="left|bottom"
+		        android:layout_marginLeft="16dp"
+		        android:layout_marginBottom="45dp"
+		        android:background="@drawable/dialog_button_selector"
+		        android:paddingLeft="@dimen/button_padding"
+       			android:paddingRight="@dimen/button_padding"
+		        android:text="@string/done"
+		        android:textColor="@color/text_normal"
+		        android:textSize="@dimen/input_text"
+		        android:visibility="gone" 
+		        />
+                <ImageButton
+                    android:id="@+id/bToggleMenu"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:layout_gravity="right|bottom"
+                    android:layout_marginBottom="45dp"
+                    android:layout_marginRight="16dp"
+                    android:background="@drawable/action_button_not_selected"
+                    android:src="@drawable/btn_plus" />
+                
+                	<ImageButton
+                	    android:id="@+id/bSaveFullPage"
+                	    android:layout_width="56dp"
+                	    android:layout_height="56dp"
+                	    android:layout_gravity="right|bottom"
+                	    android:layout_marginBottom="130dp"
+	            	    android:layout_marginRight="101dp"
+                	    android:background="@drawable/action_button_not_selected"
+                	    android:src="@drawable/btn_article"
+                	   	android:visibility="gone"
+                	    />
+                	
+                	<LinearLayout
+	            	    android:id="@+id/lSaveFullPage"
+	            	    android:layout_width="wrap_content"
+	            	    android:layout_height="wrap_content"
+	            	    android:layout_gravity="right|bottom"
+	            	    android:layout_marginBottom="156dp"
+	            	    android:layout_marginRight="156dp"
+	            	    android:orientation="vertical"
+	            	    android:visibility="gone"
+	            	    > 
+		            	<TextView android:layout_width="wrap_content"
+		            	    android:layout_height="wrap_content" 
+		            	    android:text="@string/bfull_page"
+		            	    android:textColor="@color/text_normal"
+		            	    android:layout_marginRight="10dp"
+		            	    
+						/>
+
+		            	<ImageView
+		            	    android:layout_width="match_parent"
+		            	    android:layout_height="wrap_content"
+		            	    android:scaleType="fitXY"
+		            	    android:src="@drawable/screenshot_line" />
+
+					</LinearLayout>
+            	
+	            	
+					
+	            	<ImageButton
+	            	    android:id="@+id/bSavePageFragment"
+	            	    android:layout_width="56dp"
+	            	    android:layout_height="56dp"
+	            	    android:layout_gravity="right|bottom"
+	            	    android:layout_marginBottom="155dp"
+                	    android:layout_marginRight="16dp"
+	            	    android:background="@drawable/action_button_not_selected"
+	            	    android:src="@drawable/btn_fragment" 
+	            	    android:visibility="gone"
+	            	    />
+	            	
+	            	<LinearLayout
+	            	    android:id="@+id/lSavePageFragment"
+	            	    android:layout_width="wrap_content"
+	            	    android:layout_height="wrap_content"
+	            	    android:layout_gravity="right|bottom"
+	            	    android:layout_marginBottom="206dp"
+	            	    android:layout_marginRight="60dp"
+	            	    android:orientation="vertical"
+	            	    android:visibility="gone"
+	            	    > 
+		            	<TextView android:layout_width="wrap_content"
+		            	    android:layout_height="wrap_content" 
+		            	    android:text="@string/bsave_fragment"
+		            	    android:textColor="@color/text_normal"
+		            	    android:layout_marginRight="10dp"
+						/>
+
+		            	<ImageView
+		            	    android:layout_width="match_parent"
+		            	    android:layout_height="wrap_content"
+		            	    android:scaleType="fitXY"
+		            	    android:src="@drawable/fragment_line" />
+
+					</LinearLayout>
+					
+	            	<ImageButton
+	            	    android:id="@+id/bTakeScreenshot"
+	            	    android:layout_width="56dp"
+	            	    android:layout_height="56dp"
+	            	    android:layout_gravity="right|bottom"
+	            	    android:layout_marginBottom="45dp"
+	            	    android:layout_marginRight="126dp"
+	            	    android:background="@drawable/action_button_not_selected"
+	            	    android:src="@drawable/btn_shot"
+	            	    android:visibility="gone"
+	            	    />
+	            	<LinearLayout
+	            	    android:id="@+id/lTakeScreenshot"
+	            	    android:layout_width="wrap_content"
+	            	    android:layout_height="wrap_content"
+	            	    android:layout_gravity="right|bottom"
+	            	    android:layout_marginBottom="72dp"
+	            	    android:layout_marginRight="181dp"
+	            	    android:orientation="vertical"
+	            	    android:visibility="gone"
+	            	    > 
+		            	<TextView android:layout_width="wrap_content"
+		            	    android:layout_height="wrap_content" 
+		            	    android:text="@string/bscreenshot"
+		            	    android:textColor="@color/text_normal"
+		            	    android:layout_marginRight="10dp"
+		            	    
+						/>
+
+		            	<ImageView
+		            	    android:layout_width="match_parent"
+		            	    android:layout_height="wrap_content"
+		            	    android:scaleType="fitXY"
+		            	    android:src="@drawable/screenshot_line" />
+
+					</LinearLayout>
+</FrameLayout>

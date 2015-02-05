@@ -1,0 +1,166 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rlMain"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/dkBack"
+    tools:context=".LoginPageActivity" >
+    
+	<LinearLayout
+	    android:id="@+id/linearLayout1"
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+	    android:layout_marginBottom="0dp"
+		android:layout_marginLeft="0dp"
+		android:layout_marginRight="0dp"
+		android:layout_marginTop="60dp"
+	    android:background="@color/ltBack"
+	    android:gravity="center"
+	    android:orientation="vertical" >
+		<ImageView
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:background="@drawable/setting_selector"
+	        android:contentDescription="@string/settings"
+	        android:layout_marginTop="40dp"
+	        android:src="@drawable/settinggear" />
+		    <Button
+		        android:id="@+id/bsSetting"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_gravity="center_horizontal"
+		        android:layout_marginLeft="70dp"
+		        android:layout_marginRight="70dp"
+		        android:layout_marginTop="20dp"
+		        android:layout_marginBottom="10dp"
+		        android:background="@drawable/simple_button_selector"
+		        android:text="@string/settings"
+		        android:textColor="@color/text_normal"
+		        android:textSize="@dimen/input_text"
+		        />
+		    <Button
+		        android:id="@+id/bsRegister"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_gravity="center_horizontal"
+		        android:layout_marginLeft="70dp"
+		        android:layout_marginRight="70dp"
+		        android:layout_marginTop="10dp"
+		        android:layout_marginBottom="10dp"
+		        android:background="@drawable/simple_button_selector"
+		        android:text="@string/register"
+		        android:textColor="@color/text_normal"
+		        android:textSize="@dimen/input_text"
+		        />
+		    <Button
+		        android:id="@+id/bsRateUs"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_gravity="center_horizontal"
+		        android:layout_marginLeft="70dp"
+		        android:layout_marginRight="70dp"
+		        android:layout_marginTop="10dp"
+		        android:layout_marginBottom="10dp"
+		        android:background="@drawable/simple_button_selector"
+		        android:paddingLeft="@dimen/welcome_text"
+		        android:paddingRight="@dimen/welcome_text"
+		        android:text="@string/rate_us"
+		        android:textColor="@color/text_normal"
+		        android:textSize="@dimen/input_text"
+		        />
+		    <Button
+		        android:id="@+id/bsLicenses"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_gravity="center_horizontal"
+		        android:layout_marginLeft="70dp"
+		        android:layout_marginRight="70dp"
+		        android:layout_marginTop="10dp"
+		        android:layout_marginBottom="10dp"
+		        android:background="@drawable/simple_button_selector"
+		        android:paddingLeft="@dimen/welcome_text"
+		        android:paddingRight="@dimen/welcome_text"
+		        android:text="@string/licenses"
+		        android:textColor="@color/text_normal"
+		        android:textSize="@dimen/input_text"
+		        />
+		    <Button
+		        android:id="@+id/bsHelp"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_gravity="center_horizontal"
+		        android:layout_marginLeft="70dp"
+		        android:layout_marginRight="70dp"
+		        android:layout_marginTop="10dp"
+		        android:layout_marginBottom="10dp"
+		        android:background="@drawable/simple_button_selector"
+		        android:text="@string/help"
+		        android:textColor="@color/text_normal"
+		        android:textSize="@dimen/input_text"
+		        />
+		    
+
+		    <!-- <TextView
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:gravity="center_horizontal"
+		        android:shadowColor="@color/text_shadow"
+		        android:shadowDx="1"
+		        android:shadowDy="1"
+		        android:shadowRadius="1"
+		        android:text="@string/or"
+		        android:textColor="@color/buttonBGoff"
+		        android:textSize="@dimen/input_text"
+		        android:textStyle="bold" />
+
+		    <Button
+		        android:id="@+id/bWorkOffline"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_gravity="center_horizontal"
+		        android:layout_marginBottom="4sp"
+		        android:layout_marginLeft="@dimen/password_text"
+		        android:layout_marginRight="@dimen/password_text"
+		        android:layout_marginTop="4sp"
+		        android:background="@drawable/button_selector"
+		        android:paddingLeft="@dimen/welcome_text"
+		        android:paddingRight="@dimen/welcome_text"
+		        android:text="@string/work_offline"
+		        android:textColor="@android:color/white"
+		        android:textSize="@dimen/input_text"
+		        android:textStyle="bold" /> -->
+
+		    
+		    <!-- <Button
+		        android:id="@+id/bRestoreAccount"
+		        android:layout_width="wrap_content"
+		        android:layout_height="34sp"
+		        android:layout_gravity="center_horizontal"
+		        android:background="#0FFF"
+		        android:text="@string/forgot"
+		        android:textColor="@color/buttonBGoff"
+		        android:textSize="@dimen/password_text"
+		        /> -->
+	</LinearLayout>
+
+    <!-- <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:adjustViewBounds="true"
+        android:src="@drawable/ic_launcher"
+        android:contentDescription="@string/app_name" />-->
+        
+	<ImageView
+        android:id="@+id/llauncher" 
+        android:layout_width="110dp"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="16dp"
+        android:adjustViewBounds="true"
+        android:src="@drawable/nimbus_logo"
+        android:contentDescription="@string/app_name" />
+	
+</RelativeLayout>

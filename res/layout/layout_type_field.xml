@@ -1,0 +1,49 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+	android:background="@color/transparent"
+    android:orientation="vertical" >
+
+    <EditText
+        android:id="@+id/etEditorText"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="top"
+        android:layout_weight="1"
+        android:background="@drawable/container_edittext"
+        android:hint="@string/text_hint"
+        android:maxLines="100"
+        android:minLines="3"
+        android:padding="@dimen/drawable_subpadding"
+        android:textColor="@color/buttonBGoff"
+        android:textSize="@dimen/password_text" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@color/transparent"
+        android:gravity="center"
+        android:orientation="horizontal" >
+
+    
+    <ImageButton
+		        android:id="@+id/bStroke"
+		        android:layout_width="55dp"
+		        android:layout_height="50dp"
+		        android:layout_margin="10dp"
+		        android:src="@drawable/stroke_selector"
+		        android:background="@color/transparent"
+		        android:scaleType="fitCenter"
+				android:contentDescription="@string/blur" />
+    <ImageButton
+		        android:id="@+id/bApplyText"
+		        android:layout_width="55dp"
+		        android:layout_height="50dp"
+		        android:layout_margin="10dp"
+		        android:src="@drawable/text_ok"
+		        android:background="@color/transparent"
+		        android:scaleType="fitCenter"
+				android:contentDescription="@string/blur" />
+	</LinearLayout>
+</LinearLayout>

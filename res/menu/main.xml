@@ -1,0 +1,5 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item android:title="Settings" android:titleCondensed="Settings" android:id="@+id/om_settings"></item>
+    <!-- <item android:title="Log In" android:titleCondensed="Log In" android:id="@+id/om_login"></item> -->
+    <item android:title="Home" android:titleCondensed="Home" android:id="@+id/om_home"></item>
+</menu>

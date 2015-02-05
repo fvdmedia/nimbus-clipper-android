@@ -1,0 +1,75 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/ltBack"
+    android:orientation="vertical" >
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+	android:background="@color/ltBack"
+	android:layout_marginLeft="0dp"
+	android:layout_marginRight="0dp"
+	android:layout_marginBottom="0dp"
+	android:layout_marginTop="@dimen/address_height"
+    android:orientation="vertical" >
+    
+ <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
+        android:gravity="center_horizontal"
+        android:text="@string/register_to_save"
+        android:textColor="@color/text_normal"
+        android:textSize="@dimen/password_text"
+        android:textStyle="bold"
+        android:layout_margin="@dimen/password_text"
+                />
+    <EditText
+		        android:id="@+id/etrLogin"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_margin="@dimen/password_text"
+		        android:textColorHint="@color/text_normal"
+		        android:gravity="center_horizontal"
+		        android:hint="@string/username_hint"
+		        android:padding="@dimen/password_text"
+		        android:inputType="textEmailAddress"
+		        android:textColor="@color/text_normal"
+		        android:textSize="@dimen/password_text" >
+		        <!-- <requestFocus /> -->
+		    </EditText>
+
+		    <EditText
+		        android:id="@+id/etrPassword"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_marginLeft="@dimen/password_text"
+		        android:layout_marginRight="@dimen/password_text"
+		        android:gravity="center_horizontal"
+		        android:hint="@string/password_hint"
+		        android:textColorHint="@color/text_normal"
+		        android:inputType="textPassword"
+		        android:padding="@dimen/password_text"
+		        android:textColor="@color/text_normal"
+		        android:textSize="@dimen/password_text" />     
+    <Button
+        android:id="@+id/brRegister"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/password_text"
+        android:paddingLeft="@dimen/input_text"
+        android:paddingRight="@dimen/input_text"
+        android:background="@drawable/simple_button_selector"
+        android:minHeight="48dp"
+        android:text="@string/register"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/password_text"
+        
+		/>
+
+
+
+</LinearLayout>
+</LinearLayout>

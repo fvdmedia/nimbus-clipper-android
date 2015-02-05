@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:titleCondensed="Edit" android:title="Edit" android:id="@+id/b_edit_id"></item>
+    <item android:titleCondensed="Save" android:title="Save image" android:id="@+id/b_save_id"></item>
+    <item android:titleCondensed="Upload" android:title="Upload image" android:id="@+id/b_upload_id"></item>
+    <item android:id="@+id/clear_id" android:titleCondensed="Clear" android:title="Clear"></item>
+    <item android:titleCondensed="Color" android:title="Change Color" android:id="@+id/change_paint_id" android:visible="true" android:showAsAction="ifRoom">
+        <menu>
+            <item android:title="White" android:titleCondensed="White" android:id="@+id/p_white_id"></item>
+            <item android:title="Blue" android:titleCondensed="Blue" android:id="@+id/p_blue_id"></item>
+            <item android:title="Light Blue" android:id="@+id/p_lblue_id" android:titleCondensed="Light Blue" ></item>
+            <item android:titleCondensed="Green" android:title="Green" android:id="@+id/p_green_id"></item>
+            <item android:titleCondensed="Pink" android:title="Pink" android:id="@+id/p_pink_id"></item>
+            <item android:titleCondensed="Red" android:title="Red" android:id="@+id/p_red_id"></item>
+            <item android:titleCondensed="Yellow" android:title="Yellow" android:id="@+id/p_yellow_id"></item>
+            <item android:titleCondensed="Black" android:title="Black" android:id="@+id/p_black_id"></item>
+            <item android:titleCondensed="Random" android:title="Random" android:id="@+id/p_random_id"></item>
+		</menu>
+	</item>
+    <item android:id="@+id/change_width_id" android:title="Change Width" android:titleCondensed="Width">
+        <menu>
+            <!-- <item android:id="@+id/w_xsmall" android:title="Extra Small" android:titleCondensed="XS"></item>-->
+            <item android:id="@+id/w_small" android:title="Small" android:titleCondensed="S"></item>
+            <item android:id="@+id/w_medium" android:title="Medium" android:titleCondensed="M"></item>
+            <item android:titleCondensed="L" android:id="@+id/w_large" android:title="Large"></item>
+            <item android:titleCondensed="XL" android:id="@+id/w_xlarge" android:title="Extra Large"></item>
+        </menu>
+    </item>
+    <item android:id="@+id/change_shape" android:title="Change Shape" android:titleCondensed="Shape" android:visible="true" android:showAsAction="ifRoom">
+        <menu>
+            <item android:titleCondensed="FH" android:id="@+id/sh_freehand" android:title="Free Hand"></item>
+            <item android:titleCondensed="AR" android:id="@+id/sh_arrow" android:title="Arrow"></item>
+            <item android:titleCondensed="Ln" android:id="@+id/sh_line" android:title="Line"></item>
+            <item android:titleCondensed="Rc" android:id="@+id/sh_rect" android:title="Rectangle"></item>
+            <item android:titleCondensed="RRc" android:id="@+id/sh_rrect" android:title="Round Rect"></item>
+            <item android:titleCondensed="Cl" android:id="@+id/sh_circle" android:title="Circle"></item>
+            <item android:titleCondensed="Ov" android:id="@+id/sh_oval" android:title="Oval"></item>
+            <item android:titleCondensed="Px" android:id="@+id/sh_pixel" android:title="Pixelate"></item>
+        </menu>
+    </item>
+</menu>

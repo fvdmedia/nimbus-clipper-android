@@ -1,0 +1,60 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/transparent"
+    android:orientation="vertical" >
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+	android:background="@color/dkBack"
+	android:layout_margin="0dp"
+    android:orientation="vertical" >
+    
+	<WebView
+		    android:id="@+id/wvPreview"
+		    android:layout_width="match_parent"
+		    android:layout_weight="1"
+		    android:layout_height="0dp"
+		/>
+
+	<LinearLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_margin="14dp"
+	    android:gravity="bottom"
+	    android:orientation="horizontal" >
+
+    
+    <Button
+        android:id="@+id/bCancel"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/thin_button_selector"
+        android:minHeight="36dp"
+        android:layout_weight="1"
+        android:paddingLeft="@dimen/btn_radius"
+        android:paddingRight="@dimen/btn_radius"
+        android:text="@string/cancel"
+        android:textColor="@android:color/white"
+        android:textSize="14sp"
+        />
+    <Button
+        android:id="@+id/bSave2Nimbus"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/password_text"
+        android:background="@drawable/thin_button_selector"
+        android:paddingLeft="@dimen/btn_radius"
+        android:paddingRight="@dimen/btn_radius"
+        android:minHeight="36dp"
+        android:layout_weight="1"
+        android:text="@string/save"
+        android:textColor="@android:color/white"
+        android:textSize="14sp"
+        />
+    
+</LinearLayout>
+
+</LinearLayout>
+</LinearLayout>

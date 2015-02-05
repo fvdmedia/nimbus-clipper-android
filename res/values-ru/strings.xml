@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<!-- STRINGS -->
+    <string name="app_name">Nimbus Clipper</string>
+    <string name="settings">Настройки</string>
+    
+    <string name="preview">Предпросмотр</string>
+    
+    <string name="please_wait">немного терпения...</string>
+    <string name="choose_folder">Выберите директорию</string>
+    <string name="dontask">не спрашивать папку и теги</string>
+    
+    <string name="welcome_to">Добро пожаловать в</string>
+    <string name="action_settings">Настройки</string>
+    <string name="username_hint">email</string>
+    <string name="password_hint">пароль</string>
+    <string name="text_hint">Можете писать тут</string>
+    <string name="login">Войти</string>
+    <string name="logout">Выйти</string>
+    <string name="register">Регистрация</string>
+    <string name="or">или</string>
+    <string name="ok">OK</string>
+    <string name="guide">Nimbus Clipper поможет вам:</string>
+    <string name="rate_us">Оцените нас!</string>
+    <string name="work_offline">Без аккаунта</string>
+    <string name="create_new_account"><u>Создать аккаунт в Nimbus</u></string>
+    <string name="goto_nimbus"><u>Go to Nimbus Clipper</u></string>
+	<string name="forgot"><u>Забыли пароль?</u></string>
+    <string name="lets_start">Nimbus Clipper</string>
+    <string name="take_photo">Сделать Фото</string>
+    <string name="from_gallery">Взять из галереи</string>
+    <string name="web_clipper">Веб-клиппер</string>
+    <string name="home">Домой</string>
+    <string name="tag_hint">Укажите теги</string>
+    
+    <string name="save_full">Вся страница</string>
+    <string name="save_fragment">Только фрагмент</string>
+    <string name="take_screenshot">Скриншот</string>
+    <string name="save_page">Сохранить страницу</string>
+    <string name="save_image">Сохранить картинку</string>
+    <string name="impossible_save_fragment">Не получилось сохранить в Nimbus</string>
+    <string name="try_again">Повторить</string>
+    <string name="saving_fragment">Отправляется в Nimbus</string>
+    <string name="success_save_fragment">Фрагмент успешно сохранен в Nimbus</string>
+    <string name="success_save_shot">Изображение сохранено в Nimbus</string>
+    <string name="success_save_pdf">Документ сохранен в Nimbus</string>
+    <string name="fragment_name_is">Имя фрагмента</string>
+    <string name="fragment_name">Postnews.com</string>
+    <string name="article_link">Прямая ссылка:</string>
+    <string name="get_link">Ссылка</string>
+    <string name="copy_clipboard">В буфер обмена</string>
+    <string name="share">Поделиться</string>
+    <string name="get_public_link">Cсылка</string>
+    <string name="undo">Вернуть</string>
+    <string name="undo_all">Вернуть Всё</string>
+    <string name="help">Справка</string>
+    <string name="turn_left">Налево</string>
+    <string name="turn_right">Направо</string>
+    <string name="blur">Скрыть</string>
+    <string name="blur_all">Скрыть всё</string>
+    <string name="login_to_save">Чтобы сохранить, вам нужно войти в свой аккаунт Nimbus</string>
+    <string name="register_to_save">Чтобы сохранить, вам нужно иметь аккаунт в Nimbus</string>
+    <string name="type">Текст</string>
+    <string name="line">Линия</string>
+    <string name="ink">Карандаш</string>
+	<string name="rect">Прямоугольник</string>
+	<string name="arrow">Стрелка</string>
+    <string name="standart_size">40</string>
+    <string name="h1_title">Сохранять статьи</string>
+    <string name="h2_title">Сохранять фрагменты сайтов</string>
+    <string name="h3_title">Делать и редактировать скриншоты</string>
+    <string name="h4_title">Читать и изменять PDF документы</string>
+    <string name="h5_title">Делиться заметками с друзьями и коллегами</string>
+    
+    <string name="save_article_mask">%s был успешно сохранен(а) в Nimbus</string>
+    <string name="full_page">Страница</string>
+    <string name="article">Статья</string>
+    <string name="fragment">Фрагмент</string>
+    <string name="invalid_email">неправильный email адрес</string>
+    <string name="incorrect_password">неправильный пароль</string>
+    <string name="mobile">Мобильный</string>
+    <string name="desktop">Десктопный</string>
+    <string name="save_all_styles">Сохранять стили</string>
+    <string name="without_style_saving">Без сохранения стилей</string>
+    <string name="short_password">пароль не может быть короче 8 символов</string>
+    <string name="use_longtap">Сделайте тап на нужном фрагменте, чтобы его выбрать для сохранения</string>
+    <string name="uploading_to_Nimbus">Загрузка в Nimbus</string>
+    <string name="select_default_folder">Директория по-умолчанию</string>
+    <string name="select_folder">Выберите директорию</string>
+    <string name="how_to_clip">В каком виде сохранять страницы?</string>
+    <string name="select_option">Выберите опцию</string>
+    <string name="user_agent">User Agent</string>
+    <string name="select_default_user_agent">Выберите User Agent-а по умопчанию</string>
+    <string name="do_save_image">Сохранить изображение?</string>
+    <string name="save_yes">Сохранить</string>
+    <string name="save_no">Не сохранять</string>
+    <string name="cancel">Отмена</string>
+    <string name="rate">Оцените</string>
+    <string name="rate_text">Нам очень интересно Ваше мнение о Nimbus Clipper</string>
+    <string name="rate_awesome">Отлично!</string>
+    <string name="rate_average">Неплохо</string>
+    <string name="rate_sucks">Он ужасен!</string>
+    <string name="select_format">Выберите Фотмат изображения</string>
+    <string name="format_to_upload">Формат изображения</string>
+    
+    <string name="restore_pass">Напоминание пароля</string>
+    <string name="restore">Напомнить</string>
+    <string name="wait_load">Пожалуйста дождитесь полной загрузки страницы</string>
+
+    <string name="no_media_warning">Носитель не найден</string>
+	<string name="no_media_hint">Sharing the storage media with a PC can make it inaccessible</string>
+	<string name="search_backwards">Search backwards</string>
+	<string name="search_forwards">Search forwards</string>
+	<string name="search_document">Search document</string>
+	<string name="outline_title">Содержание</string>
+	<string name="enter_password">Введите пароль</string>
+	<string name="text_not_found">Текст не найдет</string>
+	<string name="searching_">Поис&#8230;</string>
+	<string name="toggle_links">Highlight and enable links</string>
+	<string name="no_further_occurrences_found">No further occurrences found</string>
+	<string name="select">Select</string>
+	<string name="search">Поиск</string>
+	<string name="copy">Копия</string>
+	<string name="strike_out">Зачеркнуть</string>
+	<string name="delete">Удаление</string>
+	<string name="highlight">Выделене</string>
+	<string name="underline">Подчеркивание</string>
+	<string name="edit_annotations">Редактировать анотацию</string>
+	<string name="save">Сохранить</string>
+	<string name="print">Print</string>
+	<string name="dismiss">Dismiss</string>
+	<string name="parent_directory">...</string>
+	<string name="yes">Да</string>
+	<string name="no">Нет</string>
+	<string name="entering_reflow_mode">Entering reflow mode</string>
+	<string name="leaving_reflow_mode">Leaving reflow mode</string>
+	<string name="print_failed">Print failed</string>
+	<string name="select_text">Выделите текст</string>
+	<string name="copied_to_clipboard">Скопировано в буфер</string>
+	<string name="no_text_selected">Нет выделенного текста</string>
+	<string name="draw_annotation">Рисовать анотацию</string>
+	<string name="nothing_to_save">Nothing to save</string>
+	<string name="document_has_changes_save_them_">Документ был изменен. Сохранить?</string>
+	<string name="cannot_open_document">Невозможно открыть документ</string>
+	<string name="cannot_open_document_Reason">Невозможно открыть документ: %1$s</string>
+	<string name="cannot_open_file_Path">Невозможно открыть файл: %1$s</string>
+	<string name="cannot_open_buffer">Невозможно открыть буфер</string>
+	<string name="fill_out_text_field">Fill out text field</string>
+	<string name="okay">ОК</string>
+	<string name="choose_value">Выберите значение</string>
+	<string name="not_supported">Not supported</string>
+	<string name="copy_text_to_the_clipboard">Copy text to the clipboard</string>
+	<string name="more">Далее</string>
+	<string name="accept">Принять</string>
+	<string name="copy_text">копировать текст</string>
+	<string name="format_currently_not_supported">Формат не поддерживается</string>
+	<string name="toggle_reflow_mode">Toggle reflow mode</string>
+	<string name="last_open">Recently opened files</string>
+	<string name="delete_opened_file">Удалить</string>
+	<string name="alert">Внимание</string>
+	<string name="picker_title_App_Ver_Dir">%1$s %2$s: %3$s</string>
+	<string name="version">1.0</string>
+	<string name="saved">Сохранен</string>
+	<string name="please_tap">Пожалуйсто тапните для указания позиции комментария</string>
+    
+    <string name="pdf_annotate">Работа с PDF</string>
+    <string name="done">Готово</string>
+    
+    <string name="use">Используйте</string>
+    <string name="nimbus_note"><u>Nimbus Note</u></string>
+    <string name="to_see">чтобы увидеть ваши заметки</string>
+    <string name="use_nimbus"><u>Используйте Nimbus Note чтобы увидеть ваши заметки</u></string>
+    <string name="start_using">Start using Nimbus Clipper</string>
+    
+    <string name="bscreenshot">Скриншот</string>
+    <string name="bfull_page">Сохранить статью</string>
+    <string name="bsave_fragment">Сохранить фрагмент</string>
+    <string name="select_pdf">Выберите PDF</string>
+    <string name="licenses">Лицензии</string>
+    
+    <string-array name="entries">
+		<item>Сохранять стили</item>
+		<item>Без сохранения стилей</item>
+	</string-array>
+	<string-array name="user_agents">
+		<item>Мобильный</item>
+		<item>Десктопный</item>
+	</string-array>
+	
+	<string-array name="save_formats">
+		<item>JPEG</item>
+		<item>PNG</item>
+	</string-array>
+	
+	<string-array name="entry_values">
+		<item>1</item>
+		<item>0</item>
+	</string-array>
+	
+	<string-array name="dirs">
+		<item>Мои заметки</item>
+	</string-array>
+	<string-array name="dirs_values">
+		<item>по умолчанию</item>
+	</string-array>
+    
+    
+</resources>
