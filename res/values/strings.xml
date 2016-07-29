@@ -5,16 +5,18 @@
     <string name="settings">Settings</string>
     
     <string name="preview">Preview</string>
-    
+    <string name="select_tags">Select Tags</string>
     <string name="please_wait">please wait...</string>
     <string name="choose_folder">Choose folder</string>
     <string name="dontask">don\'t ask folder and tags</string>
     <string name="welcome_to">Welcome to</string>
     <string name="action_settings">Settings</string>
     <string name="username_hint">email</string>
+    <string name="title_hint">set title</string>
     <string name="password_hint">password</string>
     <string name="text_hint">Type your text here</string>
     <string name="login">Log in</string>
+    <string name="login_via">Login via</string>
     <string name="logout">Log out</string>
     <string name="register">Register</string>
     <string name="or">or</string>
@@ -91,6 +93,11 @@
     <string name="save_yes">Save</string>
     <string name="save_no">Don\'t save</string>
     
+    <string name="mk_folder">Add folder</string>
+    <string name="mk_sfolder">Add subfolder</string>
+    <string name="mk_tag">Add tag</string>
+    <string name="mkh_folder">folder name</string>
+    <string name="mkh_tag">tag name</string>
     <string name="rate">Rate</string>
     <string name="rate_text">How do you appreciate our App?</string>
     <string name="rate_awesome">Awesome!</string>
@@ -179,8 +186,12 @@
     <string name="pdf_file_is_protected">This file is protected, you can\'t edit.</string>
     <string name="licenses">Licenses</string>
     <string name="license_title">Information</string>
-    <string name="license">PDFView is based on the excellent MuPDF library v1.6. It is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version\u00a03 of the License, or (at your option) any later version.\n\nPDFView is not a PDF viewer in the sense of displaying PDF files, there is no graphical user interface and the app is not supposed to be started directly. Instead, it is a PDF viewer that provides PDF rendering service to other apps via a documented interface.\n\nAt the moment, the app is only used by LectureNotes for PDF rendering, but all other Android developers are invited to include an interface to PDFView into their apps and use PDFView for PDF rendering. Details of the interface can be found in the source of PDFView available at http://www.acadoid.com/src/pdfview.tgz, or contact the developer at devel@acadoid.com.\n\nClicking on `OK´ will close PDFView.\n\nVersion 1.8 of October 4, 2014</string>
-    
+    <string name="fast_send">Faster upload</string>
+   	<string name="pdf_finger">Using your finger, select text that you need and tap on the checkmark</string>
+    <string name="got_it">I got it</string>
+    <string name="chk_intenet">please check internet connection</string>
+    <string name="sync_err">sync error</string>
+   	
     <string-array name="entries">
 		<item>Save all styles</item>
 		<item>Without style saving</item>
@@ -207,5 +218,17 @@
 		<item>default</item>
 	</string-array>
     
+	<string-array name="lmenu_browser">
+        <item>Take Photo</item>
+        <item>From Gallery</item>
+        <item>Annotate PDF</item>
+    </string-array>
+    
+	<string-array name="lmenu_paint">
+        <item>Take Photo</item>
+        <item>From Gallery</item>
+        <item>Web Clipper</item>
+        <item>Annotate PDF</item>
+    </string-array>
     
 </resources>

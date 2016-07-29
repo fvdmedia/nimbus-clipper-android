@@ -1,24 +1,23 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/ltBack"
-    android:orientation="vertical" >
+    >
 
 <LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="@dimen/login_form_width"
+    android:layout_height="wrap_content"
 	android:background="@color/ltBack"
-	android:layout_marginLeft="0dp"
-	android:layout_marginRight="0dp"
-	android:layout_marginBottom="0dp"
-	android:layout_marginTop="0dp"
-    android:orientation="vertical" >
+	android:layout_gravity="center"
+    android:orientation="vertical"
+    android:layout_marginBottom="32dp"
+    >
     
  <TextView
       	android:id="@+id/tvLogin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="left"
+        android:layout_gravity="center_horizontal"
         android:gravity="center_horizontal"
         android:text="@string/login_to_save"
         android:textColor="@color/text_normal"
@@ -30,7 +29,7 @@
         android:id="@+id/tvRegister"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="left"
+        android:layout_gravity="center_horizontal"
         android:gravity="center_horizontal"
         android:text="@string/register_to_save"
         android:textColor="@color/text_normal"
@@ -50,7 +49,9 @@
 		        android:padding="@dimen/password_text"
 		        android:inputType="textEmailAddress"
 		        android:textColor="@color/text_normal"
-		        android:textSize="@dimen/password_text" >
+		        android:textCursorDrawable="@drawable/color_cursor"
+		        android:textSize="@dimen/password_text"
+		        android:imeOptions="actionNext" >
 		        <!-- <requestFocus /> -->
 		    </EditText>
 
@@ -66,36 +67,79 @@
 		        android:inputType="textPassword"
 		        android:padding="@dimen/password_text"
 		        android:textColor="@color/text_normal"
+		        android:textCursorDrawable="@drawable/color_cursor"
 		        android:textSize="@dimen/password_text" />     
     <Button
         android:id="@+id/blogin"
+        style="@style/BigBorderButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="@dimen/password_text"
-        android:paddingLeft="@dimen/input_text"
-        android:paddingRight="@dimen/input_text"
-        android:background="@drawable/simple_button_selector"
-        android:minHeight="48dp"
         android:text="@string/login"
-        android:textColor="@android:color/white"
-        android:textSize="@dimen/password_text"
 		/>
     <Button
         android:id="@+id/bRegister"
+        style="@style/BigBorderButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="@dimen/password_text"
-        android:paddingLeft="@dimen/input_text"
-        android:paddingRight="@dimen/input_text"
-        android:background="@drawable/simple_button_selector"
-        android:minHeight="48dp"
         android:text="@string/register"
-        android:textColor="@android:color/white"
-        android:textSize="@dimen/input_text"
-        android:textStyle="bold"
         android:visibility="gone"/>
+   <LinearLayout 
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:orientation="horizontal"
+		        android:layout_marginTop="20dp"
+		        android:layout_gravity="center_horizontal">
+		        <LinearLayout 
+		            android:id="@+id/bFLogin"
+		            android:layout_width="wrap_content" 
+		            android:layout_height="wrap_content" 
+		            android:orientation="horizontal"
+		            android:clickable="true"
+		            android:onClick="onClick"
+		            android:gravity="center_vertical">
+		            <TextView 
+		                android:layout_width="wrap_content"
+			        	android:layout_height="wrap_content"
+		                android:text="@string/login_via"
+				        android:textColor="@android:color/white"
+				        android:textSize="@dimen/password_text"
+				        />
+		            <ImageView 
+		                android:layout_width="32dp"
+		                android:layout_height="32dp"
+		                android:src="@drawable/facebook_ic"
+		                android:layout_margin="8dp"
+		                />
+		        </LinearLayout>
+
+		        <LinearLayout 
+		            android:id="@+id/bGLogin"
+		            android:layout_width="wrap_content" 
+		            android:layout_height="wrap_content" 
+		            android:orientation="horizontal"
+		            android:clickable="true"
+		            android:onClick="onClick"
+		            android:gravity="center_vertical"
+		            android:layout_marginLeft="10dp">
+		            <TextView 
+		                android:layout_width="wrap_content"
+			        	android:layout_height="wrap_content"
+		                android:text="@string/login_via"
+				        android:textColor="@android:color/white"
+				        android:textSize="@dimen/password_text"
+				        />
+		            <ImageView 
+		                android:layout_width="32dp"
+		                android:layout_height="32dp"
+		                android:src="@drawable/google_ic"
+		                android:layout_margin="8dp"
+		                />
+		        </LinearLayout>
+		    </LinearLayout>
 
 <TextView
 		        android:id="@+id/tvOr"
@@ -120,4 +164,4 @@
 		        />
 
 </LinearLayout>
-</LinearLayout>
+</FrameLayout>

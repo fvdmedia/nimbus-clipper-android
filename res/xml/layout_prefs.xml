@@ -39,6 +39,6 @@
 </ListPreference>
 <CheckBoxPreference 
           android:key="check_fast" 
-          android:title="Fast sending"
+          android:title="@string/fast_send"
           android:summary="@string/dontask"/>
 </PreferenceScreen>

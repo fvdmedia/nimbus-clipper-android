@@ -6,17 +6,18 @@
     android:background="@color/dkBack"
     >
     
-	<LinearLayout
-	    android:id="@+id/linearLayout1"
+	<FrameLayout
 	    android:layout_width="match_parent"
 	    android:layout_height="match_parent"
-	    android:layout_marginBottom="0dp"
-		android:layout_marginLeft="0dp"
-		android:layout_marginRight="0dp"
-		android:layout_marginTop="60dp"
+		android:layout_marginTop="@dimen/top_bar_height"
 	    android:background="@color/ltBack"
 	    android:gravity="center"
-	    android:orientation="vertical" >
+	   >
+		    <LinearLayout 
+		        android:layout_width="@dimen/login_form_width"
+		        android:layout_height="wrap_content"
+		        android:orientation="vertical"
+		        android:layout_gravity="center">
 		    <EditText
 		        android:id="@+id/etUsername"
 		        android:layout_width="match_parent"
@@ -28,7 +29,9 @@
 		        android:padding="@dimen/password_text"
 		        android:inputType="textEmailAddress"
 		        android:textColor="@color/text_normal"
-		        android:textSize="@dimen/password_text" >
+		        android:textSize="@dimen/password_text"
+		        android:textCursorDrawable="@drawable/color_cursor"
+		        android:imeOptions="actionNext" >
 		        <!-- <requestFocus /> -->
 		    </EditText>
 
@@ -44,24 +47,74 @@
 		        android:inputType="textPassword"
 		        android:padding="@dimen/password_text"
 		        android:textColor="@color/text_normal"
-		        android:textSize="@dimen/password_text" />
+		        android:textSize="@dimen/password_text"
+		        android:textCursorDrawable="@drawable/color_cursor"
+				/>
 
 		    <Button
 		        android:id="@+id/bLogin"
+		        style="@style/xBorderButton"
 		        android:layout_width="wrap_content"
 		        android:layout_height="wrap_content"
 		        android:layout_gravity="center_horizontal"
 		        android:layout_marginTop="30dp"
 		        android:layout_marginLeft="@dimen/password_text"
 		        android:layout_marginRight="@dimen/password_text"
-		        android:layout_marginBottom="60dp"
-		        android:background="@drawable/button_selector"
-		        android:paddingLeft="@dimen/button_padding"
-		        android:paddingRight="@dimen/button_padding"
+		        android:layout_marginBottom="20dp"
 		        android:text="@string/login"
-		        android:textColor="@android:color/white"
-		        android:textSize="@dimen/input_text"
+		        
 		        />
+		    <LinearLayout 
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:orientation="horizontal"
+		        android:layout_gravity="center_horizontal">
+		        <LinearLayout 
+		            android:id="@+id/bFLogin"
+		            android:layout_width="wrap_content" 
+		            android:layout_height="wrap_content" 
+		            android:orientation="horizontal"
+		            android:clickable="true"
+		            android:gravity="center_vertical">
+		            <TextView 
+		                android:layout_width="wrap_content"
+			        	android:layout_height="wrap_content"
+		                android:text="@string/login_via"
+				        android:textColor="@android:color/white"
+				        android:textSize="@dimen/password_text"
+				        />
+		            <ImageView 
+		                android:layout_width="32dp"
+		                android:layout_height="32dp"
+		                android:src="@drawable/facebook_ic"
+		                android:layout_margin="8dp"
+		                />
+		        </LinearLayout>
+
+		        <LinearLayout 
+		            android:id="@+id/bGLogin"
+		            android:layout_width="wrap_content" 
+		            android:layout_height="wrap_content" 
+		            android:orientation="horizontal"
+		            android:clickable="true"
+		            android:gravity="center_vertical"
+		            android:layout_marginLeft="10dp">
+		            <TextView 
+		                android:layout_width="wrap_content"
+			        	android:layout_height="wrap_content"
+		                android:text="@string/login_via"
+				        android:textColor="@android:color/white"
+				        android:textSize="@dimen/password_text"
+				        />
+		            <ImageView 
+		                android:layout_width="32dp"
+		                android:layout_height="32dp"
+		                android:src="@drawable/google_ic"
+		                android:layout_margin="8dp"
+		                />
+		        </LinearLayout>
+		    </LinearLayout>
+		    </LinearLayout>
 
 		    <!-- <TextView
 		        android:layout_width="match_parent"
@@ -104,7 +157,7 @@
 		        android:textColor="@color/buttonBGoff"
 		        android:textSize="@dimen/password_text"
 		        /> -->
-	</LinearLayout>
+	</FrameLayout>
 
     <!-- <ImageView
         android:layout_width="wrap_content"
@@ -117,11 +170,11 @@
         
 	<ImageView
         android:id="@+id/llauncher" 
-        android:layout_width="110dp"
+        android:layout_width="@dimen/logo_width"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="@dimen/logo_top_margin"
         android:adjustViewBounds="true"
         android:src="@drawable/nimbus_logo"
         android:contentDescription="@string/app_name" />

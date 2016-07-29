@@ -5,6 +5,7 @@
     <color name="buttonBGon">#00b8d4</color>
     <color name="text_shadow">#FFFF</color>
     <color name="dkBack">#0097a7</color>
+    <color name="dsOrange">#e85100</color>
     
     <color name="grey_shadow">#707070</color>
     <color name="button_start">#1293aa</color>
@@ -18,6 +19,7 @@
     
     <color name="transparent">#0FFF</color>
     <color name="semitransparent">#99000000</color>
+    <color name="xsemitransparent">#33000000</color>
     <color name="red">#FF0000</color>
     <color name="blue_icon">#FF09A0D1</color>
     <color name="gray_icon">#FFB7B7B7</color>

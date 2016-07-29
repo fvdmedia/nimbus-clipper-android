@@ -1,23 +1,21 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/ltBack"
-    android:orientation="vertical" >
+    >
 
 <LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="@dimen/login_form_width"
+    android:layout_height="wrap_content"
 	android:background="@color/ltBack"
-	android:layout_marginLeft="0dp"
-	android:layout_marginRight="0dp"
 	android:layout_marginBottom="0dp"
-	android:layout_marginTop="@dimen/address_height"
+	android:layout_gravity="center"
     android:orientation="vertical" >
     
  <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="left"
+        android:layout_gravity="center_horizontal"
         android:gravity="center_horizontal"
         android:text="@string/register_to_save"
         android:textColor="@color/text_normal"
@@ -36,7 +34,8 @@
 		        android:padding="@dimen/password_text"
 		        android:inputType="textEmailAddress"
 		        android:textColor="@color/text_normal"
-		        android:textSize="@dimen/password_text" >
+		        android:textSize="@dimen/password_text" 
+		        android:textCursorDrawable="@drawable/color_cursor">
 		        <!-- <requestFocus /> -->
 		    </EditText>
 
@@ -52,24 +51,20 @@
 		        android:inputType="textPassword"
 		        android:padding="@dimen/password_text"
 		        android:textColor="@color/text_normal"
-		        android:textSize="@dimen/password_text" />     
+		        android:textSize="@dimen/password_text"
+		        android:textCursorDrawable="@drawable/color_cursor" />     
     <Button
         android:id="@+id/brRegister"
+        style="@style/BigBorderButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="@dimen/password_text"
-        android:paddingLeft="@dimen/input_text"
-        android:paddingRight="@dimen/input_text"
-        android:background="@drawable/simple_button_selector"
-        android:minHeight="48dp"
+        android:layout_marginTop="@dimen/button_padding"
         android:text="@string/register"
-        android:textColor="@android:color/white"
-        android:textSize="@dimen/password_text"
-        
+        android:layout_marginBottom="@dimen/address_height"
 		/>
 
 
 
 </LinearLayout>
-</LinearLayout>
+</FrameLayout>

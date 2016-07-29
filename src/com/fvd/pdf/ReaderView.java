@@ -307,6 +307,14 @@ public class ReaderView
 
 		requestLayout();
 	}
+	
+	public void updateView() {
+		//mResetLayout = true;
+		//mReflowChanged = true;
+		//requestLayout();
+		getDisplayedView().invalidate();
+		getDisplayedView().requestLayout();
+	}
 
 	protected void onChildSetup(int i, View v) {}
 
@@ -323,7 +331,9 @@ public class ReaderView
 	protected void onScaleChild(View v, Float scale) {};
 
 	public View getView(int i) {
-		return mChildViews.get(i);
+		if(i>-1&&i<mChildViews.size())
+			return mChildViews.get(i);
+		else return null;
 	}
 
 	public View getDisplayedView() {
@@ -674,7 +684,8 @@ public class ReaderView
 
 	@Override
 	public View getSelectedView() {
-		throw new UnsupportedOperationException(getContext().getString(R.string.not_supported));
+		//throw new UnsupportedOperationException(getContext().getString(R.string.not_supported));
+		return null;
 	}
 
 	@Override

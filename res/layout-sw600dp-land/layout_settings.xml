@@ -1,0 +1,157 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rlMain"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/dkBack"
+    tools:context=".LoginPageActivity" >
+    <FrameLayout 
+        android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+	    android:layout_marginBottom="0dp"
+		android:layout_marginTop="@dimen/top_bar_height"
+	    android:background="@color/ltBack">
+	<LinearLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_gravity="center"
+	    android:gravity="center"
+	    android:orientation="vertical" >
+		<ImageView
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:background="@drawable/setting_selector"
+	        android:contentDescription="@string/settings"
+	        android:src="@drawable/settinggear"
+	        android:layout_marginTop="68dp" 
+	         />
+		<LinearLayout 
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:orientation="horizontal"
+		    android:layout_marginTop="28dp" 
+	       
+		    >
+		    <Button
+		        android:id="@+id/bsSetting"
+		        style="@style/BigBorderButton"
+		        android:layout_width="280dp"
+		        android:layout_height="wrap_content"
+		        android:layout_gravity="center_horizontal"
+		        android:text="@string/settings"
+		        android:onClick="onButtonClick"
+		        />
+		    
+		    <Button
+		        android:id="@+id/bsRegister"
+		        style="@style/BigBorderButton"
+		        android:layout_width="280dp"
+		        android:layout_height="wrap_content"
+		        android:layout_gravity="center_horizontal"
+		        android:layout_marginLeft="30dp"
+		        android:layout_marginRight="30dp"
+		        android:text="@string/register"
+		        android:onClick="onButtonClick"
+		        />
+		    <Button
+		        android:id="@+id/bsRateUs"
+		        style="@style/BigBorderButton"
+		        android:layout_width="280dp"
+		        android:layout_height="wrap_content"
+		        android:layout_gravity="center_horizontal"
+		        android:text="@string/rate_us"
+		        android:onClick="onButtonClick"
+		        />
+		    </LinearLayout>
+		    <LinearLayout 
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:orientation="horizontal"
+		        android:layout_marginTop="48dp" 
+		        android:layout_marginBottom="48dp"
+>
+		    <Button
+		        android:id="@+id/bsLicenses"
+		        style="@style/BigBorderButton"
+		        android:layout_width="280dp"
+		        android:layout_height="wrap_content"
+		        android:layout_gravity="center_horizontal"
+		        android:layout_marginRight="15dp"
+		        android:text="@string/licenses"
+		        android:onClick="onButtonClick"
+		        />
+		    <Button
+		        android:id="@+id/bsHelp"
+		        style="@style/BigBorderButton"
+		        android:layout_width="280dp"
+		        android:layout_height="wrap_content"
+		        android:layout_gravity="center_horizontal"
+		        android:layout_marginLeft="15dp"
+		        android:text="@string/help"
+		        android:onClick="onButtonClick"
+		        />
+		    </LinearLayout>
+
+		    <!-- <TextView
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:gravity="center_horizontal"
+		        android:shadowColor="@color/text_shadow"
+		        android:shadowDx="1"
+		        android:shadowDy="1"
+		        android:shadowRadius="1"
+		        android:text="@string/or"
+		        android:textColor="@color/buttonBGoff"
+		        android:textSize="@dimen/input_text"
+		        android:textStyle="bold" />
+
+		    <Button
+		        android:id="@+id/bWorkOffline"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_gravity="center_horizontal"
+		        android:layout_marginBottom="4sp"
+		        android:layout_marginLeft="@dimen/password_text"
+		        android:layout_marginRight="@dimen/password_text"
+		        android:layout_marginTop="4sp"
+		        android:background="@drawable/button_selector"
+		        android:paddingLeft="@dimen/welcome_text"
+		        android:paddingRight="@dimen/welcome_text"
+		        android:text="@string/work_offline"
+		        android:textColor="@android:color/white"
+		        android:textSize="@dimen/input_text"
+		        android:textStyle="bold" /> -->
+
+		    
+		    <!-- <Button
+		        android:id="@+id/bRestoreAccount"
+		        android:layout_width="wrap_content"
+		        android:layout_height="34sp"
+		        android:layout_gravity="center_horizontal"
+		        android:background="#0FFF"
+		        android:text="@string/forgot"
+		        android:textColor="@color/buttonBGoff"
+		        android:textSize="@dimen/password_text"
+		        /> -->
+	</LinearLayout>
+	</FrameLayout>
+    <!-- <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:adjustViewBounds="true"
+        android:src="@drawable/ic_launcher"
+        android:contentDescription="@string/app_name" />-->
+        
+	<ImageView
+        android:layout_width="@dimen/logo_width"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="@dimen/logo_top_margin"
+        android:adjustViewBounds="true"
+        android:src="@drawable/nimbus_logo"
+        android:contentDescription="@string/app_name" />
+	
+</RelativeLayout>

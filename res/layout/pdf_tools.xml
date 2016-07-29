@@ -1,0 +1,368 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >    
+<ViewAnimator
+	    android:id="@+id/pdf_switcher_land"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		 >
+
+		
+
+		<RelativeLayout
+			android:id="@+id/pdfAnnotBar"
+			android:layout_width="match_parent"
+			android:layout_height="@dimen/browser_panel_height"
+			android:background="@color/ltBack" >
+
+			<ImageButton
+			    android:id="@+id/pdf_toc"
+				android:layout_width="wrap_content"
+				android:layout_height="match_parent"
+				android:padding="@dimen/drawable_subpadding"
+				android:scaleType="centerInside"
+				android:contentDescription="@string/outline_title"
+				android:background="@drawable/setting_selector"
+				android:src="@drawable/pdf_tools_01" />
+			<LinearLayout 
+			    android:layout_width="match_parent"
+			    android:layout_height="wrap_content"
+			    android:layout_gravity="right|center_vertical"
+			    android:layout_marginLeft="8dp"
+			    android:orientation="horizontal"
+			    android:layout_toRightOf="@id/pdf_toc"
+			    android:layout_centerVertical="true"
+				>
+			<ImageButton
+				android:layout_width="0dp"
+		        android:layout_weight="1"
+		        android:scaleType="center"
+				android:layout_height="match_parent"
+				android:contentDescription="@string/highlight"
+				android:background="@drawable/setting_selector"
+				android:onClick="OnHighlightButtonClick"
+				android:src="@drawable/pdf_tools_02" />
+
+			<ImageButton
+				android:layout_width="0dp"
+		        android:layout_weight="1"
+				android:layout_height="match_parent"
+				android:padding="@dimen/drawable_subpadding"
+				android:scaleType="center"
+				android:contentDescription="@string/underline"
+				android:background="@drawable/setting_selector"
+				android:onClick="OnStrikeOutButtonClick"
+				android:src="@drawable/pdf_tools_03" />
+
+			<ImageButton
+				android:layout_width="0dp"
+		        android:layout_weight="1"
+				android:layout_height="match_parent"
+				android:padding="@dimen/drawable_subpadding"
+				android:scaleType="center"
+				android:contentDescription="@string/strike_out"
+				android:background="@drawable/setting_selector"
+				android:onClick="OnUnderlineButtonClick"
+				android:src="@drawable/pdf_tools_04" />
+			<ImageButton
+		        android:id="@+id/pdf_DrawComment_land"
+		        android:layout_width="0dp"
+		        android:layout_weight="1"
+		        android:layout_height="match_parent"
+		        android:padding="@dimen/drawable_subpadding"
+		        android:background="@drawable/setting_selector"
+		        android:src="@drawable/draw_tools_08"
+		        android:scaleType="centerInside"
+		        android:contentDescription="@string/app_name"
+				/>
+		    <ImageButton
+		        android:id="@+id/pdf_DrawPensil_land"
+		        android:layout_width="0dp"
+		        android:layout_weight="1"
+		        android:layout_height="match_parent"
+		        android:padding="@dimen/drawable_subpadding"
+		        android:background="@drawable/setting_selector"
+		        android:src="@drawable/draw_tools_01"
+		        android:scaleType="centerInside"
+		        android:contentDescription="@string/app_name"
+				/>
+		    <ImageButton
+		        android:id="@+id/pdf_DrawRect_land"
+		        android:layout_width="0dp"
+		        android:layout_weight="1"
+		        android:layout_height="match_parent"
+		        android:layout_marginRight="1dp"
+				android:padding="@dimen/drawable_subpadding"
+		        android:background="@drawable/setting_selector"
+		        android:src="@drawable/draw_tools_03"
+		        android:scaleType="centerInside"
+		        android:contentDescription="@string/app_name"
+				/> 
+			<ImageButton
+		        android:id="@+id/pdf_DrawArrow_land"
+		        android:layout_width="0dp"
+		        android:layout_weight="1"
+		        android:layout_height="match_parent"
+				android:padding="@dimen/drawable_subpadding"
+		        android:background="@drawable/setting_selector"
+		        android:src="@drawable/draw_tools_06"
+		        android:scaleType="centerInside"
+		        android:contentDescription="@string/app_name"
+		        />
+			<ImageButton
+		        android:id="@+id/pdf_DrawLine_land"
+		        android:layout_width="0dp"
+		        android:layout_weight="1"
+		        android:layout_height="match_parent"
+				android:padding="@dimen/drawable_subpadding"
+		        android:background="@drawable/setting_selector"
+		        android:src="@drawable/draw_tools_07"
+		        android:scaleType="centerInside"
+		        android:contentDescription="@string/app_name"
+		        />
+			<ImageButton
+		        android:id="@+id/pdfColor1_land"
+		        android:layout_width="0dp"
+		        android:layout_weight="1"
+		        android:layout_height="wrap_content"
+		        android:padding="@dimen/drawable_subpadding"
+		        android:background="@drawable/setting_selector"
+		        android:src="@drawable/icon_color_blue"
+		        android:scaleType="fitCenter"
+		        android:contentDescription="@string/app_name"
+				/>
+		    <ImageButton
+		        android:id="@+id/pdfColor2_land"
+		        android:layout_width="0dp"
+		        android:layout_weight="1"
+		        android:layout_height="wrap_content"
+				android:padding="@dimen/drawable_subpadding"
+		       android:background="@drawable/setting_selector"
+		        android:src="@drawable/icon_color_red"
+		        android:scaleType="fitCenter"
+		        android:contentDescription="@string/app_name"
+				/>
+		    <ImageButton
+		        android:id="@+id/pdfColor3_land"
+		        android:layout_width="0dp"
+		        android:layout_weight="1"
+		        android:layout_height="match_parent"
+				android:padding="@dimen/drawable_subpadding"
+		        android:background="@drawable/setting_selector"
+		        android:src="@drawable/icon_color_yellow"
+		        android:scaleType="fitCenter"
+		        android:contentDescription="@string/app_name"
+				/>    
+		    <ImageButton
+		        android:id="@+id/pdfColor4_land"
+		        android:layout_width="0dp"
+		        android:layout_weight="1"
+		        android:layout_height="match_parent"
+				android:padding="@dimen/drawable_subpadding"
+		        android:background="@drawable/setting_selector"
+		        android:src="@drawable/icon_color_white"
+		        android:scaleType="fitCenter"
+		        android:contentDescription="@string/app_name"
+				/>
+		    <ImageButton
+		        android:id="@+id/pdfColor5_land"
+		        android:layout_width="0dp"
+		        android:layout_weight="1"
+		        android:layout_height="match_parent"
+				android:padding="@dimen/drawable_subpadding"
+		        android:background="@drawable/setting_selector"
+		        android:src="@drawable/icon_color_black"
+		        android:scaleType="fitCenter"
+		        android:contentDescription="@string/app_name"
+				/>
+		    <ImageButton
+			        android:id="@+id/bDone_land"
+			        android:layout_width="0dp"
+			        android:layout_weight="1.4"
+			        android:scaleType="centerInside"
+			        android:layout_height="wrap_content"
+			        android:layout_gravity="center_vertical"
+			        android:src="@drawable/top_edit_05"
+			        android:background="@drawable/setting_selector"
+			        android:onClick="onToolsClick"
+					android:contentDescription="@string/save_full" />
+			</LinearLayout>
+		</RelativeLayout>
+
+
+		<RelativeLayout
+			android:id="@+id/pdfDeleteBar"
+			android:layout_width="match_parent"
+			android:layout_height="@dimen/browser_panel_height"
+			android:background="@color/ltBack" >
+
+			<ImageButton
+				android:id="@+id/cancelDeleteButton"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_centerVertical="true"
+				android:layout_alignParentLeft="true"
+				android:contentDescription="@string/cancel"
+				android:background="@drawable/button"
+				android:onClick="OnCancelDeleteButtonClick"
+				android:src="@drawable/tools_cancel" />
+
+			<TextView
+				android:id="@+id/deleteLabel"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_centerVertical="true"
+				android:layout_toRightOf="@+id/cancelDeleteButton"
+				android:layout_toLeftOf="@+id/deleteButton"
+				android:gravity="center"
+				android:singleLine="true"
+				android:textColor="#FFFFFF"
+				android:textStyle="bold"
+				android:text="@string/delete"
+				android:textAppearance="?android:attr/textAppearanceMedium" />
+
+			<ImageButton
+				android:id="@+id/deleteButton"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_centerVertical="true"
+				android:layout_alignParentRight="true"
+				android:contentDescription="@string/delete"
+				android:background="@drawable/button"
+				android:onClick="OnDeleteButtonClick"
+				android:src="@drawable/pdf_basket" />
+
+		</RelativeLayout>
+
+		
+
+		<RelativeLayout
+			android:id="@+id/pdfAcceptBar"
+			android:layout_width="match_parent"
+			android:layout_height="@dimen/browser_panel_height"
+			android:background="@color/ltBack" >
+
+			<ImageButton
+				android:id="@+id/cancelAcceptButton"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_centerVertical="true"
+				android:layout_alignParentLeft="true"
+				android:contentDescription="@string/cancel"
+				android:background="@drawable/button"
+				android:onClick="OnCancelAcceptButtonClick"
+				android:src="@drawable/tools_cancel" />
+
+			<TextView
+				android:id="@+id/annotType"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_centerVertical="true"
+				android:layout_toRightOf="@+id/cancelAcceptButton"
+				android:layout_toLeftOf="@+id/acceptButton"
+				android:gravity="center"
+				android:singleLine="true"
+				android:textColor="#FFFFFF"
+				android:textStyle="bold"
+				android:textAppearance="?android:attr/textAppearanceMedium" />
+
+			<ImageButton
+				android:id="@+id/acceptButton"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_centerVertical="true"
+				android:layout_alignParentRight="true"
+				android:contentDescription="@string/accept"
+				android:background="@drawable/button"
+				android:onClick="OnAcceptButtonClick"
+				android:src="@drawable/tools_ok" />
+		</RelativeLayout>
+		<LinearLayout
+		     	android:id="@+id/savebar"
+			    android:layout_width="match_parent"
+			    android:layout_height="@dimen/browser_panel_height"
+			    android:orientation="horizontal"
+			    android:background="@color/dkBack"
+			    >
+		    
+		     <ImageButton
+			        android:id="@+id/pdfSave2Nimbus_land"
+			        android:layout_width="0dp"
+			        android:layout_height="match_parent"
+			        android:scaleType="fitCenter"
+			        android:adjustViewBounds="true"
+			        android:layout_weight="1"
+			        android:layout_gravity="center_vertical"
+			        android:background="@color/transparent"
+			        android:contentDescription="@string/save_full"
+			        android:padding="1dp"
+			        android:src="@drawable/top_done_01"
+			        android:onClick="onToolsClick"
+			         />
+			    		   <View 
+			       android:layout_width="1dp"
+			       android:layout_height="match_parent"
+			       android:background="#77FFFFFF"
+			       android:layout_marginLeft="2dp"
+			       android:layout_marginRight="2dp"
+			       android:layout_marginTop="6dp"
+			       android:layout_marginBottom="6dp"/>
+			    <ImageButton
+			        android:id="@+id/pdfSave2SD_land"
+			        android:layout_width="0dp"
+			        android:layout_weight="1"
+			        android:layout_height="match_parent"
+			        android:scaleType="fitCenter"
+			        android:adjustViewBounds="true"
+			        android:padding="1dp"
+			        android:layout_gravity="center_vertical"
+			        android:src="@drawable/top_done_03"
+			        android:background="@drawable/setting_selector"
+					android:contentDescription="@string/save_full"
+					android:onClick="onToolsClick" />
+			    <View 
+			       android:layout_width="1dp"
+			       android:layout_height="match_parent"
+			       android:background="#77FFFFFF"
+			       android:layout_marginLeft="2dp"
+			       android:layout_marginRight="2dp"
+			       android:layout_marginTop="6dp"
+			       android:layout_marginBottom="6dp"/>
+			     <ImageButton
+			        android:id="@+id/pdfShare_land"
+			        android:layout_width="0dp"
+			        android:layout_weight="0.5"
+			        android:layout_height="match_parent"
+			        android:scaleType="fitCenter"
+			        android:adjustViewBounds="true"
+			        android:padding="1dp"
+			        android:layout_gravity="center_vertical"
+			        android:src="@drawable/top_done_04"
+			        android:background="@drawable/setting_selector"
+					android:contentDescription="@string/save_full"
+					android:onClick="onToolsClick" />
+			     <View 
+			       android:layout_width="1dp"
+			       android:layout_height="match_parent"
+			       android:background="#77FFFFFF"
+			       android:layout_marginLeft="2dp"
+			       android:layout_marginRight="2dp"
+			       android:layout_marginTop="6dp"
+			       android:layout_marginBottom="6dp"/>
+			     <ImageButton
+			        android:id="@+id/btnBack_land"
+			        android:layout_width="0dp"
+			        android:layout_weight="0.6"
+			        android:scaleType="fitCenter"
+			        android:layout_height="wrap_content"
+			        android:layout_gravity="center_vertical"
+			        android:padding="1dp"
+			        android:src="@drawable/top_done_05"
+			        android:background="@drawable/setting_selector"
+					android:contentDescription="@string/save_full"
+					android:onClick="onToolsClick" />
+		</LinearLayout>
+		</ViewAnimator>
+</FrameLayout>

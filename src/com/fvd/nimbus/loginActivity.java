@@ -45,7 +45,8 @@ public class loginActivity extends Activity implements OnClickListener,AsyncTask
         }
         
         setContentView(R.layout.screen_login);
-        overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+        //overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+        overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
         serverHelper.getInstance().setCallback(this,this);
         if (!appSettings.getInstance().getIsTablet())
         	setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -53,9 +54,9 @@ public class loginActivity extends Activity implements OnClickListener,AsyncTask
         
         userMail = getIntent().getStringExtra("userMail").toString();
         tv=(TextView)findViewById(R.id.etUsername);
-        tv.setFocusableInTouchMode(true);
-        tv.setFocusable(true);
-        tv.requestFocus();
+        /*tv.setFocusableInTouchMode(true);
+        tv.setFocusable(true);*/
+        /*tv.requestFocus();*/
         tv.setText(userMail);
         tv.setOnKeyListener(new OnKeyListener() {           
             @Override
@@ -72,6 +73,8 @@ public class loginActivity extends Activity implements OnClickListener,AsyncTask
         
         btnSave.setOnClickListener(this);
         findViewById(R.id.bNewAccount).setOnClickListener(this);
+        findViewById(R.id.bFLogin).setOnClickListener(this);
+        findViewById(R.id.bGLogin).setOnClickListener(this);
      }
 	
 
@@ -88,6 +91,7 @@ public class loginActivity extends Activity implements OnClickListener,AsyncTask
 
 	public void onClick(View v)
 	{
+		Intent i;
 		switch (v.getId()) 
 		{
 		    case R.id.bLogin:
@@ -103,11 +107,27 @@ public class loginActivity extends Activity implements OnClickListener,AsyncTask
     				sendRequest("user:auth", String.format("\"email\":\"%s\",\"password\":\"%s\"",userMail,userPass));
 		        break;
 		    case R.id.bNewAccount:
-		    	Intent i = new Intent(getApplicationContext(), RegisterDlg.class);
+		    	i = new Intent(getApplicationContext(), RegisterDlg.class);
 		    	i.putExtra("userMail", userMail==null?"":userMail);
 		    	startActivityForResult(i, 1);
-		    	overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+		    	//overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+		    	overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
 		    	break;
+		    case R.id.bFLogin:
+		    	i = new Intent(getApplicationContext(), loginWithActivity.class);
+		    	i.putExtra("service", "facebook");
+		    	startActivity(i);
+		    	overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
+		    	finish();
+		    	break;
+		    case R.id.bGLogin:
+		    	i = new Intent(getApplicationContext(), loginWithActivity.class);
+		    	i.putExtra("service", "google");
+		    	startActivity(i);
+		    	overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
+		    	finish();
+		    	break;
+	
 	    }
 		
 	}
@@ -125,7 +145,6 @@ public class loginActivity extends Activity implements OnClickListener,AsyncTask
             	if (error == 0){
             		if (action.equalsIgnoreCase("user:auth")){
             			final String sessionId = root.getJSONObject("body").getString("sessionid");
-            			serverHelper.getInstance().setSessionId(sessionId);
             			Editor editor=prefs.edit();
         	    		editor.putString("userMail", userMail);
         	    		editor.putString("userPass", userPass);
@@ -135,7 +154,8 @@ public class loginActivity extends Activity implements OnClickListener,AsyncTask
         	    		appSettings.userPass = userPass;
         	    		editor.commit();
         	    		Toast.makeText(getApplicationContext(), "user authorized", Toast.LENGTH_LONG).show();
-        	    		overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+        	    		//overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+        	    		overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
         	    		finish();
         	    		
             		}

@@ -18,7 +18,8 @@ public class ArticleDlg extends Activity implements OnClickListener{
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+        //overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+        overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         try{
         	requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -51,7 +52,8 @@ public class ArticleDlg extends Activity implements OnClickListener{
 		    	catch (Exception e) {
 					// TODO: handle exception
 				}
-		    	overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+		    	//overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+		    	overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
 		    	finish();
 		        break;
 		    case R.id.bShare:
@@ -60,7 +62,8 @@ public class ArticleDlg extends Activity implements OnClickListener{
                 intent.putExtra(Intent.EXTRA_TEXT, url + "\r\n\r\nVia Nimbus Clipper for Android");
                 intent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Shared Note from Nimbus");
                 startActivity(Intent.createChooser(intent, "Share"));
-                overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+                //overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+                overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
 		    	finish();
 		        break;    
 	    }

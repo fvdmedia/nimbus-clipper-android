@@ -9,9 +9,14 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.json.JSONObject;
 import org.json.JSONArray;
+
+
+import android.R.string;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -20,11 +25,11 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
-//import android.util.Log;
-//import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
@@ -44,7 +49,9 @@ import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -65,8 +72,10 @@ import android.graphics.drawable.Drawable;
 import android.view.KeyEvent;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+
 
 import com.fvd.utils.FolderItem;
 import com.fvd.utils.HistoryItem;
@@ -75,18 +84,28 @@ import com.fvd.utils.AsyncTaskCompleteListener;
 import com.fvd.utils.appSettings;
 import com.fvd.utils.prefsEditListener;
 import com.fvd.utils.serverHelper;
+import com.fvd.browser.QuickReturnViewType;
+import com.fvd.browser.QuickReturnWebViewOnScrollChangedListener;
 import com.fvd.browser.fvdBrowerEventsListener;
 import com.fvd.browser.fvdWebView;
-//import android.content.DialogInterface.OnClickListener;
+import com.fvd.classes.BugReporter;
+import com.fvd.classes.DataExchange;
+import com.fvd.classes.DrawerMenuAdapter;
+import com.fvd.classes.FolderListItem;
 
-public class BrowseActivity extends Activity implements AsyncTaskCompleteListener<String, String>, fvdBrowerEventsListener,TextWatcher{
+//import android.content.DialogInterface.OnClickListener;
+import com.getbase.floatingactionbutton.FloatingActionsMenu;
+
+
+
+public class BrowseActivity extends Activity implements AsyncTaskCompleteListener<String, String>, fvdBrowerEventsListener,TextWatcher, OnItemClickListener{
 
 	private final String deskAgent="Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.17 Safari/537.36";
 	
 	private static final int IDM_OPEN = 101; 
 	private static final int IDM_SAVE = 102; 
 	
-	
+	final int SHOW_SETTINGS=11;
 	final int DIALOG_CAPTURE = 1;
 	final int DIALOG_CLIP = 2;
 	String captureItems[] = { "view", "full" };
@@ -97,16 +116,17 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
 	Menu myMenu = null;
 	/*static final String SaveDir= "Pictures";
 	private String SavingPath;*/
-	
+	DrawerLayout drawer;
+	DataExchange clipData;
 	private AutoCompleteTextView urlField;
 	private ImageButton     navButton;
 	private ProgressBar     progressBar;
 	//private SharedPreferences prefs;
 
 	private String scripts="";
-	private String selHtml="";
-	private String selBuff="";
-	private String selText="";
+	//private String selHtml="";
+	//private String selBuff="";
+	//private String selText="";
 	Context ctx;
 	
 	private String userMail = "";
@@ -117,6 +137,7 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
 	private int clipMode=0;
 	private ProgressDialog progressDialog;
 	private SharedPreferences prefs;
+	String lastAction="";
 	//Animation animationFadeIn;
 	//Animation animationFadeOut;
 	//List<HistoryItem>  m_arrHistoryItems=new ArrayList<HistoryItem>();
@@ -124,12 +145,17 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
 	//ArrayAdapter<HistoryItem> adapter;
 	//ArrayAdapter<String> adapter;
 	boolean isInitNow = true;
+	
+	FloatingActionsMenu floatMenu;
 	private enum NavButtonState
     {
         NBS_GO,
         NBS_REFRESH,
         NBS_STOP
     }
+	
+	View mQuickReturnHeaderTextView;
+    View mQuickReturnFooterTextView;
 
 	
     private  NavButtonState     navButtonState = NavButtonState.NBS_GO;
@@ -137,7 +163,9 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+        //overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+        //overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
+        //overridePendingTransition(R.anim.activity_open_scale,R.anim.activity_close_translate);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         try{
         	requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -145,6 +173,7 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
         catch (Exception e){
         	e.printStackTrace();
         }
+        clipData = new DataExchange();
         isInitNow = true;
         setContentView(R.layout.screen_browser);
         serverHelper.getInstance().setCallback(this,this);
@@ -152,6 +181,7 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
         lastUrl = prefs.getString("LAST_URL","");
         saveCSS = prefs.getString("clipStyle", "1").equals("1");
         ctx = this;
+        
         //adapter = new TextAdapter(this);		
         
         /*Uri data = getIntent().getData();
@@ -170,26 +200,27 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
         }
         else if(Intent.ACTION_SEND.equals(action) /*&& type != null*/){
         	if ("text/plain".equals(type)) {
-        		lastUrl=intent.getStringExtra(Intent.EXTRA_TEXT);
-        		int i = lastUrl.indexOf("http");
-        		if(i>0){
-        			int c = lastUrl.indexOf(" ", i);
-        			if(c>-1 && c>i) lastUrl=lastUrl.substring(i,c);
-        		}
-        		i=lastUrl.indexOf("\n");
-        		if(i!=-1) 
-        			lastUrl=lastUrl.substring(0,i);
+        		String surl=intent.getStringExtra(Intent.EXTRA_TEXT);
+        		if(surl.contains(" ")){
+        			String[] arr=surl.replace("\t", " ").split(" ");
+        			for (String s : arr) {
+						if(s.contains("://")){
+							lastUrl=s.trim();
+							break;
+						}
+					}
+        		} else if(surl.contains("://")) lastUrl=surl.trim();
         		appSettings.appendLog("browse:onCreate  "+lastUrl);
             } 
         }
         
        
-        
-        //lastUrl="http://en.wikipedia.org/wiki/Main_Page";
-        
+        drawer=(DrawerLayout)findViewById(R.id.root);
+
+        View v=findViewById(R.id.wv);
         wv = (fvdWebView) findViewById(R.id.wv);
         wv.setEventsHandler(this);
-        registerForContextMenu(wv); 
+        //registerForContextMenu(wv); 
         urlField = ( AutoCompleteTextView )findViewById(R.id.etAddess);
         urlField.setSelectAllOnFocus(true);
         urlField.setOnEditorActionListener(new EditText.OnEditorActionListener() {
@@ -209,56 +240,21 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
                 return false;
             }
         });
+        onViewCreated();  
         
-          
         
-        /*urlField.setOnTouchListener( new EditText.OnTouchListener(){
-
-			@Override
-			public boolean onTouch(View arg0, MotionEvent arg1) {
-				if (arg1.getAction() == MotionEvent.ACTION_UP){
-					EditText e = (EditText)arg0;
-					if(e.getSelectionEnd()<=e.getSelectionStart())
-					e.selectAll();
-				}
-				return false;
-			}
-        
-        });*/
         
         handler = new Handler() {
     		@Override
     		public void handleMessage(Message msg) {
     			switch (msg.what) {
 				case 0:
-					//Log.e("fvdWebView",String.format("tsjiSelectionChanged hb: %d",msg.arg1));
-					ImageButton ib =  (ImageButton)findViewById(R.id.bSaveFullPage);
-					if(msg.arg1==1){
-						if(!ib.isSelected()) ib.setSelected(true);
-					}
-					else {
-						if(ib.isSelected()) ib.setSelected(false);
-					}
-					//ib.setSelected(msg.arg1==1);
 					findViewById(R.id.bZoomStack).setVisibility(View.VISIBLE);
-					findViewById(R.id.bDone).setVisibility(View.VISIBLE);
-					findViewById(R.id.bSaveFullPage).setVisibility(View.GONE);
-					findViewById(R.id.bTakeScreenshot).setVisibility(View.GONE);
-					findViewById(R.id.bSavePageFragment).setVisibility(View.GONE);
 					findViewById(R.id.bToggleMenu).setVisibility(View.GONE);
+
 					
-					
-					//((ImageButton)findViewById(R.id.bZoomOut)).setVisibility(View.VISIBLE);
 					break;
-				/*case 1:
-					if(selHtml.length()>0){
-	            		if (sessionId.length() == 0) showSettings();
-	            		else {
-	            			sendNote(wv.getTitle(), selHtml);
-	            			wv.endSelectionMode();
-	            		}
-	            	}
-					break;*/
+				
 				default:
 					break;
 				}
@@ -275,9 +271,10 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
             }
         });
         
-        ((ImageButton)findViewById(R.id.bSavePageFragment)).setOnClickListener(new View.OnClickListener(){
+        findViewById(R.id.bSavePageFragment).setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
-            	toggleTools();
+            	//toggleTools();
+            	floatMenu.collapse();
             	if(!wv.getInjected()) Toast.makeText(ctx, getString(R.string.wait_load), Toast.LENGTH_LONG).show();
             	clipMode =2;		
             	if(wv.getInjected()/* && !v.isSelected()*/){
@@ -285,40 +282,14 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
             		v.setSelected(true);
             		Toast.makeText(ctx, ctx.getString(R.string.use_longtap), Toast.LENGTH_LONG).show();
             	}
-            	/*else{
-            		if(selHtml.length()>0){
-            			wv.setCanClip(false);
-            			wv.endSelectionMode();
-            			//v.setSelected(false);
-            			//appSettings.appendLog("<html><head><title>Untitled Document</title><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head><body>" + selHtml + "</body></html>");
-            			Intent i = new Intent(getApplicationContext(), previewActivity.class);
-            			clipMode =2;
-            	    	i.putExtra("content", selHtml);
-            	    	startActivityForResult(i,5);
-            	    	overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
-            			wv.endSelectionMode();
-            			selHtml = "";
-            		}
-            	}*/
+            	
             }
         });
         
-        ((ImageButton)findViewById(R.id.bSaveFullPage)).setOnClickListener(new View.OnClickListener(){
+        (findViewById(R.id.bSaveFullPage)).setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
-            	/*if(wv.getInjected() && !v.isSelected()){
-            		wv.saveArticle();
-            		clipMode =1;
-            		progressDialog = ProgressDialog.show(v.getContext(), "FVD Nimbus", getString(R.string.please_wait), true, false);
-            	}
-            	else
-            	if(selHtml.length()>0){
-            			Intent i = new Intent(getApplicationContext(), previewActivity.class);
-            			clipMode =2;
-            	    	i.putExtra("content", selHtml);
-            	    	startActivityForResult(i,5);
-            			wv.endSelectionMode();
-            	}*/
-            	toggleTools();
+            	
+            	floatMenu.collapse();
             	if(wv.getInjected()){
             		wv.setCanClip(false);
             		wv.saveArticle();
@@ -331,9 +302,10 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
             }
         });
         
-        ((ImageButton)findViewById(R.id.bTakeScreenshot)).setOnClickListener(new View.OnClickListener(){
+        findViewById(R.id.bTakeScreenshot).setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
             	//toggleTools();
+            	floatMenu.collapse();
     			findViewById(R.id.bSaveFullPage).setVisibility(View.GONE);
     			findViewById(R.id.bSavePageFragment).setVisibility(View.GONE);
     			findViewById(R.id.bTakeScreenshot).setVisibility(View.GONE);
@@ -363,40 +335,75 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
         (findViewById(R.id.bDone)).setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
             	{
-        			wv.setCanClip(false);
-        			wv.endSelectionMode();
-        			//findViewById(R.id.bSavePageFragment).setSelected(false);
-        			clipMode =2;
-           			wv.endSelectionMode();
-        			if(selHtml.length()>0){
-	        			Intent i = new Intent(getApplicationContext(), previewActivity.class);
-	        	    	i.putExtra("content", selHtml);
-	        	    	startActivityForResult(i,5);
-	        	    	overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
-        			}
-        			selHtml = "";
+            		try{
+            		
+	            		wv.setCanClip(false);
+	        			wv.endSelectionMode();
+	        			//findViewById(R.id.bSavePageFragment).setSelected(false);
+	        			clipMode =2;
+	           			wv.endSelectionMode();
+	           			String selHtml=clipData.getContent();
+	        			if(selHtml.length()>0){
+	        				String ss=selHtml.substring(0,selHtml.indexOf(">")+1).toLowerCase();
+	        				int j=ss.indexOf("<div");
+	        				if(j==0){
+	        					j=ss.indexOf("style");
+	        					if(j>0){
+	        						int k=ss.indexOf("\"",j+11);
+	        						if(k>0) selHtml = selHtml.replace(selHtml.substring(j,k+1),"");
+	        					}
+	        					//selHtml="<DIV>"+selHtml.substring(ss.length());
+	        				}
+	        				clipData.setContent(selHtml);
+	        				clipData.setTitle(wv.getTitle());
+	        				
+	        				/*if (true){
+	        	    			
+	        	    			if(sessionId.length() == 0 || userPass.length()==0) showSettings();
+	        	    			else {
+	        	    				if(prefs.getBoolean("check_fast", false)){
+	        	    					sendNote(wv.getTitle(), clipData.getContent(), parent, tag);
+	        	    					clipData.setContent("");
+	        	    				}
+	        	    				else {
+	        	    				//serverHelper.getInstance().setCallback(this,this);
+	        	    				if(appSettings.sessionId.length()>0) {
+	        	    					serverHelper.getInstance().sendRequest("notes:getFolders", "","");
+	        	    					}
+	        	    				}
+	        	    			}
+	        	    			wv.endSelectionMode();
+	        	    		} */
+	        				
+		        			Intent i = new Intent(getApplicationContext(), previewActivity.class);
+		        	    	i.putExtra("content", clipData);
+		        	    	startActivityForResult(i,5);
+		        	    	//overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+		        	    	overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
+	        			}
+	        			//clipData.setContent("");
+            		}
+            		catch (Exception e){
+            			BugReporter.Send("onEndSelection", e.getMessage());
+            		}
         		}
             	//showDialog(DIALOG_CAPTURE);
             }
         });
         
-        ((ImageButton)findViewById(R.id.bZoomIn)).setOnClickListener(new View.OnClickListener(){
+        findViewById(R.id.bZoomIn).setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
             	wv.ZoomInSelection();
             }
         });
         
-        ((ImageButton)findViewById(R.id.bZoomOut)).setOnClickListener(new View.OnClickListener(){
+        findViewById(R.id.bZoomOut).setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
             	wv.ZoomOutSelection();
             }
         });
         
-        ((ImageButton)findViewById(R.id.bToggleMenu)).setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v) {
-            	toggleTools();
-            }
-        });
+        
         
         setNavButtonState(NavButtonState.NBS_GO);
         
@@ -428,10 +435,7 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
         	openURL();
         }
         isInitNow = false;
-        //urlField.setAdapter(adapter);
-        //adapter = new ArrayAdapter<String>(this,android.R.layout.simple_dropdown_item_1line,arrHistoryItems);
-        //adapter=new TextAdapter(this);
-        //urlField.setAdapter(adapter);
+        
         urlField.setOnItemClickListener(new OnItemClickListener() {
 		    @Override
 			public void onItemClick(AdapterView<?> parent, View v,
@@ -451,17 +455,61 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
           
         urlField.addTextChangedListener(this);
         parent = prefs.getString("remFolderId", "default");
+        
+        
+        
+        /*ListView listView = (ListView) findViewById(R.id.left_drawer);
+        listView.setAdapter(new DrawerMenuAdapter(this,getResources().getStringArray(R.array.lmenu_browser)));
+		listView.setOnItemClickListener(this);*/
+    }
+    
+    private class DrawerItemClickListener implements ListView.OnItemClickListener {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            //selectItem(position);
+        }
     }
     
     
     
     private void showSettings()
     {
-    	Intent i = new Intent(getApplicationContext(), LoginDlg.class);
+    	Intent i = new Intent(getApplicationContext(), loginActivity.class/* LoginDlg.class*/);
     	i.putExtra("userMail", userMail==null?"":userMail);
-    	startActivityForResult(i, 3);
-    	overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+    	startActivityForResult(i, 11);
+    	//overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+    	overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
     	//startActivity(i);
+    }
+    
+    public void onButtonClick(View v){
+    	drawer.closeDrawer(GravityCompat.START);
+		Intent ip=new Intent();
+		switch (v.getId()) {
+		case R.id.lbTakePhoto:
+    		ip.putExtra("act", "photo");
+    		ip.setClassName("com.fvd.nimbus","com.fvd.nimbus.PaintActivity");
+    		startActivity(ip);
+			break;
+		case R.id.lbFromGallery:
+			ip.putExtra("act", "picture");
+    		ip.setClassName("com.fvd.nimbus","com.fvd.nimbus.PaintActivity");
+    		startActivity(ip);
+			break;
+		case R.id.lbPdfAnnotate:
+    		ip.setClassName("com.fvd.nimbus","com.fvd.nimbus.ChoosePDFActivity");
+    		startActivity(ip);
+			break;
+		case R.id.libSettings:
+    		Intent inten = new Intent(getApplicationContext(), SettingsActivity.class);
+        	startActivityForResult(inten,SHOW_SETTINGS);
+        	overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
+    		return;
+		default:
+			break;
+		}
+		overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
+		finish();
     }
     
     private void showArticleSuccess()
@@ -481,7 +529,8 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
     	Intent i = new Intent(getApplicationContext(), ArticleSuccess.class);
     	i.putExtra("mode", extra);
     	startActivityForResult(i, 4);
-    	overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+    	//overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+    	overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
     	//startActivity(i);
     }
     
@@ -490,7 +539,8 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
     	Intent i = new Intent(getApplicationContext(), ArticleDlg.class);
     	i.putExtra("url", url);
     	startActivity(i);
-    	overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+    	//overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+    	overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
     	//startActivity(i);
     }
     
@@ -562,9 +612,10 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
     					 iPaint.putExtra("temp", true);
     					 iPaint.putExtra("path", filename);
     					 iPaint.putExtra("domain", getDomainName(lastUrl));
-    					 iPaint.setClassName("com.fvd.nimbus","com.fvd.nimbus.Paint");
+    					 iPaint.setClassName("com.fvd.nimbus","com.fvd.nimbus.PaintActivity");
     					 startActivity(iPaint);
-    					 overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+    					 //overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+    					 overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
     				 }
     				 
     			}
@@ -605,9 +656,22 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
 		return false;
 	}
     
+    void hideKeyboard(){
+		InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+		if(imm!=null){
+			imm.hideSoftInputFromWindow(findViewById(R.id.etAddess).getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+		}
+	}
+    
     protected void onNavButtonClicked()
     {
-    	((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(this.getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+    	//((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(this.getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+    	try{
+    		hideKeyboard();
+    	}
+    	catch (Exception e){
+    		
+    	}
         if (this.navButtonState == NavButtonState.NBS_GO || this.navButtonState == NavButtonState.NBS_REFRESH)
         {
             //setNavButtonState(NavButtonState.NBS_STOP);
@@ -638,6 +702,7 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
         Drawable icon = getResources().getDrawable(res);
 
         navButton.setImageDrawable(icon);
+        hideKeyboard();
     }
     
     private void openURL()
@@ -682,11 +747,13 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
     @Override
     protected void onResume(){
     	super.onResume();
-    	overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+    	//overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+    	//overridePendingTransition(R.anim.activity_open_scale,R.anim.activity_close_translate);
+    	//overridePendingTransition(R.anim.activity_open_scale,R.anim.activity_close_translate);
     	if (prefs==null) prefs = PreferenceManager.getDefaultSharedPreferences(this);
     	serverHelper.getInstance().setCallback(this,this);
     	if (sessionId.length()==0) sessionId = prefs.getString("sessionId", "");
-    	serverHelper.getInstance().setSessionId(sessionId);
+    	appSettings.sessionId=(sessionId);
     }
     
     @Override
@@ -695,6 +762,7 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
     	e.putString("LAST_URL",lastUrl);
     	e.commit();
     	super.onPause();
+    	
     }
     
     boolean isInSelectionMode()
@@ -702,11 +770,20 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
     	return (wv.isInSelectionMode() || findViewById(R.id.bSaveFullPage).isSelected());
     }
     
+    void updateBackButton(){
+    	findViewById(R.id.ibBackPage).setVisibility(wv.canGoBack()?View.VISIBLE:View.GONE);
+    }
+    
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
       if (keyCode == KeyEvent.KEYCODE_BACK) {
-    	  if(findViewById(R.id.bSaveFullPage).getVisibility()!=View.GONE){
-    		  toggleTools();
+    	  if(drawer.isDrawerOpen(GravityCompat.START)){
+  			drawer.closeDrawer(GravityCompat.START);
+  			return true;
+  		  }
+    	  if(floatMenu.isExpanded()){
+    		  //toggleTools();
+    		  floatMenu.collapse();
     		  return true;
     	  }
     	  if(isInSelectionMode()){
@@ -714,14 +791,16 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
     		  //wv.loadUrl("javascript:android.clearSelection();");
     		  return true;
     	  }
-    	  if (wv.canGoBack()){
+    	  /*if (wv.canGoBack()){
     		  wv.goBack();
     		  return true;
-    	  }
-    	  overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+    	  }*/
+    	  //overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+    	  overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
       }
       else if (keyCode == KeyEvent.KEYCODE_HOME) {
-    	  overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+    	  //overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+    	  overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
     	  finish();
       }
       return super.onKeyDown(keyCode, event);
@@ -743,10 +822,12 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
       case R.id.om_settings:
     	  	Intent i = new Intent(getApplicationContext(), PrefsActivity.class);
       		startActivityForResult(i,6);
-      		overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+      		//overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+      		overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
     	  break;
       case R.id.om_home:
-    	  overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+    	  //overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+    	  overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
     	  finish();
     	  break;
       /*case R.id.om_login:
@@ -802,7 +883,6 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
             	if (error == 0){
             		if (action.equalsIgnoreCase("user:auth")){
             			sessionId = root.getJSONObject("body").getString("sessionid");
-            			serverHelper.getInstance().setSessionId(sessionId);
             					Editor e=prefs.edit();
             					e.putString("userMail", userMail);
                 	    		e.putString("userPass", userPass);
@@ -812,39 +892,60 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
                 	   appSettings.sessionId=sessionId;
                 	   appSettings.userMail=userMail;
                 	   appSettings.userPass=userPass;
-            			
-            			if(selHtml.length()>0){
-                    	    sendNote(wv.getTitle(), selHtml,parent,tag);
+            			if(lastAction!="") {
+            				serverHelper.getInstance().sendRequest(lastAction, "","");
+            			} else
+            			if(clipData!=null && clipData.getContent().length()>0){
+                    	    /*sendNote(wv.getTitle(), clipData.getContent(),parent,tag);
+                    	    clipData.setContent("");*/
+            				if(prefs.getBoolean("check_fast", false)){
+            					sendNote(clipData.getTitle(), clipData.getContent(), parent, tag);
+            					clipData.setContent("");
+            				}
+            				else {
+            				serverHelper.getInstance().setCallback(this,this);
+            				if(appSettings.sessionId.length()>0) {
+            					serverHelper.getInstance().sendRequest("notes:getFolders", "","");
+            					}
+            				}
                     	}
-            			else if(selBuff.length()>0){
-                    	    sendNote(wv.getTitle(), selBuff,parent,tag);
-                    	    selBuff="";
-                    	}
+            			/*else if(selBuff.length()>0){
+                    	    
+            				if(prefs.getBoolean("check_fast", false)){
+            					sendNote(wv.getTitle(), selBuff, parent, tag);
+                				selBuff="";
+            				}
+            				else {
+            				serverHelper.getInstance().setCallback(this,this);
+            				if(appSettings.sessionId.length()>0) {
+            					serverHelper.getInstance().sendRequest("notes:getFolders", "","");
+            					}
+            				}
+                    	}*/
             			
             		}
             		else if(action.equalsIgnoreCase("notes:getfolders")){
             			
             			//ArrayList<FolderItem>items=new ArrayList<FolderItem>();
-            			ArrayList<String>items=new ArrayList<String>();
+            			//ArrayList<FolderListItem>items=new ArrayList<FolderListItem>();
             			try{
-            				result = URLDecoder.decode(result,"UTF-16"); 
-           	        	        String id="";
-            	        		String title="";
-            	        		JSONArray arr =  root.getJSONObject("body").getJSONArray("notes");
-            	        		for(int i=0; i<arr.length();i++){
-            	        			JSONObject obj = new JSONObject(arr.getString(i));
-            	        			title= obj.getString("title");
-            	        			id=obj.getString("global_id");
-            	        			//title = fromUTF(title);
-            	        			//items.add(new FolderItem(title,id));
-            	        			items.add(title+"::"+id);
-            	        		}
+            					result = URLDecoder.decode(result,"UTF-16"); 
+            	        		clipData.setData(result);
+            	        		String cr=prefs.getString("remFolderId", "default");
+            	        		if(cr==null || cr=="") cr="default";
+            	        		clipData.setId(cr);
+            	        		clipData.setTitle(wv.getTitle());
+            	        		clipData.setTags("androidclipper");
             	        		Intent intent = new Intent(getApplicationContext(), tagsActivity.class);
-            	        		intent.putExtra("items", items);
-            	        		intent.putExtra("current", prefs.getString("remFolderId", "default"));
-            	    	    	startActivityForResult(intent,7);
-            	    	    	overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+            	        		intent.putExtra("xdata", clipData);
+            	        		/*intent.putExtra("current", cr);
+            	        		intent.putExtra("title", wv.getTitle());
+            	        		intent.putExtra("tags", "androidclipper");*/
             	        		
+            	    	    	startActivityForResult(intent,7);
+            	    	    	//overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+            	    	    	overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
+            	    	    	clipData.setData("");
             	        }
             	        catch (Exception Ex){
             	        	appSettings.appendLog("prefs:onTaskComplete "+Ex.getMessage());
@@ -865,7 +966,19 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
             		else if("user_register".equals(action)){
             			sendRequest("user:auth", String.format("\"email\":\"%s\",\"password\":\"%s\"",userMail,userPass));
             		}
-            	} else Toast.makeText(getApplicationContext(), String.format("Error: %s",serverHelper.errorMsg(error)), Toast.LENGTH_LONG).show();
+            	} else 
+            		{	
+            			if(action.equalsIgnoreCase("user:auth")){
+            				lastAction="";
+            				showSettings();
+            			}
+            			else if(error==-6){
+                			if(action=="notes:getFolders") lastAction=action;
+                			else lastAction="";
+                			showSettings();
+                		} 
+            			else Toast.makeText(getApplicationContext(), String.format("Error: %s",serverHelper.errorMsg(error)), Toast.LENGTH_LONG).show();
+            		}
             }
             catch (Exception Ex){
             }
@@ -930,10 +1043,13 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
 		lastUrl = url;
     	urlField.setText(url);
     	saveToHistory(url);
+    	View v=findViewById(R.id.ibBackPage);
+    	
 	}
 
 	@Override
 	public void onPageFinished(String url) {
+		
 		String s=String.format("var fvdViewHeight=%d;\r\nvar fvdSaveCss=%s;\r\n",wv.getHeight(),saveCSS==true?"true":"false");
 		wv.eval("javascript:" +String.format("var fvdViewHeight=%d;\r\nvar fvdSaveCss=%s;\r\n",wv.getHeight(),saveCSS==true?"true":"false") +getScripts()); 
   	  	setNavButtonState(NavButtonState.NBS_REFRESH);
@@ -947,6 +1063,8 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
   	  catch (Exception ce) {
 			//Log.e("fvdWebView","onSelectionChanged: "+e.getMessage());	
 		} 
+  	  updateBackButton();
+  	  
 	}
 	
 	private String m_strLastUrl = "";
@@ -996,44 +1114,139 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
     	}
     	else if (requestCode==5){
     		if (resultCode==RESULT_OK){
-    			selBuff=data.getStringExtra("content");
+    			DataExchange cl = (DataExchange) data.getExtras().getSerializable("content");
     			if(sessionId.length() == 0 || userPass.length()==0) showSettings();
     			else {
-    				
     				if(prefs.getBoolean("check_fast", false)){
-    					sendNote(wv.getTitle(), selBuff, parent, tag);
-        				selBuff="";
+    					sendNote(wv.getTitle(), cl.getContent(), parent, tag);
+    					clipData.setContent("");
     				}
     				else {
     				serverHelper.getInstance().setCallback(this,this);
-    				if(serverHelper.getInstance().getSession().length()>0) {
+    				if(appSettings.sessionId.length()>0) {
     					serverHelper.getInstance().sendRequest("notes:getFolders", "","");
     					}
     				}
     			}
-    			/*selBuff=data.getStringExtra("content");
-    			parent = data.getStringExtra("parent");
-    			tag = data.getStringExtra("tag");
-    			if(sessionId.length() == 0 || userPass.length()==0) showSettings();
-    			else {
-    				sendNote(wv.getTitle(), selBuff, parent, tag);
-    				selBuff="";
-    			}*/
     		} 
     		wv.endSelectionMode();
-    	}
-    	else if(requestCode==7){
-    		if (resultCode==RESULT_OK && data!=null){
-    		
-			parent = data.getStringExtra("id");
-			tag = data.getStringExtra("tag");
-			if(sessionId.length() == 0 || userPass.length()==0) showSettings();
-			else {
-				sendNote(wv.getTitle(), selBuff, parent, tag);
-				selBuff="";
-			}
+    	}else if (requestCode==11){
+    		if(appSettings.sessionId!=""){
+    			sessionId=appSettings.sessionId;
+    			userPass=appSettings.userPass;
+    			if(lastAction!="") {
+    				serverHelper.getInstance().sendRequest(lastAction, "","");
+    			} else
+    			if(clipData!=null && clipData.getContent().length()>0){
+    				if(prefs.getBoolean("check_fast", false)){
+    					sendNote(clipData.getTitle(), clipData.getContent(), parent, tag);
+    					clipData.setContent("");
+    				}
+    				else {
+    				serverHelper.getInstance().setCallback(this,this);
+    				if(appSettings.sessionId.length()>0) {
+    					serverHelper.getInstance().sendRequest("notes:getFolders", "","");
+    					}
+    				}
+            	}
     		}
     	}
+    	else if(requestCode==7){
+    		
+    		if (resultCode==RESULT_OK && data!=null){
+    			try{ 
+    				DataExchange xdata=(DataExchange)data.getExtras().getSerializable("xdata");
+					parent = xdata.getId();
+					tag = xdata.getTags();
+					String xtitle = xdata.getTitle();
+					clipData.setTitle(xtitle);
+					//clipData.setTags(tag);
+					if(sessionId.length() == 0 || userPass.length()==0) showSettings();
+					else {
+						sendNote(xtitle, clipData.getContent(), parent, tag);
+						clipData.setContent("");
+					}
+    			}
+    			catch (Exception e){
+    				BugReporter.Send("BrowseAct", e.getMessage());
+    			}
+    		}
+    		
+    	}else if(requestCode==SHOW_SETTINGS){
+      	  switch (resultCode) {
+      	  case RESULT_FIRST_USER+1:
+        		Intent i = new Intent(getApplicationContext(), PrefsActivity.class);
+            	startActivity(i);
+            	
+            	overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
+        		break;
+        	case RESULT_FIRST_USER+2:
+        		if(appSettings.sessionId.length() == 0) showLogin();
+      		else {
+      			appSettings.sessionId="";
+      			//serverHelper.getInstance().setSessionId(appSettings.sessionId);
+      			Editor e = prefs.edit();
+      			e.putString("userMail", userMail);
+          	    e.putString("userPass", "");
+          	    e.putString("sessionId", appSettings.sessionId);
+          	    e.commit();
+      			showLogin();
+      			}
+        		break;	
+        	case RESULT_FIRST_USER+3:
+        		try{
+                	startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + getApplicationInfo().packageName)));
+                }
+                catch(Exception e){
+                }
+        	case RESULT_FIRST_USER+4:
+        		Uri uri = Uri.parse("http://help.everhelper.me/customer/portal/articles/1376820-nimbus-clipper-for-android---quick-guide");
+        		Intent it = new Intent(Intent.ACTION_VIEW, uri);
+        		startActivity(it);
+        		//overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+        		overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
+        		break;
+        	case RESULT_FIRST_USER+5:
+        		final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
+	            alertDialogBuilder.setMessage(getScriptContent("license.txt"))
+	            .setCancelable(false)
+	            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+	                public void onClick(DialogInterface dialog, int id) {
+	                    // no alert dialog shown
+	                    //alertDialogShown = null;
+	                    // canceled
+	                    setResult(RESULT_CANCELED);
+	                    // and finish
+	                    //finish();
+	                }
+	            });
+	            // create alert dialog
+	            final AlertDialog alertDialog = alertDialogBuilder.create();
+	            alertDialog.setTitle(getString(R.string.license_title));
+	            
+	            // and show
+	            //alertDialogShown = alertDialog;
+	            try {
+	                alertDialog.show();
+	            } catch (final java.lang.Exception e) {
+	                // nothing to do
+	            } catch (final java.lang.Error e) {
+	                // nothing to do
+	            }
+        		break;
+			default:
+				break;
+			}
+        }
+    }
+	
+	private void showLogin()
+    {
+    	Intent i = new Intent(getApplicationContext(), loginActivity.class);
+    	i.putExtra("userMail", userMail==null?"":userMail);
+    	startActivity(i);
+    	//overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+    	overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
     }
 	
 	@Override
@@ -1053,7 +1266,8 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
 				if(html.length()>0){
 					
             		if (sessionId.length() == 0) {
-            			selBuff=html;
+            			clipData.setContent(html);
+            			clipData.setTitle(wv.getTitle());
             			showSettings();
             		}
             		else {
@@ -1065,28 +1279,33 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
 			else 
 				if(plainText.equals("action:saveArticle")){
 					if(html.length()>0){
+						//appSettings.appendLog(html);
+						clipData.setContent(html);
+						clipData.setTitle(wv.getTitle());
 						Intent i = new Intent(getApplicationContext(), previewActivity.class);
             	    	i.putExtra("url", wv.getUrl());
             	    	i.putExtra("title", wv.getTitle());
-            	    	i.putExtra("content", html);
+            	    	i.putExtra("content", clipData);
             	    	startActivityForResult(i,5);
-            	    	overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+            	    	//overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+            	    	overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
 	            	}
 				}
 			else{
 				if(plainText.equals("action:selectionChanged")){
-					selBuff="";
-					selText=plainText==null?"":plainText;
-					selHtml = html==null?"":html;
+					
+					String selHtml = html==null?"":html;
 					Message msg = new Message();
 					msg.arg1=selHtml.length()>0?1:0;
 					msg.what = 0;
-					
+					clipData.setContent(html);
+					clipData.setTitle(wv.getTitle());
 					handler.sendMessage(msg);
 				}
 			}
 		}
 		catch (Exception e) {
+			BugReporter.Send("onSelectionChanged", e.getMessage());
 			//Log.e("fvdWebView","onSelectionChanged: "+e.getMessage());	
 		} 
 		/*if(this.contextMenuVisible){
@@ -1157,11 +1376,15 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
 
 	@Override
 	public void onEndSelection() {
+		try{
 		ImageButton ib =  (ImageButton)findViewById(R.id.bSaveFullPage);
 		ib.setSelected(false);
 		findViewById(R.id.bZoomStack).setVisibility(View.GONE);
-		findViewById(R.id.bDone).setVisibility(View.GONE);
 		findViewById(R.id.bToggleMenu).setVisibility(View.VISIBLE);
+		}
+		catch (Exception e){
+			BugReporter.Send("onEndSelection", e.getMessage());
+		}
 		
 
 	}
@@ -1179,6 +1402,7 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
 	@Override
 	public boolean getCanBrowse() {
 		// TODO Auto-generated method stub
+		appSettings.appendLog(String.format("canBrowse: %s\r\n", findViewById(R.id.bSaveFullPage).isSelected()?"false":"true"));
 		return !(findViewById(R.id.bSaveFullPage).isSelected());
 	}
 
@@ -1300,7 +1524,95 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
 	    	screenCapture(which == 1);
 	    }
 	  };*/
-	void toggleTools(){
+	QuickReturnViewType mQuickReturnViewType=QuickReturnViewType.FOOTER;
+	public void onViewCreated() {
+
+        int headerHeight = getResources().getDimensionPixelSize(R.dimen.top_bar_height);
+        int headerTranslation = -(headerHeight);
+
+        int footerTranslation = headerHeight*3;//findViewById(R.id.bToggleMenu).getMeasuredHeight();
+
+        mQuickReturnHeaderTextView=findViewById(R.id.lBrowser);
+        mQuickReturnFooterTextView=findViewById(R.id.floatFrame);
+        floatMenu=(FloatingActionsMenu) findViewById(R.id.bToggleMenu);
+        QuickReturnWebViewOnScrollChangedListener scrollListener;
+
+        switch (mQuickReturnViewType) {
+            case HEADER:
+                mQuickReturnHeaderTextView.setVisibility(View.VISIBLE);
+                scrollListener = new QuickReturnWebViewOnScrollChangedListener.Builder(QuickReturnViewType.HEADER)
+                        .header(mQuickReturnHeaderTextView)
+                        .minHeaderTranslation(headerTranslation)
+                        .build();
+                wv.setOnScrollChangedListener(scrollListener);
+                break;
+            case FOOTER:
+                mQuickReturnFooterTextView.setVisibility(View.VISIBLE);
+                scrollListener = new QuickReturnWebViewOnScrollChangedListener.Builder(QuickReturnViewType.FOOTER)
+                        .footer(mQuickReturnFooterTextView)
+                        .minFooterTranslation(footerTranslation)
+                        .build();
+                wv.setOnScrollChangedListener(scrollListener);
+                break;
+            case BOTH:
+                mQuickReturnHeaderTextView.setVisibility(View.VISIBLE);
+                mQuickReturnFooterTextView.setVisibility(View.VISIBLE);
+                scrollListener = new QuickReturnWebViewOnScrollChangedListener.Builder(QuickReturnViewType.BOTH)
+                        .header(mQuickReturnHeaderTextView)
+                        .minHeaderTranslation(headerTranslation)
+                        .footer(mQuickReturnFooterTextView)
+                        .minFooterTranslation(footerTranslation)
+                        .build();
+                wv.setOnScrollChangedListener(scrollListener);
+                break;
+        }
+
+        wv.setOverScrollEnabled(false);
+    }
+	
+	public void onGoBackClick (View v) {
+		if (wv.canGoBack()){
+  		  wv.goBack();
+  	  	} else v.setVisibility(View.GONE);
+	}
+
+
+
+	@Override
+	public void onTap() {
+		// TODO Auto-generated method stub
+		if(floatMenu.isExpanded()) floatMenu.collapse();
+	}
+
+	@Override
+	public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+		drawer.closeDrawer(GravityCompat.START);
+		Intent ip=new Intent();
+		switch (arg2) {
+		case 0:
+    		ip.putExtra("act", "photo");
+    		ip.setClassName("com.fvd.nimbus","com.fvd.nimbus.PaintActivity");
+    		startActivity(ip);
+			break;
+		case 1:
+			ip.putExtra("act", "picture");
+    		ip.setClassName("com.fvd.nimbus","com.fvd.nimbus.PaintActivity");
+    		startActivity(ip);
+			break;
+		case 2:
+    		ip.setClassName("com.fvd.nimbus","com.fvd.nimbus.ChoosePDFActivity");
+    		startActivity(ip);
+			break;
+
+		default:
+			break;
+		}
+		overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
+		finish();
+		
+	}
+	
+	/*void toggleTools(){
 		if(findViewById(R.id.bSaveFullPage).getVisibility()!=View.GONE){
 			findViewById(R.id.vShadow).setVisibility(View.GONE);
 			//findViewById(R.id.bToggleMenu).startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate_ccw));
@@ -1343,7 +1655,7 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
 	            	findViewById(R.id.bSavePageFragment).setVisibility(View.VISIBLE);
 	    			findViewById(R.id.bSavePageFragment).startAnimation(AnimationUtils.loadAnimation(this, R.anim.fadein));
 	            }
-	        },50);*/
+	        },50);
 			
 			findViewById(R.id.bSaveFullPage).setVisibility(View.VISIBLE);
 			findViewById(R.id.bSaveFullPage).startAnimation(AnimationUtils.loadAnimation(this, R.anim.fadein1));
@@ -1362,5 +1674,5 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
 	            }
 	        },150);
 		}
-	}
+	}*/
 }

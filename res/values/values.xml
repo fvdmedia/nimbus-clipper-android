@@ -3,4 +3,5 @@
     <integer name="slider_weight">3</integer>
     <integer name="color_weight">2</integer>
     <integer name="free_space_weight">0</integer>
+    <integer name="is_tablet">0</integer>
 </resources>

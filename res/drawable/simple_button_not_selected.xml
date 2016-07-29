@@ -1,0 +1,11 @@
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle" >
+    <stroke android:width="2.3dp"
+            android:color="#FFFFFF" />
+    <solid android:color="@color/buttonBGon"/>
+    <corners
+     android:bottomRightRadius="@dimen/thin_btn_radius"
+     android:bottomLeftRadius="@dimen/thin_btn_radius"
+  	 android:topLeftRadius="@dimen/thin_btn_radius"
+  	 android:topRightRadius="@dimen/thin_btn_radius"/>
+</shape>

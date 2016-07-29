@@ -16,7 +16,8 @@ public class OutlineActivity extends ListActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+		//overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+		overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
 		mItems = OutlineActivityData.get().items;
 		setListAdapter(new OutlineAdapter(getLayoutInflater(),mItems));
 		// Restore the position within the list from last viewing

@@ -695,6 +695,7 @@ public abstract class PageView extends ViewGroup {
 	}
 
 	public void update() {
+		
 		// Cancel pending render task
 		if (mDrawEntire != null) {
 			mDrawEntire.cancel(true);
@@ -722,6 +723,7 @@ public abstract class PageView extends ViewGroup {
 		mDrawEntire.execute();
 
 		updateHq(true);
+		
 	}
 
 	public void removeHq() {

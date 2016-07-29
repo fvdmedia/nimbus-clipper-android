@@ -1,0 +1,34 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+	    <shape android:shape="rectangle">
+        	<gradient 
+        	    android:startColor="#00000000"
+        	    android:centerColor="#00000000"
+        	    android:endColor="#00000000"
+        	    />
+        	<corners 
+        	    android:bottomRightRadius="@dimen/thin_btn_shadow"
+	     		android:bottomLeftRadius="@dimen/thin_btn_shadow"
+		     	android:topLeftRadius="@dimen/thin_btn_shadow"
+	  	 	    android:topRightRadius="@dimen/thin_btn_shadow"/>
+        	<padding 
+	        android:left="@dimen/thin_btn_sh_padding"
+	        android:top="@dimen/thin_btn_sh_padding"
+	        android:right="@dimen/thin_btn_sh_padding"
+	        android:bottom="@dimen/thin_btn_sh_padding"/>
+		</shape>
+	</item>
+    <item >
+	<shape 
+	    android:shape="rectangle" >
+	    <solid android:color="@color/buttonBGon"/>
+	    <corners
+	     android:bottomRightRadius="@dimen/thin_btn_radius"
+	     android:bottomLeftRadius="@dimen/thin_btn_radius"
+	  	 android:topLeftRadius="@dimen/thin_btn_radius"
+	  	 android:topRightRadius="@dimen/thin_btn_radius"/>
+	    
+	    
+	</shape>
+	</item>
+</layer-list>

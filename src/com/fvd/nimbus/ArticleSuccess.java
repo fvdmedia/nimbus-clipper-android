@@ -16,7 +16,8 @@ public class ArticleSuccess extends Activity implements OnClickListener{
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+        //overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+        overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         try{
         	requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -40,7 +41,8 @@ public class ArticleSuccess extends Activity implements OnClickListener{
 		    	setResult(RESULT_OK, intent);
 		        break;
 	    }
-		overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+		//overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+		overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
 		finish();
 	}
 }

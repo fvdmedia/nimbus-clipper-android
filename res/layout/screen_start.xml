@@ -24,10 +24,9 @@
 			    android:layout_height="wrap_content"
 			    android:layout_marginTop="10dp"
 			    android:layout_gravity="center_horizontal"
-			    
 			    android:text="@string/please_wait"
 			    android:textColor="@color/buttonBGoff"
-			    android:textSize="16dp"
+			    android:textSize="16sp"
 			    android:textStyle="bold" />
     	
     </LinearLayout>
@@ -57,13 +56,13 @@
 			    android:gravity="center"
 			    android:background="@color/ltBack"
 			    android:orientation="vertical" >
-
-		    <Button
-		        android:id="@+id/bTakePhoto"
+			
+		    <!-- <Button
+		        
 		        android:layout_width="match_parent"
 		        android:layout_height="wrap_content"
-		        android:layout_marginTop="70dp"
-		        android:layout_gravity="center_horizontal"
+		        
+		        
 		        android:background="@drawable/button_selector"
 		        android:drawableLeft="@drawable/camera"
 		        android:drawablePadding="@dimen/drawable_padding"
@@ -72,9 +71,35 @@
 		        android:text="@string/take_photo"
 		        android:textColor="@drawable/button_text_color"
 		        android:textSize="@dimen/input_text"
-		        />
+		        android:onClick="onButtonClick"
+		        />-->
+		    <FrameLayout 
+		        android:id="@+id/bTakePhoto"
+		        android:layout_marginTop="70dp"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:background="@drawable/button_selector"
+		        android:minHeight="48dp"
+		        android:clickable="true"
+		        android:paddingLeft="@dimen/welcome_text"
+		        android:paddingRight="@dimen/welcome_text"
+		        android:onClick="onButtonClick">
+		        <ImageView android:layout_width="wrap_content"
+		            android:layout_height="wrap_content" 
+		            android:src="@drawable/camera"
+		            android:layout_gravity="center_vertical"
+		            />
+		        <TextView 
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:text="@string/take_photo"
+		            android:layout_gravity="center_vertical"
+		        	android:textColor="@drawable/button_text_color"
+		        	android:textSize="@dimen/input_text"
+		        	android:layout_marginLeft="50dp"/>
+		    </FrameLayout>
 
-		    <Button
+		    <!-- <Button
 		        android:id="@+id/bFromGallery"
 		        android:layout_width="match_parent"
 		        android:layout_height="wrap_content"
@@ -89,10 +114,40 @@
 		        android:text="@string/from_gallery"
 		        android:textColor="@drawable/button_text_color"
 		        android:textSize="@dimen/input_text"
+		        android:onClick="onButtonClick"
 		        />
+		         -->
+		    
+		    <FrameLayout 
+		        android:id="@+id/bFromGallery"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_marginBottom="@dimen/welcome_text"
+		        android:layout_marginTop="@dimen/welcome_text"
+		        android:background="@drawable/button_selector"
+		        android:minHeight="48dp"
+		        android:paddingLeft="@dimen/welcome_text"
+		        android:paddingRight="@dimen/welcome_text"
+		        android:clickable="true"
+		        android:onClick="onButtonClick">
+		        <ImageView 
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content" 
+		            android:src="@drawable/icon_gallery"
+		            android:layout_gravity="center_vertical"
+		            />
+		        <TextView 
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:text="@string/from_gallery"
+		            android:layout_gravity="center_vertical"
+		        	android:textColor="@drawable/button_text_color"
+		        	android:textSize="@dimen/input_text"
+		        	android:layout_marginLeft="50dp"/>
+		    </FrameLayout>
 
-		    <Button
-		        android:id="@+id/bWebClipper"
+		    <!-- Button
+		        
 		        android:layout_width="match_parent"
 		        android:layout_height="wrap_content"
 		        android:layout_gravity="center_horizontal"
@@ -105,10 +160,38 @@
 		        android:text="@string/web_clipper"
 		        android:textColor="@drawable/button_text_color"
 		        android:textSize="@dimen/input_text"
-		        />
+		        android:onClick="onButtonClick"
+		        />-->
 		    
-		    <Button
-		        android:id="@+id/bPdfAnnotate"
+		    <FrameLayout 
+		        android:id="@+id/bWebClipper"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_marginBottom="@dimen/welcome_text"
+		        android:background="@drawable/button_selector"
+		        android:minHeight="48dp"
+		        android:paddingLeft="@dimen/welcome_text"
+		        android:paddingRight="@dimen/welcome_text"
+		        android:clickable="true"
+		        android:onClick="onButtonClick">
+		        <ImageView 
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content" 
+		            android:src="@drawable/clipper"
+		            android:layout_gravity="center_vertical"
+		            />
+		        <TextView 
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:text="@string/web_clipper"
+		            android:layout_gravity="center_vertical"
+		        	android:textColor="@drawable/button_text_color"
+		        	android:textSize="@dimen/input_text"
+		        	android:layout_marginLeft="50dp"/>
+		    </FrameLayout>
+		    
+		    <!-- <Button
+		        
 		        android:layout_width="match_parent"
 		        android:layout_height="wrap_content"
 		        android:layout_gravity="center_horizontal"
@@ -120,18 +203,48 @@
 		        android:text="@string/pdf_annotate"
 		        android:textColor="@drawable/button_text_color"
 		        android:textSize="@dimen/input_text"
-		        />
+		        android:onClick="onButtonClick"
+		        />-->
+		    
+		    <FrameLayout 
+		        android:id="@+id/bPdfAnnotate"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_marginBottom="@dimen/welcome_text"
+		        android:background="@drawable/button_selector"
+		        android:minHeight="48dp"
+		        android:paddingLeft="@dimen/welcome_text"
+		        android:paddingRight="@dimen/welcome_text"
+		        android:clickable="true"
+		        android:onClick="onButtonClick">
+		        <ImageView 
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content" 
+		            android:src="@drawable/icon_pdf"
+		            android:layout_gravity="center_vertical"
+		            />
+		        <TextView 
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:text="@string/pdf_annotate"
+		            android:layout_gravity="center_vertical"
+		        	android:textColor="@drawable/button_text_color"
+		        	android:textSize="@dimen/input_text"
+		        	android:layout_marginLeft="50dp"/>
+		    </FrameLayout>
 	</LinearLayout>
 	</LinearLayout>
 </LinearLayout>
-
+<LinearLayout android:layout_height="wrap_content"
+    	android:layout_width="match_parent"
+    	android:orientation="vertical"
+    	android:layout_alignParentBottom="true"
+        android:layout_centerInParent="true">
 		<LinearLayout  
         android:orientation="horizontal"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:layout_alignParentBottom="true"
-        android:layout_centerInParent="true"
-        android:layout_marginBottom="66dp">
+        >
 
         <View
             android:layout_width="0dp"
@@ -149,6 +262,7 @@
 		        android:layout_weight="5"
 		        android:layout_marginLeft="6dp"
 		        android:layout_marginRight="6dp"
+		        android:onClick="onButtonClick"
 		        />
 
         <View
@@ -166,11 +280,11 @@
         android:layout_height="wrap_content"
         android:background="@color/transparent"
         android:contentDescription="@string/settings"
-        android:layout_alignParentBottom="true"
-        android:layout_centerInParent="true"
+        android:layout_gravity="center_horizontal"
         android:layout_marginBottom="16dp"
-        android:src="@drawable/settinggear" />
-
+        android:src="@drawable/settinggear"
+        android:onClick="onButtonClick" />
+</LinearLayout>
     <ImageView
         android:id="@+id/llauncher" 
         android:layout_width="110dp"

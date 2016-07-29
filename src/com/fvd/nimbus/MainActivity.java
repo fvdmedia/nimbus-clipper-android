@@ -22,6 +22,7 @@ import android.content.SharedPreferences.Editor;
 import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -32,6 +33,7 @@ import android.hardware.Camera.PictureCallback;
 import android.hardware.Camera.Size;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 //import android.util.Log;
@@ -52,7 +54,7 @@ import com.fvd.utils.prefsEditListener;
 import com.fvd.utils.appSettings;
 import com.fvd.utils.serverHelper;
 
-public class MainActivity extends Activity implements OnClickListener,AsyncTaskCompleteListener<String, String>{
+public class MainActivity extends Activity implements AsyncTaskCompleteListener<String, String>{
 	private static final int TAKE_PHOTO = 1;
 	private static final int TAKE_PICTURE = 2;
 	private static final int SIGN_IN = 3;
@@ -81,9 +83,14 @@ public class MainActivity extends Activity implements OnClickListener,AsyncTaskC
         catch (Exception e){
         	e.printStackTrace();
         }
+        File ex=getExternalCacheDir();
+        if (ex==null) ex=getCacheDir();
+        if (ex==null) ex=Environment.getExternalStorageDirectory();
+        if(ex!=null) appSettings.cacheDir=ex.getPath();
         
         setContentView(R.layout.screen_start);
-        overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+        //overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+        overridePendingTransition(R.anim.activity_open_translate,R.anim.activity_close_translate);
         
         if (!isTaskRoot()) {
         
@@ -98,19 +105,23 @@ public class MainActivity extends Activity implements OnClickListener,AsyncTaskC
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         appSettings.getInstance().setIsTablet(isTablet());
         serverHelper.getInstance().setCallback(this,this);
-        findViewById(R.id.bTakePhoto).setOnClickListener(this);
+        /*findViewById(R.id.bTakePhoto).setOnClickListener(this);
         findViewById(R.id.bFromGallery).setOnClickListener(this);
         findViewById(R.id.bWebClipper).setOnClickListener(this);
         findViewById(R.id.bPdfAnnotate).setOnClickListener(this);
-        findViewById(R.id.ibSettings).setOnClickListener(this);
+        findViewById(R.id.ibSettings).setOnClickListener(this);*/
         
-        userMail = prefs.getString("userMail", "");
+        /*userMail = prefs.getString("userMail", "");
         userPass = prefs.getString("userPass", "");
         String sessionId = prefs.getString("sessionId", "");
         appSettings.sessionId=sessionId;
  	    appSettings.userMail=userMail;
- 	    appSettings.userPass=userPass;
-        
+ 	    appSettings.userPass=userPass;*/
+        appSettings.init(this);
+        userMail = appSettings.userMail;
+        userPass = appSettings.userPass;
+ 	    
+ 	    
         if(isFirst()){
         	createShortcut(this);
         	showHelp();
@@ -119,12 +130,12 @@ public class MainActivity extends Activity implements OnClickListener,AsyncTaskC
         	if(!prefs.getBoolean("offline", false)){
         		if ((userMail.length()== 0 || userPass.length() == 0)) showLogin();
         		else{
-        			if (sessionId.length() == 0 /*|| true*/){ 
-        				serverHelper.getInstance().setSessionId(sessionId);
+        			if (appSettings.sessionId.length() == 0 /*|| true*/){ 
+        				//serverHelper.getInstance().setSessionId(sessionId);
         				serverHelper.getInstance().sendRequest("user:auth", String.format("\"email\":\"%s\",\"password\":\"%s\"",userMail,userPass),"");
         			}
         			else {
-        				serverHelper.getInstance().setSessionId(sessionId);
+        				//serverHelper.getInstance().setSessionId(sessionId);
         				serverHelper.getInstance().sendQuietRequest("user:authstate", "","");
         			}
         			AppRate.start(this);
@@ -154,11 +165,12 @@ public class MainActivity extends Activity implements OnClickListener,AsyncTaskC
     @Override
 	  public void onResume() {
 	    super.onResume();
-	    overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+	    //overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+	    overridePendingTransition(R.anim.activity_open_scale,R.anim.activity_close_translate);
 	    if(prefs == null) prefs = PreferenceManager.getDefaultSharedPreferences(this);
 	    appSettings.getInstance().setIsTablet(isTablet());
         serverHelper.getInstance().setCallback(this,this);
-        serverHelper.getInstance().setSessionId(prefs.getString("sessionId", ""));
+        appSettings.sessionId=prefs.getString("sessionId", "");
 	  }
     
    
@@ -175,6 +187,8 @@ public class MainActivity extends Activity implements OnClickListener,AsyncTaskC
         addIntent.putExtra(Intent.EXTRA_SHORTCUT_NAME, "Nimbus Clipper");
         addIntent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE,Intent.ShortcutIconResource.fromContext(context, R.drawable.app_icon));
         addIntent.putExtra("duplicate", false);
+        addIntent.setAction("com.android.launcher.action.UNINSTALL_SHORTCUT");
+        context.sendBroadcast(addIntent);
         addIntent.setAction("com.android.launcher.action.INSTALL_SHORTCUT");
         context.sendBroadcast(addIntent);
     }
@@ -193,25 +207,34 @@ public class MainActivity extends Activity implements OnClickListener,AsyncTaskC
 		return ((System.currentTimeMillis() - ms)/(24 * 60 * 60 * 1000))>4;
 	}
     
-    public void showSettingsPopup(View view) {
+    /*public void showSettingsPopup(View view) {
 
     	if (serverHelper.getInstance().getSession().length() == 0) ((Button)settingsLayout.findViewById(R.id.bssLogin)).setText(getResources().getString(R.string.login));
     	else ((Button)settingsLayout.findViewById(R.id.bssLogin)).setText(getResources().getString(R.string.logout));
     	if (canRate()) ((Button)settingsLayout.findViewById(R.id.bssRateUs)).setVisibility(View.VISIBLE);
     	else ((Button)settingsLayout.findViewById(R.id.bssRateUs)).setVisibility(View.GONE);
+    }*/
+    
+    
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        setContentView(R.layout.screen_start);
     }
     
     boolean isTablet(){
-    	Display d = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+    	/*Display d = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
     	Point size = new Point();
     	size.x = d.getWidth();
-    	size.y = d.getHeight();
-    	boolean b = size.x>1280 || size.y>1280;//size.x>480 && size.y>800||size.x>800 && size.y>480;
-    	if (!b) setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+    	size.y = d.getHeight();*/
+    	//boolean b = size.x>1280 || size.y>1280;//size.x>480 && size.y>800||size.x>800 && size.y>480;
+    	boolean b=getResources().getInteger(R.integer.is_tablet)!=0;
+    	//boolean b=(this.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK)>= Configuration.SCREENLAYOUT_SIZE_LARGE;
+     	if (!b) setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		return b;
     }
     
-    public void onClick(View v)
+    public void onButtonClick(View v)
     {
     	switch(v.getId()){
     	case R.id.bTakePhoto:
@@ -236,20 +259,23 @@ public class MainActivity extends Activity implements OnClickListener,AsyncTaskC
     		Intent iBrowse = new Intent();
     		iBrowse.setClassName("com.fvd.nimbus","com.fvd.nimbus.BrowseActivity");
     		startActivity(iBrowse);
-    		overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+    		//overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+    		overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
     		break;
     	case R.id.bPdfAnnotate:
     		Intent ip = new Intent();
     		ip.setClassName("com.fvd.nimbus","com.fvd.nimbus.ChoosePDFActivity");
     		startActivity(ip);
-    		overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+    		//overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+    		overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
     		break;
     	case R.id.ibSettings:
     		Intent inten = new Intent(getApplicationContext(), SettingsActivity.class);
         	startActivityForResult(inten,SHOW_SETTINGS);
-        	overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+        	//overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
+        	overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
     		break;
-    	case R.id.bssSettings:
+    	/*case R.id.bssSettings:
     		Intent i = new Intent(getApplicationContext(), PrefsActivity.class);
         	startActivity(i);
         	overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
@@ -286,7 +312,7 @@ public class MainActivity extends Activity implements OnClickListener,AsyncTaskC
             }
             catch(Exception e){
             }
-    		break;
+    		break;*/
     	}
     }
     
@@ -305,7 +331,8 @@ public class MainActivity extends Activity implements OnClickListener,AsyncTaskC
     		outputFileUri = Uri.fromFile(file);
     		intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
     		startActivityForResult(intent, TAKE_PHOTO);
-    		overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+    		//overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+    		overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
     	}
     	catch (Exception e){
     		appSettings.appendLog("main:getPhoto  "+e.getMessage());
@@ -340,7 +367,7 @@ public class MainActivity extends Activity implements OnClickListener,AsyncTaskC
     			Intent iPaint = new Intent();
         		iPaint.putExtra("temp", true);
         		iPaint.putExtra("path", photoFileName);
-        		iPaint.setClassName("com.fvd.nimbus","com.fvd.nimbus.Paint");
+        		iPaint.setClassName("com.fvd.nimbus","com.fvd.nimbus.PaintActivity");
         		startActivity(iPaint);
     		}
     		showProgress(false);
@@ -385,7 +412,7 @@ public class MainActivity extends Activity implements OnClickListener,AsyncTaskC
     			 			Intent iPaint = new Intent();
     			 			iPaint.putExtra("temp", temp);
     			 			iPaint.putExtra("path", drawString);
-    			 			iPaint.setClassName("com.fvd.nimbus","com.fvd.nimbus.Paint");
+    			 			iPaint.setClassName("com.fvd.nimbus","com.fvd.nimbus.PaintActivity");
     			 			startActivity(iPaint);
     			 		}
     			 		catch (Exception e)
@@ -419,19 +446,27 @@ public class MainActivity extends Activity implements OnClickListener,AsyncTaskC
         	  case RESULT_FIRST_USER+1:
           		Intent i = new Intent(getApplicationContext(), PrefsActivity.class);
               	startActivity(i);
-              	overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+              	//overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+              	overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
           		break;
           	case RESULT_FIRST_USER+2:
-          		if(serverHelper.getInstance().getSession().length() == 0) showLogin();
+          		if(appSettings.sessionId.length() == 0) showLogin();
         		else {
-        			String sessionId="";
-        			serverHelper.getInstance().setSessionId(sessionId);
-        			Editor e = prefs.edit();
-        			e.putString("userMail", userMail);
-            	    e.putString("userPass", "");
-            	    e.putString("sessionId", sessionId);
-            	    e.commit();
-        			showLogin();
+        			if(true || appSettings.service==""){
+	        			appSettings.sessionId="";
+	        			Editor e = prefs.edit();
+	        			e.putString("userMail", userMail);
+	            	    e.putString("userPass", "");
+	            	    e.putString("sessionId", appSettings.sessionId);
+	            	    e.commit();
+	        			showLogin();
+        			} else {
+	        				i = new Intent(getApplicationContext(), loginWithActivity.class);
+	        		    	i.putExtra("logout", "true");
+	        		    	i.putExtra("service", appSettings.service);
+	        		    	startActivity(i);
+	        		    	overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
+        				}
         			}
           		break;	
           	case RESULT_FIRST_USER+3:
@@ -444,7 +479,8 @@ public class MainActivity extends Activity implements OnClickListener,AsyncTaskC
           		Uri uri = Uri.parse("http://help.everhelper.me/customer/portal/articles/1376820-nimbus-clipper-for-android---quick-guide");
           		Intent it = new Intent(Intent.ACTION_VIEW, uri);
           		startActivity(it);
-          		overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+          		//overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+          		overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
           		break;
           	case RESULT_FIRST_USER+5:
           		final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
@@ -584,14 +620,16 @@ public class MainActivity extends Activity implements OnClickListener,AsyncTaskC
     	Intent i = new Intent(getApplicationContext(), loginActivity.class);
     	i.putExtra("userMail", userMail==null?"":userMail);
     	startActivity(i);
-    	overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+    	//overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+    	overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
     }
     
     private void showHelp()
     {
     	Intent i = new Intent(getApplicationContext(), helpActivity.class);
     	startActivity(i);
-    	overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+    	//overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+    	overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
     }
     
     @Override
@@ -601,10 +639,11 @@ public class MainActivity extends Activity implements OnClickListener,AsyncTaskC
     		try{
             	JSONObject root = new JSONObject(result);
             	int error = root.getInt("errorCode");
+            	//error=-6;
+            	
             	if (error == 0){
             		if (action.equalsIgnoreCase("user:auth")){
             			final String sessionId = root.getJSONObject("body").getString("sessionid");
-            			serverHelper.getInstance().setSessionId(sessionId);
             					Editor e = prefs.edit();
             					e.putString("userMail", userMail);
                 	    		e.putString("userPass", userPass);
@@ -621,12 +660,11 @@ public class MainActivity extends Activity implements OnClickListener,AsyncTaskC
             			boolean auth = root.getJSONObject("body").getBoolean("authorized");
             			Toast.makeText(getApplicationContext(), "user " + (auth?"authorized":"not authorized"), Toast.LENGTH_LONG).show();
             			if(!auth){
-            				String sessionId="";
-                			serverHelper.getInstance().setSessionId(sessionId);
+            				appSettings.sessionId="";
                 			Editor e = prefs.edit();
                 			e.putString("userMail", userMail);
                     	    e.putString("userPass", "");
-                    	    e.putString("sessionId", sessionId);
+                    	    e.putString("sessionId", appSettings.sessionId);
                     	    e.commit();
                 			showLogin();
             			}
@@ -636,6 +674,12 @@ public class MainActivity extends Activity implements OnClickListener,AsyncTaskC
             		}
             	} else 
             		{
+            			if(error==-6){
+            				showLogin();
+            				/*if(userMail.length()>0 && userPass.length()>0){
+            					sendRequest("user:auth", String.format("\"email\":\"%s\",\"password\":\"%s\"",userMail,userPass));
+            				} else showLogin();*/
+            			} else 
             			Toast.makeText(getApplicationContext(), String.format("Error: %s",serverHelper.errorMsg(error)), Toast.LENGTH_LONG).show();
             		}
             }

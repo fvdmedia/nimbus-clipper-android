@@ -14,6 +14,7 @@ import java.util.concurrent.Executor;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.fvd.classes.DataExchange;
 import com.fvd.paint.Shape;
 import com.fvd.paint.Text;
 import com.fvd.paint.DrawView.Mode;
@@ -39,6 +40,7 @@ import com.fvd.utils.appSettings;
 import com.fvd.utils.helper;
 import com.fvd.utils.serverHelper;
 
+import android.R.string;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -49,6 +51,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -108,7 +111,8 @@ public class MuPDFActivity extends Activity implements OnClickListener, FilePick
 	private View         mButtonsView;
 	private boolean      mButtonsVisible=false;
 	private EditText     mPasswordView;
-	private LinearLayout topBar;
+	private ViewAnimator topBar;
+	private ViewAnimator mSwitcherLand;
 	private int          mPageSliderRes;
 	private ImageButton  mOutlineButton;
 	private ImageButton  mSaveNimbus;
@@ -127,7 +131,8 @@ public class MuPDFActivity extends Activity implements OnClickListener, FilePick
 	private AlertDialog mAlertDialog;
 	private FilePicker mFilePicker;
 	private Context ctx;
-	
+	private OnClickListener OutlineListener; 
+	int[] buttons={R.id.pdfColor1_land,R.id.pdfColor2_land,R.id.pdfColor3_land, R.id.pdfColor4_land,R.id.pdfColor5_land};
 
 	public void createAlertWaiter() {
 		mAlertsActive = true;
@@ -307,12 +312,24 @@ public class MuPDFActivity extends Activity implements OnClickListener, FilePick
 		mButtonsView.findViewById(R.id.pdf_DrawArrow).setOnClickListener(this);
 		mButtonsView.findViewById(R.id.pdf_DrawLine).setOnClickListener(this);
 		mButtonsView.findViewById(R.id.pdf_DrawComment).setOnClickListener(this);
+		
+		mButtonsView.findViewById(R.id.pdf_DrawPensil_land).setOnClickListener(this);
+		mButtonsView.findViewById(R.id.pdf_DrawRect_land).setOnClickListener(this);
+		mButtonsView.findViewById(R.id.pdf_DrawArrow_land).setOnClickListener(this);
+		mButtonsView.findViewById(R.id.pdf_DrawLine_land).setOnClickListener(this);
+		mButtonsView.findViewById(R.id.pdf_DrawComment_land).setOnClickListener(this);
         
 		mButtonsView.findViewById(R.id.pdfColor1).setOnClickListener(this);
 		mButtonsView.findViewById(R.id.pdfColor2).setOnClickListener(this);
 		mButtonsView.findViewById(R.id.pdfColor3).setOnClickListener(this);
 		mButtonsView.findViewById(R.id.pdfColor4).setOnClickListener(this);
 		mButtonsView.findViewById(R.id.pdfColor5).setOnClickListener(this);
+		
+		mButtonsView.findViewById(R.id.pdfColor1_land).setOnClickListener(this);
+		mButtonsView.findViewById(R.id.pdfColor2_land).setOnClickListener(this);
+		mButtonsView.findViewById(R.id.pdfColor3_land).setOnClickListener(this);
+		mButtonsView.findViewById(R.id.pdfColor4_land).setOnClickListener(this);
+		mButtonsView.findViewById(R.id.pdfColor5_land).setOnClickListener(this);
 
         (( Button )mButtonsView.findViewById(R.id.pdf_ApplyText)).setOnClickListener(new OnClickListener() {
 			
@@ -333,6 +350,12 @@ public class MuPDFActivity extends Activity implements OnClickListener, FilePick
 				}
 			}
 		});
+        
+        appSettings.init(this);
+        userMail = appSettings.userMail;
+        userPass = appSettings.userPass;
+        
+ 	    
 		serverHelper.getInstance().setCallback(this, this);
 		mAlertBuilder = new AlertDialog.Builder(this);
 
@@ -425,6 +448,71 @@ public class MuPDFActivity extends Activity implements OnClickListener, FilePick
 
 		createUI(savedInstanceState);
 	}
+	
+	
+	@Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        /*if (getResources().getInteger(R.integer.is_tablet)!=0 &&  newConfig.orientation==Configuration.ORIENTATION_LANDSCAPE){
+        	findViewById(R.id.flTools).setVisibility(View.VISIBLE);
+        }
+        else findViewById(R.id.flTools).setVisibility(View.GONE);*/
+        setBarConfig(newConfig.orientation);
+    }
+	
+	
+Boolean isEditable(){
+	if(core!=null){
+		return core.isUnencryptedPDF() && !core.wasOpenedFromBuffer();
+	}
+	return false;
+}
+Boolean isTabletLandscape=false;
+    
+void setBarConfig(int orientation){
+		hideTools();
+    	if (getResources().getInteger(R.integer.is_tablet)!=0 &&  orientation==Configuration.ORIENTATION_LANDSCAPE){
+        	//findViewById(R.id.flTools).setVisibility(View.VISIBLE);
+    		isTabletLandscape=true;
+    		if(isEditable())
+    			topBar.setDisplayedChild(1);
+    		mBottomBarSwitcher.setVisibility(View.GONE);
+    		showButtons();
+    		mDocView.refresh(false);
+    		
+    		/*topBar.postDelayed(new Runnable() {
+				
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+					mDocView.requestLayout();
+				}
+			}, 100);*/
+    		/*mDocView.setMode(MuPDFReaderView.Mode.Viewing);
+    		 * 
+    		mDocView.requestLayout();*/
+    		//mButtonsView.findViewById(R.id.topbar).setVisibility(View.GONE);
+    		
+        	//((ViewAnimator)findViewById(R.id.top_switcher)).setDisplayedChild(2);
+    		
+        }
+        else {
+         	isTabletLandscape=false;
+        	/*((ViewAnimator)findViewById(R.id.top_switcher)).setDisplayedChild(0);
+        	findViewById(R.id.footer).setVisibility(View.VISIBLE);
+        	setSelectedFoot(0);*/
+         	topBar.setDisplayedChild(0);
+         	//mBottomBarSwitcher.setVisibility(View.VISIBLE);
+         	mBottomBarSwitcher.setVisibility(View.VISIBLE);
+         	showButtons();
+         	mDocView.refresh(false);
+         	
+         	
+         	//mButtonsView.findViewById(R.id.topbar).setVisibility(View.VISIBLE);
+         	//mButtonsView.findViewById(R.id.pdf_switcher_land).setVisibility(View.GONE);
+        	
+        }
+    }
 
 	public void requestPassword(final Bundle savedInstanceState) {
 		mPasswordView = new EditText(this);
@@ -529,6 +617,7 @@ public class MuPDFActivity extends Activity implements OnClickListener, FilePick
 						showButtons();
 						mTopBarMode = TopBarMode.Delete;
 						mBottomBarSwitcher.setDisplayedChild(mTopBarMode.ordinal());
+						mSwitcherLand.setDisplayedChild(1);
 					}
 					break;
 				case Delete:
@@ -590,7 +679,23 @@ public class MuPDFActivity extends Activity implements OnClickListener, FilePick
 		});
 
 		if (core.hasOutline()) {
-			mOutlineButton.setOnClickListener(new View.OnClickListener() {
+			OutlineListener=new OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					// TODO Auto-generated method stub
+					OutlineItem outline[] = core.getOutline();
+					if (outline != null) {
+						OutlineActivityData.get().items = outline;
+						Intent intent = new Intent(MuPDFActivity.this, OutlineActivity.class);
+						startActivityForResult(intent, OUTLINE_REQUEST);
+						//overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+						overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
+					}
+				}
+			};
+			mOutlineButton.setOnClickListener(OutlineListener);
+			/*mOutlineButton.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) {
 					OutlineItem outline[] = core.getOutline();
 					if (outline != null) {
@@ -600,17 +705,18 @@ public class MuPDFActivity extends Activity implements OnClickListener, FilePick
 						overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
 					}
 				}
-			});
+			});*/
+			mButtonsView.findViewById(R.id.pdf_toc).setOnClickListener(OutlineListener);
 		} else {
 			mOutlineButton.setVisibility(View.GONE);
+			mButtonsView.findViewById(R.id.pdf_toc).setVisibility(View.GONE);
 		}
 
 		// Reenstate last state if it was recorded
 		SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
 		mDocView.setDisplayedViewIndex(prefs.getInt("page"+mFileName, 0));
 
-		if (savedInstanceState == null || !savedInstanceState.getBoolean("ButtonsHidden", false))
-			showButtons();
+		
 
 		if(savedInstanceState != null && savedInstanceState.getBoolean("SearchMode", false))
 			searchModeOn();
@@ -625,8 +731,13 @@ public class MuPDFActivity extends Activity implements OnClickListener, FilePick
 		layout.addView(mButtonsView);
 		
 		setContentView(layout);
+		setBarConfig(getResources().getConfiguration().orientation);
+		if (savedInstanceState == null || !savedInstanceState.getBoolean("ButtonsHidden", false))
+			showButtons();
+		setSelectedColor(R.id.pdfColor2_land);
 	}
 
+	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		switch (requestCode) {
@@ -659,7 +770,8 @@ public class MuPDFActivity extends Activity implements OnClickListener, FilePick
 		case 7:
 			if (resultCode==RESULT_OK && data!=null){
 	    		
-				String parent = data.getStringExtra("id");
+				DataExchange xdata=(DataExchange)data.getExtras().getSerializable("xdata");
+				String parent = xdata.getId();
 				serverHelper.getInstance().uploadPdfFile(helper.extractFileName(mFilePath), parent, mFilePath);
 	    		}
 			break;
@@ -766,16 +878,18 @@ public class MuPDFActivity extends Activity implements OnClickListener, FilePick
 			topBar.startAnimation(anim);
 			
 			if(core.isUnencryptedPDF() && !core.wasOpenedFromBuffer()){
-				anim = new TranslateAnimation(0, 0, mBottomBarSwitcher.getHeight(), 0);
-				anim.setDuration(200);
-				anim.setAnimationListener(new Animation.AnimationListener() {
-					public void onAnimationStart(Animation animation) {
-						mBottomBarSwitcher.setVisibility(View.VISIBLE);
-					}
-					public void onAnimationRepeat(Animation animation) {}
-					public void onAnimationEnd(Animation animation) {}
-				});
-				mBottomBarSwitcher.startAnimation(anim);
+				if(!isTabletLandscape){
+					anim = new TranslateAnimation(0, 0, mBottomBarSwitcher.getHeight(), 0);
+					anim.setDuration(200);
+					anim.setAnimationListener(new Animation.AnimationListener() {
+						public void onAnimationStart(Animation animation) {
+							mBottomBarSwitcher.setVisibility(View.VISIBLE);
+						}
+						public void onAnimationRepeat(Animation animation) {}
+						public void onAnimationEnd(Animation animation) {}
+					});
+					mBottomBarSwitcher.startAnimation(anim);
+				}
 			}
 			else Toast.makeText(ctx, getString(R.string.pdf_file_is_protected), Toast.LENGTH_LONG).show();
 		}
@@ -800,16 +914,18 @@ public class MuPDFActivity extends Activity implements OnClickListener, FilePick
 			topBar.startAnimation(anim);
 			
 			if(core.isUnencryptedPDF() && !core.wasOpenedFromBuffer()){
-				anim = new TranslateAnimation(0, 0, 0, mBottomBarSwitcher.getHeight());
-				anim.setDuration(200);
-				anim.setAnimationListener(new Animation.AnimationListener() {
-					public void onAnimationStart(Animation animation) {}
-					public void onAnimationRepeat(Animation animation) {}
-					public void onAnimationEnd(Animation animation) {
-						mBottomBarSwitcher.setVisibility(View.INVISIBLE);
-					}
-				});
-				mBottomBarSwitcher.startAnimation(anim);
+				if(!isTabletLandscape){
+					anim = new TranslateAnimation(0, 0, 0, mBottomBarSwitcher.getHeight());
+					anim.setDuration(200);
+					anim.setAnimationListener(new Animation.AnimationListener() {
+						public void onAnimationStart(Animation animation) {}
+						public void onAnimationRepeat(Animation animation) {}
+						public void onAnimationEnd(Animation animation) {
+							mBottomBarSwitcher.setVisibility(View.INVISIBLE);
+						}
+					});
+					mBottomBarSwitcher.startAnimation(anim);
+				}
 			}
 			
 			mDocView.setMode(MuPDFReaderView.Mode.Viewing);
@@ -849,7 +965,8 @@ public class MuPDFActivity extends Activity implements OnClickListener, FilePick
 		printIntent.setDataAndType(docUri, "aplication/pdf");
 		printIntent.putExtra("title", mFileName);
 		startActivityForResult(printIntent, PRINT_REQUEST);
-		overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+		//overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+		overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
 	}
 
 	private void showInfo(String message) {
@@ -863,8 +980,9 @@ public class MuPDFActivity extends Activity implements OnClickListener, FilePick
 		mSharePdf = (ImageButton)mButtonsView.findViewById(R.id.pdfShare);
 		mAnnotTypeText = (TextView)mButtonsView.findViewById(R.id.annotType);
 		mBottomBarSwitcher = (ViewAnimator)mButtonsView.findViewById(R.id.switcher);
-		topBar = (LinearLayout)mButtonsView.findViewById(R.id.topbar);
-		mBottomBarSwitcher.setVisibility(View.INVISIBLE);
+		mSwitcherLand = (ViewAnimator)mButtonsView.findViewById(R.id.pdf_switcher_land);
+		topBar = (ViewAnimator)mButtonsView.findViewById(R.id.pdf_top_switcher);
+		//mBottomBarSwitcher.setVisibility(View.INVISIBLE);
 	}
 
 	public void OnMoreButtonClick(View v) {
@@ -874,6 +992,7 @@ public class MuPDFActivity extends Activity implements OnClickListener, FilePick
 	public void OnCancelMoreButtonClick(View v) {
 		mTopBarMode = TopBarMode.Annot;
 		mBottomBarSwitcher.setDisplayedChild(mTopBarMode.ordinal());
+		mSwitcherLand.setDisplayedChild(0);
 		mDocView.setMode(MuPDFReaderView.Mode.Viewing);
 	}
 
@@ -888,18 +1007,28 @@ public class MuPDFActivity extends Activity implements OnClickListener, FilePick
 	public void OnEditAnnotButtonClick(View v) {
 		mTopBarMode = TopBarMode.Annot;
 		mBottomBarSwitcher.setDisplayedChild(mTopBarMode.ordinal());
+		mSwitcherLand.setDisplayedChild(0);
 	}
 
 	public void OnCancelAnnotButtonClick(View v) {
 		mTopBarMode = TopBarMode.Annot;
 		mBottomBarSwitcher.setDisplayedChild(mTopBarMode.ordinal());
+		mSwitcherLand.setDisplayedChild(0);
 		mDocView.setMode(MuPDFReaderView.Mode.Viewing);
 	}
 
 	public void OnHighlightButtonClick(View v) {
 		hideTools();
+		if (appSettings.prefsReadString(this,"pdfdlg", "0")=="0"){
+			showMessage("", getString(R.string.pdf_finger));
+			appSettings.prefsWriteString(this,"pdfdlg","1" );
+		}
+		
+		
 		mTopBarMode = TopBarMode.Accept;
 		mBottomBarSwitcher.setDisplayedChild(mTopBarMode.ordinal());
+
+		mSwitcherLand.setDisplayedChild(2);
 		mAcceptMode = AcceptMode.Highlight;
 		mDocView.setMode(MuPDFReaderView.Mode.Selecting);
 		mAnnotTypeText.setText(R.string.highlight);
@@ -907,8 +1036,14 @@ public class MuPDFActivity extends Activity implements OnClickListener, FilePick
 	}
 
 	public void OnUnderlineButtonClick(View v) {
+		if (appSettings.prefsReadString(this,"pdfdlg", "0")=="0"){
+			showMessage("", getString(R.string.pdf_finger));
+			appSettings.prefsWriteString(this,"pdfdlg","1" );
+		}
 		mTopBarMode = TopBarMode.Accept;
 		mBottomBarSwitcher.setDisplayedChild(mTopBarMode.ordinal());
+
+		mSwitcherLand.setDisplayedChild(2);
 		mAcceptMode = AcceptMode.Underline;
 		mDocView.setMode(MuPDFReaderView.Mode.Selecting);
 		mAnnotTypeText.setText(R.string.underline);
@@ -917,8 +1052,14 @@ public class MuPDFActivity extends Activity implements OnClickListener, FilePick
 
 	public void OnStrikeOutButtonClick(View v) {
 		hideTools();
+		if (appSettings.prefsReadString(this,"pdfdlg", "0")=="0"){
+			showMessage("", getString(R.string.pdf_finger));
+			appSettings.prefsWriteString(this,"pdfdlg","1" );
+		}
+		
 		mTopBarMode = TopBarMode.Accept;
 		mBottomBarSwitcher.setDisplayedChild(mTopBarMode.ordinal());
+		mSwitcherLand.setDisplayedChild(2);
 		mAcceptMode = AcceptMode.StrikeOut;
 		mDocView.setMode(MuPDFReaderView.Mode.Selecting);
 		mAnnotTypeText.setText(R.string.strike_out);
@@ -946,6 +1087,7 @@ public class MuPDFActivity extends Activity implements OnClickListener, FilePick
 			break;
 		}
 		mBottomBarSwitcher.setDisplayedChild(mTopBarMode.ordinal());
+		mSwitcherLand.setDisplayedChild(0);
 	}
 
 	public void OnAcceptButtonClick(View v) {
@@ -982,12 +1124,15 @@ public class MuPDFActivity extends Activity implements OnClickListener, FilePick
 			mTopBarMode = TopBarMode.Annot;
 			if (!success)
 				showInfo(getString(R.string.nothing_to_save));
+			mDocView.updateView();
 			break;
 		default:	
 			break;
 		}
 		mBottomBarSwitcher.setDisplayedChild(mTopBarMode.ordinal());
+		mSwitcherLand.setDisplayedChild(0);
 		mDocView.setMode(MuPDFReaderView.Mode.Viewing);
+
 	}
 
 	public void OnCancelSearchButtonClick(View v) {
@@ -1000,6 +1145,7 @@ public class MuPDFActivity extends Activity implements OnClickListener, FilePick
 			pageView.deleteSelectedAnnotation();
 		mTopBarMode = TopBarMode.Annot;
 		mBottomBarSwitcher.setDisplayedChild(mTopBarMode.ordinal());
+		mSwitcherLand.setDisplayedChild(0);
 	}
 
 	public void OnCancelDeleteButtonClick(View v) {
@@ -1008,6 +1154,7 @@ public class MuPDFActivity extends Activity implements OnClickListener, FilePick
 			pageView.deselectAnnotation();
 		mTopBarMode = TopBarMode.Annot;
 		mBottomBarSwitcher.setDisplayedChild(mTopBarMode.ordinal());
+		mSwitcherLand.setDisplayedChild(0);
 	}
 
 	private void showKeyboard() {
@@ -1049,7 +1196,8 @@ public class MuPDFActivity extends Activity implements OnClickListener, FilePick
 			core.startAlerts();
 			createAlertWaiter();
 		}
-		overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+		//overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+		overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
 		super.onStart();
 	}
 
@@ -1107,7 +1255,8 @@ public class MuPDFActivity extends Activity implements OnClickListener, FilePick
 		Intent intent = new Intent(this, ChoosePDFActivity.class);
 		intent.setAction(ChoosePDFActivity.PICK_KEY_FILE);
 		startActivityForResult(intent, FILEPICK_REQUEST);
-		overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+		//overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+		overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
 	}
 	
 	private class SaveTask extends AsyncTask<Void, Void, Void>{
@@ -1146,7 +1295,7 @@ public class MuPDFActivity extends Activity implements OnClickListener, FilePick
 			startActivity(Intent.createChooser(share, "Share PDF Document"));
 			break;
 		case 2:
-			if(serverHelper.getInstance().getSession().length()>0) {
+			if(appSettings.sessionId.length()>0) {
 				serverHelper.getInstance().sendRequest("notes:getFolders", "","");
 			} else showSettings();
 			break;
@@ -1159,6 +1308,7 @@ public class MuPDFActivity extends Activity implements OnClickListener, FilePick
 		
 	}
 
+	DataExchange clipData;
 	@SuppressLint("NewApi")
 	@Override
 	public void onTaskComplete(String result, String action) {
@@ -1173,8 +1323,7 @@ public class MuPDFActivity extends Activity implements OnClickListener, FilePick
         	if (error==0){
         		if (action.equalsIgnoreCase("user:auth")){
         			appSettings.sessionId = root.getJSONObject("body").getString("sessionid");
-        			serverHelper.getInstance().setSessionId(appSettings.sessionId);
-        			appSettings.storeUserData(ctx, userMail, userPass, appSettings.sessionId); 
+        			appSettings.storeUserData(ctx, userMail, userPass, appSettings.sessionId,""); 
         			Toast.makeText(getApplicationContext(), "user authorized", Toast.LENGTH_LONG).show();
         			serverHelper.getInstance().sendRequest("notes:getFolders", "","");
         		}
@@ -1182,7 +1331,7 @@ public class MuPDFActivity extends Activity implements OnClickListener, FilePick
         			
         			ArrayList<String>items=new ArrayList<String>();
         			try{
-        				result = URLDecoder.decode(result,"UTF-16"); 
+        				/*result = URLDecoder.decode(result,"UTF-16"); 
        	        	        String id="";
         	        		String title="";
         	        		JSONArray arr =  root.getJSONObject("body").getJSONArray("notes");
@@ -1197,8 +1346,28 @@ public class MuPDFActivity extends Activity implements OnClickListener, FilePick
         	        		intent.putExtra("current", appSettings.prefsReadString(this,"remFolderId", "default"));
         	        		intent.putExtra("hideTags", true);
         	    	    	startActivityForResult(intent,7);
-        	    	    	overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
-        	        		
+        	    	    	//overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+        	    	    	overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
+        	        		*/
+        				
+        				result = URLDecoder.decode(result,"UTF-16"); 
+        				if(clipData==null) clipData=new DataExchange();
+        				clipData.setData(result);
+    	        		String cr=appSettings.prefsReadString(this,"remFolderId", "default");
+    	        		if(cr==null || cr=="") cr="default";
+    	        		clipData.setId(cr);
+    	        		clipData.setTitle("");
+    	        		clipData.setTags("androidclipper");
+    	        		Intent intent = new Intent(getApplicationContext(), tagsActivity.class);
+    	        		intent.putExtra("xdata", clipData);
+    	        		/*intent.putExtra("current", cr);
+    	        		intent.putExtra("title", wv.getTitle());
+    	        		intent.putExtra("tags", "androidclipper");*/
+    	        		
+    	    	    	startActivityForResult(intent,7);
+    	    	    	//overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+    	    	    	overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
+    	    	    	clipData.setData("");
         	        }
         	        catch (Exception Ex){
         	        	appSettings.appendLog("prefs:onTaskComplete "+Ex.getMessage());
@@ -1216,7 +1385,12 @@ public class MuPDFActivity extends Activity implements OnClickListener, FilePick
         			serverHelper.getInstance().sendRequest("user:auth", String.format("\"email\":\"%s\",\"password\":\"%s\"",appSettings.userMail,appSettings.userPass),"");
         		}
         	}
-        	else Toast.makeText(getApplicationContext(), String.format("Error: %s",serverHelper.errorMsg(error)), Toast.LENGTH_LONG).show();
+        	else {
+        		if(action.equalsIgnoreCase("user:auth")){
+    				showSettings();
+    			}
+        		Toast.makeText(getApplicationContext(), String.format("Error: %s",serverHelper.errorMsg(error)), Toast.LENGTH_LONG).show();
+        	}
         }
         catch (Exception Ex){
         }
@@ -1228,7 +1402,8 @@ public class MuPDFActivity extends Activity implements OnClickListener, FilePick
     	i.putExtra("id", id);
     	i.putExtra("isPDF", true);
     	startActivityForResult(i, 4);
-    	overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+    	//overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+    	overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
     }
 	
 	private void showShareDlg(String url)
@@ -1236,7 +1411,8 @@ public class MuPDFActivity extends Activity implements OnClickListener, FilePick
     	Intent i = new Intent(getApplicationContext(), ArticleDlg.class);
     	i.putExtra("url", url);
     	startActivity(i);
-    	overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+    	//overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+    	overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
     }
 	
 	private void showSettings()
@@ -1244,7 +1420,8 @@ public class MuPDFActivity extends Activity implements OnClickListener, FilePick
     	Intent i = new Intent(getApplicationContext(), LoginDlg.class);
     	i.putExtra("userMail", appSettings.userMail==null?"":appSettings.userMail);
     	startActivityForResult(i, 5);
-    	overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+    	//overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+    	overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
     }
 	
 	public void showToolsPopup(View view) {
@@ -1254,6 +1431,29 @@ public class MuPDFActivity extends Activity implements OnClickListener, FilePick
 		} else hideTools();
 
     }
+	
+	void showMessage(String title, String text){
+		LayoutInflater layoutInflater = LayoutInflater.from(this);
+		View promptView = layoutInflater.inflate(R.layout.alertbox, null);
+		final AlertDialog.Builder alert = new AlertDialog.Builder(this);
+		  alert.setTitle(title);
+		  alert.setView(promptView);
+
+		  final TextView input = (TextView) promptView
+		    .findViewById(R.id.xtvText);
+		  input.setText(text);
+
+		  
+			
+		  alert.setPositiveButton(getString(R.string.got_it), new DialogInterface.OnClickListener() {
+			   public void onClick(DialogInterface dialog, int whichButton) {}
+				  });
+
+		  // create an alert dialog
+		  AlertDialog alert1 = alert.create();
+		  alert1.show();
+
+	}
 	
 	void hideTools(){
 	if (mButtonsView.findViewById(R.id.pdf_color_menu).getVisibility()!=View.GONE)
@@ -1275,22 +1475,70 @@ public class MuPDFActivity extends Activity implements OnClickListener, FilePick
     }
 
 	void setDrawMode(){
+		waitForTouch=false;
 		mTopBarMode = TopBarMode.Accept;
 		mBottomBarSwitcher.setDisplayedChild(mTopBarMode.ordinal());
+		mSwitcherLand.setDisplayedChild(2);
 		mAcceptMode = AcceptMode.Ink;
 		mDocView.setMode(MuPDFReaderView.Mode.Drawing);
 		findViewById(R.id.inkButton).setSelected(false);
 	}
+	
+	public void onToolsClick(View v) {
+		switch (v.getId()) {
+		case R.id.bDone_land:
+				mSwitcherLand.setDisplayedChild(3);
+			break;
+		case R.id.btnBack_land:
+				mSwitcherLand.setDisplayedChild(0);
+			break;
+		case R.id.pdfSave2Nimbus_land:
+			if (appSettings.sessionId.length() == 0) {
+				showSettings();
+				if(core.hasChanges()) core.save();
+			}
+			else {
+				if(core.hasChanges()) new SaveTask(2).execute();
+			else {
+    					serverHelper.getInstance().sendRequest("notes:getFolders", "","");
+				}
+			}
+		break;
+		case R.id.pdfSave2SD_land:
+			if(core.hasChanges()) {
+				new SaveTask(0).execute();
+			}
+		break;
+		case R.id.pdfShare_land:
+			if(true || core.hasChanges()) {
+				new SaveTask(1).execute();
+			}
+		break;
+
+		default:
+			break;
+		}
+	}
+	
+	
+	void setSelectedColor(int sid){
+		for (int id : buttons) {
+			mButtonsView.findViewById(id).setSelected(id==sid);
+		}
+	}
+	
 	@Override
 	public void onClick(View v) {
 		switch(v.getId()){
 		case R.id.pdf_DrawPensil:
+		case R.id.pdf_DrawPensil_land:
     		setDrawMode();
     		mDocView.setShape(0);
     		hideTools();
     		mAnnotTypeText.setText(R.string.ink);
     		break;
     	case R.id.pdf_DrawRect:
+    	case R.id.pdf_DrawRect_land:
     		setDrawMode();
     		mDocView.setShape(1);
     		setSelectedFoot(3);
@@ -1298,6 +1546,7 @@ public class MuPDFActivity extends Activity implements OnClickListener, FilePick
     		mAnnotTypeText.setText(R.string.rect);
     		break;
     	case R.id.pdf_DrawArrow:
+    	case R.id.pdf_DrawArrow_land:
     		setDrawMode();
     		mDocView.setShape(2);
     		setSelectedFoot(3);
@@ -1305,41 +1554,54 @@ public class MuPDFActivity extends Activity implements OnClickListener, FilePick
     		mAnnotTypeText.setText(R.string.arrow);
     		break;
     	case R.id.pdf_DrawLine:
+    	case R.id.pdf_DrawLine_land:
     		setDrawMode();
     		mDocView.setShape(3);
     		hideTools();
     		mAnnotTypeText.setText(R.string.line);
     		break;
+    	case R.id.pdf_DrawComment:
+    	case R.id.pdf_DrawComment_land:
+			waitForTouch=true;
+			hideTools();
+			Toast.makeText(ctx, getString(R.string.please_tap), Toast.LENGTH_LONG).show();
+		break;
     	case R.id.pdfColor1:
+    	case R.id.pdfColor1_land:
     		mDocView.setColor(0);
     		((ImageButton)findViewById(R.id.colorButton)).setImageResource(R.drawable.icon_color_blue);
+    		setSelectedColor(R.id.pdfColor1_land);
     		hideTools();
     		break;
     	case R.id.pdfColor2:
+    	case R.id.pdfColor2_land:
     		mDocView.setColor(1);
     		((ImageButton)findViewById(R.id.colorButton)).setImageResource(R.drawable.icon_color_red);
+    		setSelectedColor(R.id.pdfColor2_land);
     		hideTools();
     		break;
     	case R.id.pdfColor3:
+    	case R.id.pdfColor3_land:
     		mDocView.setColor(2);
     		((ImageButton)findViewById(R.id.colorButton)).setImageResource(R.drawable.icon_color_yellow);
+    		setSelectedColor(R.id.pdfColor3_land);
     		hideTools();
     		break;
     	case R.id.pdfColor4:
+    	case R.id.pdfColor4_land:
     		mDocView.setColor(3);
     		((ImageButton)findViewById(R.id.colorButton)).setImageResource(R.drawable.icon_color_white);
+    		setSelectedColor(R.id.pdfColor4_land);
     		hideTools();
     		break;
     	case R.id.pdfColor5:
+    	case R.id.pdfColor5_land:
     		mDocView.setColor(4);
     		((ImageButton)findViewById(R.id.colorButton)).setImageResource(R.drawable.icon_color_black);
+    		setSelectedColor(R.id.pdfColor5_land);
     		hideTools();
     		break;
-    		case R.id.pdf_DrawComment:
-    			waitForTouch=true;
-    			hideTools();
-    			Toast.makeText(ctx, getString(R.string.please_tap), Toast.LENGTH_LONG).show();
-    		break;
+    	
 		}
 	}
 	

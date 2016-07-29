@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.fvd.classes.BugReporter;
+import com.fvd.classes.DataExchange;
 import com.fvd.utils.AsyncTaskCompleteListener;
 import com.fvd.utils.FolderItem;
 import com.fvd.utils.appSettings;
@@ -30,13 +32,15 @@ import android.widget.Toast;
 
 public class previewActivity extends Activity implements OnClickListener, AsyncTaskCompleteListener<String, String>{
 	
-	private String content ="";
+	//private String content ="";
 	private String title ="";
 	private String url ="";
+	private DataExchange cl;
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+        //overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+        overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         try{
         	requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -44,26 +48,41 @@ public class previewActivity extends Activity implements OnClickListener, AsyncT
         catch (Exception e){
         	e.printStackTrace();
         }
+        //BugReporter.Send("preview.onCreate", "p1");
         setContentView(R.layout.screen_preview);
-        content = getIntent().getStringExtra("content").toString();
-        title = "";
-        url = "";
         findViewById(R.id.bSave2Nimbus).setOnClickListener(this);
         findViewById(R.id.bCancel).setOnClickListener(this);
         WebSettings settings = ((WebView )findViewById(R.id.wvPreview)).getSettings();
         settings.setDefaultZoom(ZoomDensity.FAR);
         settings.setDefaultTextEncodingName("utf-8");
-        if(content.length()>0){
-        	WebView wv=( WebView )findViewById(R.id.wvPreview);
-        	wv.loadDataWithBaseURL("about:blank", content, "text/html", "", null);
-        	wv.setWebViewClient(new WebViewClient() {
-                @Override
-                public boolean shouldOverrideUrlLoading(WebView view, String url)
-                {
-                	return true;
-                }
-            });
+        try{
+        	//BugReporter.Send("preview.onCreate", "p2");
+	        cl = (DataExchange) getIntent().getExtras().getSerializable("content");
+	        //String content = cl.getContent();//getIntent().getStringExtra("content").toString();
+	        title = "";
+	        url = "";
+	        
+	        //BugReporter.Send("preview.onCreate", "p3");
+	        if(cl!=null && cl.getContent().length()>0){
+	        	WebView wv=( WebView )findViewById(R.id.wvPreview);
+	        	//BugReporter.Send("preview.onCreate", "p4");
+	        	wv.loadDataWithBaseURL("about:blank", toUtf8(cl.getContent()), "text/html", "", null);
+	        	wv.getSettings().setBuiltInZoomControls(true);
+	        	wv.getSettings().setDisplayZoomControls(false);
+	        	wv.setWebViewClient(new WebViewClient() {
+	                @Override
+	                public boolean shouldOverrideUrlLoading(WebView view, String url)
+	                {
+	                	return true;
+	                }
+	            });
+	        }
         }
+        catch (Exception e){
+        	BugReporter.Send("preview.onCreate", e.getMessage());
+        }
+        if (cl==null) cl=new DataExchange();
+        
      }
 	
 	String toUtf8(String text){
@@ -75,12 +94,11 @@ public class previewActivity extends Activity implements OnClickListener, AsyncT
     	if (requestCode==1){
     		if (resultCode==RESULT_OK){
     			Intent intent = new Intent();
-    			intent.putExtra("content", content);
+    			intent.putExtra("content", cl);
     			intent.putExtra("parent", data.getStringExtra("id"));
     			intent.putExtra("tag", data.getStringExtra("tag"));
 		    	setResult(RESULT_OK, intent);
 		    	finish();
-    			
     		} 
     		
     	}
@@ -92,12 +110,12 @@ public class previewActivity extends Activity implements OnClickListener, AsyncT
 		switch (v.getId()) 
 		{
 		    case R.id.bSave2Nimbus:
-		    	intent.putExtra("content", content);
+		    	intent.putExtra("content", cl);
 		    	setResult(RESULT_OK, intent);
 		    	finish();
 		        break;
 		        default:
-		        		intent.putExtra("content", content);
+		        		intent.putExtra("content", cl);
 		    			setResult(RESULT_CANCELED, intent);
 		    			finish();
 		        	break;

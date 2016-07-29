@@ -27,14 +27,15 @@ public class LoginDlg extends Activity implements OnClickListener{
         catch (Exception e){
         	e.printStackTrace();
         }
+        overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
         setContentView(R.layout.layout_login);
         String userMail = getIntent().getStringExtra("userMail").toString();
         tv=(TextView)findViewById(R.id.etlogin);
-        tv.setFocusableInTouchMode(true);
+        /*tv.setFocusableInTouchMode(true);
         tv.setFocusable(true);
-        tv.requestFocus();
+        tv.requestFocus();*/
         tv.setText(userMail);
-        tv.setOnKeyListener(new OnKeyListener() {           
+        /*tv.setOnKeyListener(new OnKeyListener() {           
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if (event.getAction()==KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
@@ -43,12 +44,12 @@ public class LoginDlg extends Activity implements OnClickListener{
                 }
                 return false;
             }
-        });
+        });*/
         findViewById(R.id.bCreateAccount).setOnClickListener(this);
         findViewById(R.id.bRegister).setOnClickListener(this);
         Button btnSave=(Button)findViewById(R.id.blogin);
         btnSave.setOnClickListener(this);
-        tv.postDelayed(new Runnable() {
+        /*tv.postDelayed(new Runnable() {
             @Override
             public void run() {
                 // TODO Auto-generated method stub
@@ -56,7 +57,7 @@ public class LoginDlg extends Activity implements OnClickListener{
                 getSystemService(Context.INPUT_METHOD_SERVICE);
                 keyboard.showSoftInput(tv, 0);
             }
-        },200);
+        },200);*/
      }
 	
 	public void onClick(View v)
@@ -66,7 +67,13 @@ public class LoginDlg extends Activity implements OnClickListener{
 		switch (v.getId()) 
 		{
 		    case R.id.blogin:
-		    	((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(this.getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+		    	//((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(this.getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+		    	try{
+		    		hideKeyboard();
+		    	}
+		    	catch (Exception e) {
+					// TODO: handle exception
+				}
 		    	mail  = tv.getText().toString();
 		    	pass = ((TextView)findViewById(R.id.etPassword)).getText().toString();
 		    	if(mail.indexOf("@")==-1 || mail.indexOf(".")==-1){
@@ -105,12 +112,20 @@ public class LoginDlg extends Activity implements OnClickListener{
     				intent.putExtra("userMail", mail);
     				intent.putExtra("userPass", pass);
     				setResult(RESULT_FIRST_USER, intent);
-    				overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+    				//overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+    				overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
     				finish();
     			}
 		    	break;
 	    }
 		
+	}
+	void hideKeyboard(){
+		InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+		if(imm!=null){
+			if(!imm.hideSoftInputFromWindow(findViewById(R.id.etlogin).getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS))
+				if(!imm.hideSoftInputFromWindow(findViewById(R.id.etPassword).getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS));
+		}
 	}
         
     }

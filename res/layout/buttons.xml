@@ -8,18 +8,24 @@
 	        android:layout_width="match_parent"
 		    android:layout_height="match_parent"
 		    android:orientation="vertical">
+		    <ViewAnimator
+	    		android:id="@+id/pdf_top_switcher"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+		 	>
 		    <LinearLayout
-	     	android:id="@+id/topbar"
-		    android:layout_width="match_parent"
-		    android:layout_height="wrap_content"
-		    android:orientation="horizontal"
-		    android:background="@color/dkBack"
-		    >
+			    android:layout_width="match_parent"
+			    android:layout_height="@dimen/browser_panel_height"
+			    android:orientation="horizontal"
+			    android:background="@color/dkBack"
+			    >
 		    
 		     <ImageButton
 			        android:id="@+id/pdfSave2Nimbus"
 			        android:layout_width="0dp"
-			        android:layout_height="wrap_content"
+			        android:layout_height="match_parent"
+			        android:scaleType="fitCenter"
+			        android:adjustViewBounds="true"
 			        android:layout_weight="1"
 			        android:layout_gravity="center_vertical"
 			        android:background="@color/transparent"
@@ -29,30 +35,46 @@
 			    		   <View 
 			       android:layout_width="1dp"
 			       android:layout_height="match_parent"
-			       android:background="@android:color/white"
-			       android:layout_margin="4dp"/>
+			       android:background="#77FFFFFF"
+			       android:layout_marginLeft="2dp"
+			       android:layout_marginRight="2dp"
+			       android:layout_marginTop="6dp"
+			       android:layout_marginBottom="6dp"/>
 			    <ImageButton
 			        android:id="@+id/pdfSave2SD"
 			        android:layout_width="0dp"
 			        android:layout_weight="1"
-			        android:layout_height="wrap_content"
+			        android:layout_height="match_parent"
+			        android:scaleType="fitCenter"
+			        android:adjustViewBounds="true"
 			        android:padding="@dimen/drawable_subpadding"
 			        android:layout_gravity="center_vertical"
 			        android:src="@drawable/top_done_03"
 			        android:background="@drawable/setting_selector"
 					android:contentDescription="@string/save_full" />
+			    <View 
+			       android:layout_width="1dp"
+			       android:layout_height="match_parent"
+			       android:background="#77FFFFFF"
+			       android:layout_marginLeft="2dp"
+			       android:layout_marginRight="2dp"
+			       android:layout_marginTop="6dp"
+			       android:layout_marginBottom="6dp"/>
 			     <ImageButton
 			        android:id="@+id/pdfShare"
 			        android:layout_width="0dp"
 			        android:layout_weight="0.5"
-			        android:layout_height="wrap_content"
+			        android:layout_height="match_parent"
+			        android:scaleType="fitCenter"
+			        android:adjustViewBounds="true"
 			        android:padding="@dimen/drawable_subpadding"
 			        android:layout_gravity="center_vertical"
 			        android:src="@drawable/top_done_04"
 			        android:background="@drawable/setting_selector"
 					android:contentDescription="@string/save_full" />
-				 
-		</LinearLayout>	
+		</LinearLayout>
+		<include layout="@layout/pdf_tools"/>	
+		</ViewAnimator>
 		<RelativeLayout 
 		    android:layout_width="match_parent"
 		    android:layout_weight="1"
@@ -279,6 +301,7 @@
 	    android:id="@+id/switcher"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
+		android:visibility="visible"
 		 >
 
 		<!--<RelativeLayout

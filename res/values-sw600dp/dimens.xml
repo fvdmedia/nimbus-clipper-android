@@ -6,7 +6,7 @@
     <dimen name="login_horizontal_margin">72dp</dimen>
     <dimen name="login_vertical_margin">160dp</dimen>
     <dimen name="login_vertical_halfmargin">80dp</dimen>
-    <dimen name="activity_horizontal_margin">80dp</dimen>
+    <dimen name="activity_horizontal_margin">40dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="drawable_padding">18dp</dimen>
     <dimen name="drawable_subpadding">5dp</dimen>
@@ -22,9 +22,32 @@
     
     <dimen name="welcome_text">48sp</dimen>
     <dimen name="input_text">28sp</dimen>
-    <dimen name="password_text">20sp</dimen>
+    <dimen name="password_text">24sp</dimen>
 	<dimen name="tab_text">18sp</dimen>
 	
 	<dimen name="divider_selector">0dp</dimen>
 	<dimen name="browser_panel_height">48dp</dimen>
+	<dimen name="btn_radius">28dp</dimen>
+	<dimen name="btn_min_height">56dp</dimen>
+	<dimen name="thin_btn_radius">24dp</dimen>
+	<dimen name="thin_btn_shadow">27dp</dimen>
+	
+	<dimen name="xthin_btn_shadow">23dp</dimen>
+	<dimen name="xthin_btn_min_height">48dp</dimen>
+	<dimen name="xthin_btn_radius">24dp</dimen>
+	
+    <dimen name="thin_btn_min_height">54dp</dimen>
+    
+	<dimen name="btn_margin">140dp</dimen>
+	
+	<dimen name="btn_text_size">24sp</dimen>
+	<dimen name="button_padding">54dp</dimen>
+	
+	<dimen name="top_bar_height">100dp</dimen>
+	<dimen name="logo_width">180dp</dimen>
+	<dimen name="logo_top_margin">24dp</dimen>
+	<dimen name="login_form_width">420dp</dimen>
+	<dimen name="dialog_btns_margin">80dp</dimen>
+	<dimen name="hlp_title_dimens">20sp</dimen>
+	
 </resources>

@@ -5,7 +5,7 @@
     <string name="settings">Настройки</string>
     
     <string name="preview">Предпросмотр</string>
-    
+    <string name="select_tags">Метки</string>
     <string name="please_wait">немного терпения...</string>
     <string name="choose_folder">Выберите директорию</string>
     <string name="dontask">не спрашивать папку и теги</string>
@@ -13,9 +13,11 @@
     <string name="welcome_to">Добро пожаловать в</string>
     <string name="action_settings">Настройки</string>
     <string name="username_hint">email</string>
+    <string name="title_hint">укажите название</string>
     <string name="password_hint">пароль</string>
     <string name="text_hint">Можете писать тут</string>
     <string name="login">Войти</string>
+    <string name="login_via">Войти c</string>
     <string name="logout">Выйти</string>
     <string name="register">Регистрация</string>
     <string name="or">или</string>
@@ -33,6 +35,11 @@
     <string name="home">Домой</string>
     <string name="tag_hint">Укажите теги</string>
     
+    <string name="mk_folder">Добавить папку</string>
+    <string name="mk_sfolder">Добавить подпапку</string>
+    <string name="mk_tag">Добавить метку</string>
+    <string name="mkh_folder">имя папки</string>
+    <string name="mkh_tag">метка</string>
     <string name="save_full">Вся страница</string>
     <string name="save_fragment">Только фрагмент</string>
     <string name="take_screenshot">Скриншот</string>
@@ -48,7 +55,7 @@
     <string name="fragment_name">Postnews.com</string>
     <string name="article_link">Прямая ссылка:</string>
     <string name="get_link">Ссылка</string>
-    <string name="copy_clipboard">В буфер обмена</string>
+    <string name="copy_clipboard">В буфер</string>
     <string name="share">Поделиться</string>
     <string name="get_public_link">Cсылка</string>
     <string name="undo">Вернуть</string>
@@ -86,7 +93,7 @@
     <string name="use_longtap">Сделайте тап на нужном фрагменте, чтобы его выбрать для сохранения</string>
     <string name="uploading_to_Nimbus">Загрузка в Nimbus</string>
     <string name="select_default_folder">Директория по-умолчанию</string>
-    <string name="select_folder">Выберите директорию</string>
+    <string name="select_folder">Директория</string>
     <string name="how_to_clip">В каком виде сохранять страницы?</string>
     <string name="select_option">Выберите опцию</string>
     <string name="user_agent">User Agent</string>
@@ -177,6 +184,13 @@
     <string name="bsave_fragment">Сохранить фрагмент</string>
     <string name="select_pdf">Выберите PDF</string>
     <string name="licenses">Лицензии</string>
+    <string name="pdf_file_is_protected">Файл защищен, Вы не можете его редактировать.</string>
+    <string name="license_title">Информация</string>
+    <string name="fast_send">Быстрая загрузка</string>
+    <string name="pdf_finger">Выделите пальцем нужный текст и нажмите на галочку</string>
+    <string name="got_it">Хорошо</string>
+    <string name="chk_intenet">пожалуйста проверьте интернет соединение</string>
+    <string name="sync_err">ошибка синхронизации</string>
     
     <string-array name="entries">
 		<item>Сохранять стили</item>
@@ -204,5 +218,17 @@
 		<item>по умолчанию</item>
 	</string-array>
     
+    <string-array name="lmenu_browser">
+        <item>Сделать Фото</item>
+        <item>Взять из галлереи</item>
+        <item>Работа с PDF</item>
+    </string-array>
+    
+	<string-array name="lmenu_paint">
+        <item>Сделать Фото</item>
+        <item>Взять из галлереи</item>
+        <item>Веб-клиппер</item>
+        <item>Работа с PDF</item>
+    </string-array>
     
 </resources>

@@ -1,6 +1,15 @@
-   <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    
+    android:id="@+id/root"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    >
+
+       <RelativeLayout
 	    android:layout_width="match_parent"
 	    android:layout_height="match_parent"
+	    android:id="@+id/content_frame"
 	    >
 	   
 	    <LinearLayout 
@@ -17,7 +26,8 @@
 			    android:layout_width="match_parent"
 			    android:layout_height="@dimen/browser_panel_height"
 			    android:orientation="horizontal"
-			    android:background="@color/dkBack" >
+			    android:background="@color/dkBack" 
+			    >
 			    <ImageButton
 			        android:id="@+id/bTurnLeft"
 			        android:layout_width="0dp"
@@ -45,9 +55,9 @@
 			        android:id="@+id/bUndo"
 			        android:layout_width="0dp"
 			        android:layout_weight="0.8"
-			        android:scaleType="fitCenter"
+			        android:scaleType="centerInside"
 			        android:layout_height="wrap_content"
-			        android:padding="@dimen/drawable_subpadding"
+			        android:padding="1dp"
 			        android:layout_gravity="center_vertical"
 			        android:src="@drawable/top_edit_03"
 			        android:background="@drawable/setting_selector"
@@ -57,10 +67,10 @@
 			        android:id="@+id/bClearAll"
 			        android:layout_width="0dp"
 			        android:layout_weight="0.8"
-			        android:scaleType="fitCenter"
+			        android:scaleType="centerInside"
 			        android:layout_height="wrap_content"
 			        android:layout_gravity="center_vertical"
-			        android:padding="@dimen/drawable_subpadding"
+			        android:padding="1dp"
 			        android:src="@drawable/top_edit_04"
 			        android:background="@drawable/setting_selector"
 					android:contentDescription="@string/save_full" />
@@ -68,10 +78,10 @@
 			        android:id="@+id/bDone"
 			        android:layout_width="0dp"
 			        android:layout_weight="0.6"
-			        android:scaleType="fitCenter"
+			        android:scaleType="centerInside"
 			        android:layout_height="wrap_content"
 			        android:layout_gravity="center_vertical"
-			        android:padding="@dimen/drawable_subpadding"
+			        android:padding="1dp"
 			        android:src="@drawable/top_edit_05"
 			        android:background="@drawable/setting_selector"
 					android:contentDescription="@string/save_full" />
@@ -92,31 +102,42 @@
 			        android:layout_gravity="center_vertical"
 			        android:background="@color/transparent"
 			        android:contentDescription="@string/save_full"
-			        android:padding="@dimen/drawable_subpadding"
+			        android:padding="1dp"
 			        android:src="@drawable/top_done_01" />
-			    		   <View 
+			    <View 
 			       android:layout_width="1dp"
 			       android:layout_height="match_parent"
-			       android:background="@android:color/white"
-			       android:layout_margin="4dp"/>
+			       android:background="#77FFFFFF"
+			       android:layout_marginLeft="2dp"
+			       android:layout_marginRight="2dp"
+			       android:layout_marginTop="6dp"
+			       android:layout_marginBottom="6dp"/>
 			    <ImageButton
 			        android:id="@+id/bSave2SD"
 			        android:layout_width="0dp"
 			        android:layout_weight="1"
 			        android:scaleType="fitCenter"
 			        android:layout_height="wrap_content"
-			        android:padding="@dimen/drawable_subpadding"
+			        android:padding="1dp"
 			        android:layout_gravity="center_vertical"
 			        android:src="@drawable/top_done_03"
 			        android:background="@drawable/setting_selector"
 					android:contentDescription="@string/save_full" />
+			    <View 
+			       android:layout_width="1dp"
+			       android:layout_height="match_parent"
+			       android:background="#77FFFFFF"
+			       android:layout_marginLeft="2dp"
+			       android:layout_marginRight="2dp"
+			       android:layout_marginTop="6dp"
+			       android:layout_marginBottom="6dp"/>
 			     <ImageButton
 			        android:id="@+id/btnShare"
 			        android:layout_width="0dp"
 			        android:layout_weight="0.5"
 			        android:scaleType="fitCenter"
 			        android:layout_height="wrap_content"
-			        android:padding="@dimen/drawable_subpadding"
+			        android:padding="1dp"
 			        android:layout_gravity="center_vertical"
 			        android:src="@drawable/top_done_04"
 			        android:background="@drawable/setting_selector"
@@ -129,12 +150,135 @@
 			        android:scaleType="fitCenter"
 			        android:layout_height="wrap_content"
 			        android:layout_gravity="center_vertical"
-			        android:padding="@dimen/drawable_subpadding"
+			        android:padding="1dp"
 			        android:src="@drawable/top_done_05"
 			        android:background="@drawable/setting_selector"
 					android:contentDescription="@string/save_full" />
-			</LinearLayout>	    
-			   
+			</LinearLayout>	
+			<LinearLayout
+	      	    android:id="@+id/tool_edit_land"
+			    android:layout_width="match_parent"
+			    android:layout_height="@dimen/browser_panel_height"
+			    android:orientation="horizontal"
+			    android:background="@color/ltBack" 
+			    >
+			    <ImageButton
+			        android:id="@+id/bTurnLeft_land"
+			        android:layout_width="0dp"
+			        android:layout_height="wrap_content"
+			        android:layout_weight="0.4"
+			        android:scaleType="fitCenter"
+			        android:layout_gravity="center_vertical"
+			        android:background="@color/transparent"
+			        android:contentDescription="@string/save_full"
+			        android:padding="@dimen/drawable_subpadding"
+			        android:src="@drawable/top_edit_01"
+			        android:onClick="onTopBarClick"/>
+
+			    <ImageButton
+			        android:id="@+id/bTurnRight_land"
+			        android:layout_width="0dp"
+			        android:layout_weight="0.4"
+			        android:scaleType="fitCenter"
+			        android:layout_height="wrap_content"
+			        android:padding="@dimen/drawable_subpadding"
+			        android:layout_gravity="center_vertical"
+			        android:src="@drawable/top_edit_02"
+			        android:background="@drawable/setting_selector"
+					android:contentDescription="@string/save_full"
+					android:onClick="onTopBarClick" />
+			    <ImageButton
+			        android:id="@+id/bEditPage_land"
+			        android:layout_width="0dp"
+			        android:layout_weight="0.4"
+			        android:layout_height="match_parent"
+			        android:src="@drawable/tools_01"
+			        android:background="@drawable/setting_selector"
+					android:contentDescription="@string/save_full"
+					android:onClick="onTopBarClick" />
+			    <ImageButton
+			        android:id="@+id/bToolShape_land"
+			        android:layout_width="0dp"
+			        android:layout_weight="0.4"
+			        android:layout_height="match_parent"
+			        android:padding="@dimen/drawable_subpadding"
+			        android:src="@drawable/draw_tools_01"
+			        android:background="@drawable/setting_selector"
+					android:contentDescription="@string/save_fragment"
+					android:onClick="onTopBarClick" />
+				<ImageButton
+			        android:id="@+id/bToolText_land"
+			        android:layout_width="0dp"
+			        android:layout_weight="0.4"
+			        android:layout_height="match_parent"
+			        android:padding="@dimen/drawable_subpadding"
+			        android:src="@drawable/tools_03"
+			        android:background="@drawable/setting_selector"
+					android:contentDescription="@string/take_screenshot"
+					android:onClick="onTopBarClick" />
+			    <ImageButton
+			        android:id="@+id/bToolCrop_land"
+			        android:layout_width="0dp"
+			        android:layout_weight="0.4"
+			        android:layout_height="match_parent"
+			        android:padding="@dimen/drawable_subpadding"
+			        android:src="@drawable/se_icon_crop"
+			        android:background="@drawable/setting_selector"
+					android:contentDescription="@string/save_fragment"
+					android:onClick="onTopBarClick" />
+				<com.fvd.classes.CircleButton
+			        android:id="@+id/bToolColor_land"
+			        android:layout_width="0dp"
+			        android:layout_weight="0.4"
+			        android:layout_height="match_parent"
+			        android:padding="@dimen/drawable_subpadding"
+			        
+			        android:background="@color/transparent"
+			        android:scaleType="fitCenter"
+					android:contentDescription="@string/take_screenshot"
+					android:onClick="onTopBarClick" />	
+			     <ImageButton
+				        android:id="@+id/bUndo_land"
+				        android:layout_width="0dp"
+				        android:layout_weight="0.8"
+				        android:scaleType="fitCenter"
+				        android:layout_height="wrap_content"
+				        android:padding="1dp"
+				        android:layout_gravity="center_vertical"
+				        android:src="@drawable/top_edit_03"
+				        android:background="@drawable/setting_selector"
+						android:contentDescription="@string/save_full"
+						android:onClick="onTopBarClick" />
+			    		  
+				<ImageButton
+			        android:id="@+id/bClearAll_land"
+			        android:layout_width="0dp"
+			        android:layout_weight="0.8"
+			        android:scaleType="fitCenter"
+			        android:layout_height="wrap_content"
+			        android:layout_gravity="center_vertical"
+			        android:padding="1dp"
+			        android:src="@drawable/top_edit_04"
+			        android:background="@drawable/setting_selector"
+					android:contentDescription="@string/save_full"
+					android:onClick="onTopBarClick" />
+				<ImageButton
+			        android:id="@+id/bDone_land"
+			        android:layout_width="0dp"
+			        android:layout_weight="0.6"
+			        android:scaleType="fitCenter"
+			        android:layout_height="wrap_content"
+			        android:layout_gravity="center_vertical"
+			        android:padding="1dp"
+			        android:src="@drawable/top_edit_05"
+			        android:background="@drawable/setting_selector"
+					android:contentDescription="@string/save_full"
+					android:onClick="onTopBarClick" />
+			</LinearLayout>    
+			<include layout="@layout/draw_tools"
+				android:visibility="gone"/>
+			<include layout="@layout/color_tools"
+				android:visibility="gone"/>
 		</ViewAnimator>
 		<RelativeLayout 
 		    android:layout_width="match_parent"
@@ -156,7 +300,8 @@
 			android:layout_centerHorizontal="true" 
     		android:orientation="vertical"
     		android:background="@android:color/white"
-    		android:visibility="gone" >
+    		android:visibility="gone"
+    		android:clickable="true" >
 
 			 <LinearLayout
 			    android:layout_width="match_parent"
@@ -193,8 +338,9 @@
 			            android:layout_height="wrap_content"
 			            android:progressDrawable="@drawable/icon_progress_line"
 			            android:thumb="@drawable/icon_thumb"
-			            android:max="4"
+			            android:max="40"
 		       			android:progress="1"
+		       			
 			            />
 				</LinearLayout>
 			</LinearLayout>
@@ -236,7 +382,7 @@
 			            android:layout_height="wrap_content"
 			            android:progressDrawable="@drawable/icon_progress_line"
 			            android:thumb="@drawable/icon_thumb"
-			            android:max="4"
+			            android:max="40"
 		       			android:progress="1"
 			            />
 				</LinearLayout>		
@@ -286,21 +432,21 @@
 		        android:layout_height="match_parent"
 				android:padding="@dimen/drawable_subpadding"
 		        android:background="@drawable/button_solid_selector"
-		        android:src="@drawable/icon_color_white"
+		        android:src="@drawable/icon_color_black"
 		        android:scaleType="fitCenter"
 		        android:contentDescription="@string/app_name"
 				/>
-		    <ImageButton
+		   <ImageButton
 		        android:id="@+id/bColor5"
 		        android:layout_width="0dp"
 		        android:layout_weight="1"
 		        android:layout_height="match_parent"
 				android:padding="@dimen/drawable_subpadding"
-		        android:background="@drawable/button_solid_selector"
-		        android:src="@drawable/icon_color_black"
 		        android:scaleType="fitCenter"
 		        android:contentDescription="@string/app_name"
-				/>
+		        android:clickable="true"
+		        android:src="@drawable/icon_palette"
+		        android:background="@color/dkBack"/>
 		</LinearLayout>
 		</LinearLayout>
 		<!-- /color menu -->
@@ -469,7 +615,9 @@
 
 		<!-- /draw tools -->
 		</RelativeLayout>
-		
+		<FrameLayout 
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content">
        	<LinearLayout
        	    android:id="@+id/footer"
 		    android:layout_width="match_parent"
@@ -512,17 +660,30 @@
 		        android:src="@drawable/se_icon_crop"
 		        android:background="@drawable/setting_selector"
 				android:contentDescription="@string/save_fragment" />
-			<ImageButton
+			<com.fvd.classes.CircleButton
 		        android:id="@+id/bToolColor"
 		        android:layout_width="0dp"
 		        android:layout_weight="1"
 		        android:layout_height="match_parent"
+		        android:padding="8dp"
+		        android:background="@color/transparent"
+		        android:scaleType="fitCenter"
+		        android:clickable="true"
+				android:contentDescription="@string/take_screenshot" />
+			<ImageButton
+		        android:id="@+id/bErase"
+		        android:layout_width="0dp"
+		        android:layout_weight="1"
+		        android:layout_height="match_parent"
 		        android:padding="@dimen/drawable_subpadding"
-		        android:src="@drawable/icon_color_red"
+		        android:src="@drawable/erasers"
 		        android:background="@drawable/setting_selector"
 		        android:scaleType="fitCenter"
-				android:contentDescription="@string/take_screenshot" />			
+		        android:visibility="gone"
+				android:contentDescription="@string/take_screenshot" />		
 		</LinearLayout>
+		
+		</FrameLayout>
 		</LinearLayout>
 		<LinearLayout
         android:id="@+id/paintWait" 
@@ -555,3 +716,171 @@
     	
     </LinearLayout>
 </RelativeLayout>
+<!-- ListView
+        android:id="@+id/left_drawer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:divider="@color/dkBack"
+        android:dividerHeight="0.2dp"
+        android:paddingRight="30dp"
+        android:background="@color/ltBack"/-->    
+<LinearLayout
+	    android:id="@+id/left_drawer"
+	    android:layout_gravity="start"
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+	    android:background="@color/ltBack"
+	    android:gravity="fill_vertical"
+	    android:orientation="vertical" >
+	    <!-- LinearLayout 
+	        android:layout_width="match_parent"
+	    	android:layout_height="match_parent"
+	    	android:orientation="vertical"
+	    	android:background="@color/ltBack"
+	    	-->
+	<ImageView
+	        
+	        android:layout_width="110dp"
+	        android:layout_height="wrap_content"
+		    android:layout_gravity="center_horizontal"   
+	        android:layout_marginTop="40dp"
+	        android:adjustViewBounds="true"
+	        android:src="@drawable/nimbus_logo"
+	        android:contentDescription="@string/app_name" />
+			    <LinearLayout
+				    android:layout_width="wrap_content"
+				    android:layout_height="wrap_content"
+				    android:layout_gravity="center"
+				    android:gravity="center"
+				    android:background="@color/ltBack"
+				    android:orientation="vertical" >
+				
+			    
+			    <FrameLayout 
+			        android:id="@+id/lbTakePhoto"
+			        android:layout_marginTop="10dp"
+			        android:layout_width="match_parent"
+			        android:layout_height="wrap_content"
+			        android:background="@drawable/button_selector"
+			        android:minHeight="48dp"
+			        android:clickable="true"
+			        android:paddingLeft="@dimen/welcome_text"
+			        android:paddingRight="@dimen/welcome_text"
+			        android:onClick="onButtonClick">
+			        <ImageView android:layout_width="wrap_content"
+			            android:layout_height="wrap_content" 
+			            android:src="@drawable/camera"
+			            android:layout_gravity="center_vertical"
+			            />
+			        <TextView 
+			            android:layout_width="wrap_content"
+			            android:layout_height="wrap_content"
+			            android:text="@string/take_photo"
+			            android:layout_gravity="center_vertical"
+			        	android:textColor="@drawable/button_text_color"
+			        	android:textSize="@dimen/input_text"
+			        	android:layout_marginLeft="50dp"/>
+			    </FrameLayout>
+	
+			    
+			    
+			    <FrameLayout 
+			        android:id="@+id/lbFromGallery"
+			        android:layout_width="match_parent"
+			        android:layout_height="wrap_content"
+			        android:layout_marginBottom="@dimen/welcome_text"
+			        android:layout_marginTop="@dimen/welcome_text"
+			        android:background="@drawable/button_selector"
+			        android:minHeight="48dp"
+			        android:paddingLeft="@dimen/welcome_text"
+			        android:paddingRight="@dimen/welcome_text"
+			        android:clickable="true"
+			        android:onClick="onButtonClick">
+			        <ImageView 
+			            android:layout_width="wrap_content"
+			            android:layout_height="wrap_content" 
+			            android:src="@drawable/icon_gallery"
+			            android:layout_gravity="center_vertical"
+			            />
+			        <TextView 
+			            android:layout_width="wrap_content"
+			            android:layout_height="wrap_content"
+			            android:text="@string/from_gallery"
+			            android:layout_gravity="center_vertical"
+			        	android:textColor="@drawable/button_text_color"
+			        	android:textSize="@dimen/input_text"
+			        	android:layout_marginLeft="50dp"/>
+			    </FrameLayout>
+	
+			    
+			    
+			    <FrameLayout 
+			        android:id="@+id/lbWebClipper"
+			        android:layout_width="match_parent"
+			        android:layout_height="wrap_content"
+			        android:layout_marginBottom="@dimen/welcome_text"
+			        android:background="@drawable/button_selector"
+			        android:minHeight="48dp"
+			        android:paddingLeft="@dimen/welcome_text"
+			        android:paddingRight="@dimen/welcome_text"
+			        android:clickable="true"
+			        android:onClick="onButtonClick">
+			        <ImageView 
+			            android:layout_width="wrap_content"
+			            android:layout_height="wrap_content" 
+			            android:src="@drawable/clipper"
+			            android:layout_gravity="center_vertical"
+			            />
+			        <TextView 
+			            android:layout_width="wrap_content"
+			            android:layout_height="wrap_content"
+			            android:text="@string/web_clipper"
+			            android:layout_gravity="center_vertical"
+			        	android:textColor="@drawable/button_text_color"
+			        	android:textSize="@dimen/input_text"
+			        	android:layout_marginLeft="50dp"/>
+			    </FrameLayout>
+			    
+			   
+			    
+			    <FrameLayout 
+			        android:id="@+id/lbPdfAnnotate"
+			        android:layout_width="match_parent"
+			        android:layout_height="wrap_content"
+			        android:layout_marginBottom="@dimen/welcome_text"
+			        android:background="@drawable/button_selector"
+			        android:minHeight="48dp"
+			        android:paddingLeft="@dimen/welcome_text"
+			        android:paddingRight="@dimen/welcome_text"
+			        android:clickable="true"
+			        android:onClick="onButtonClick">
+			        <ImageView 
+			            android:layout_width="wrap_content"
+			            android:layout_height="wrap_content" 
+			            android:src="@drawable/icon_pdf"
+			            android:layout_gravity="center_vertical"
+			            />
+			        <TextView 
+			            android:layout_width="wrap_content"
+			            android:layout_height="wrap_content"
+			            android:text="@string/pdf_annotate"
+			            android:layout_gravity="center_vertical"
+			        	android:textColor="@drawable/button_text_color"
+			        	android:textSize="@dimen/input_text"
+			        	android:layout_marginLeft="50dp"/>
+			    </FrameLayout>
+		</LinearLayout>
+		<ImageButton
+	        android:id="@+id/libSettings"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:background="@color/transparent"
+	        android:contentDescription="@string/settings"
+	        android:layout_gravity="center_horizontal"
+	        android:layout_marginBottom="16dp"
+	        android:src="@drawable/settinggear"
+	        android:onClick="onButtonClick" />
+		<!-- /LinearLayout-->
+	</LinearLayout>
+</android.support.v4.widget.DrawerLayout>

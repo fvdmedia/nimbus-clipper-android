@@ -182,13 +182,15 @@ public class ChoosePDFActivity extends ListActivity {
 		case PickPDF:
 			// Start an activity to display the PDF file
 			startActivity(intent);
-			overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+			//overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+			overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
 			finish();
 			break;
 		case PickKeyFile:
 			// Return the uri to the caller
 			setResult(RESULT_OK, intent);
-			overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+			//overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+			overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
 			finish();
 			break;
 		}

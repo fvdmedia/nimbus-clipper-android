@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import android.app.Activity;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -48,6 +49,7 @@ public class helpActivity extends Activity {
 		
 		try{
 			setContentView(R.layout.layout_help);
+	     	if (getResources().getInteger(R.integer.is_tablet)==0) setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 			flipper = (ViewFlipper) findViewById(R.id.flipper);
 			btnsGroup = (RadioGroup) findViewById(R.id.radioGroup);
 			

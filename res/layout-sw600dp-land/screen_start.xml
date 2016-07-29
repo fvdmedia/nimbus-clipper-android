@@ -1,0 +1,195 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rlMain"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/ltBack" >
+
+    <LinearLayout
+        android:id="@+id/lWait" 
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="false"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:visibility="invisible"
+        android:orientation="vertical" >
+		<ProgressBar 
+	        android:indeterminateDrawable="@drawable/blue_progress" 
+	        android:layout_height="50dp" 
+	        android:layout_width="50dp">       
+	    </ProgressBar> 
+	   <TextView
+			    android:layout_width="wrap_content"
+			    android:layout_height="wrap_content"
+			    android:layout_marginTop="10dp"
+			    android:layout_gravity="center_horizontal"
+			    
+			    android:text="@string/please_wait"
+			    android:textColor="@color/buttonBGoff"
+			    android:textSize="16sp"
+			    android:textStyle="bold" />
+    	
+    </LinearLayout>
+    
+    <LinearLayout
+        android:id="@+id/lMenu" 
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+	    android:background="@color/dkBack"
+	    android:orientation="vertical" >
+
+		<FrameLayout
+		    android:layout_width="match_parent"
+		    android:layout_height="match_parent"
+		    android:layout_marginBottom="0dp"
+		    android:layout_marginTop="@dimen/top_bar_height"
+		    android:background="@color/ltBack"
+		    android:gravity="fill_vertical"
+		    >
+
+		    <LinearLayout
+			    android:layout_width="740dp"
+			    android:layout_height="wrap_content"
+			    android:layout_gravity="center"
+			    android:gravity="center"
+			    android:background="@color/ltBack"
+			    android:orientation="vertical"
+			    android:layout_marginBottom="20dp"
+			>
+			<LinearLayout 
+			    android:layout_width="match_parent"
+			    android:layout_height="wrap_content"
+			    android:orientation="horizontal"
+			    android:layout_marginBottom="36dp">
+			    <Button
+			        android:id="@+id/bTakePhoto"
+			        style="@style/BigBorderButton"
+			        android:layout_width="0dp"
+			        android:layout_weight="1"
+			        android:layout_height="wrap_content"
+			        android:layout_gravity="center_horizontal"
+			        android:drawableLeft="@drawable/camera"
+			        android:drawablePadding="@dimen/drawable_padding"
+			        android:layout_marginRight="32dp"
+			        android:text="@string/take_photo"
+			        android:onClick="onButtonClick"
+		        />
+			    
+			    <Button
+			        android:id="@+id/bWebClipper"
+			        style="@style/BigBorderButton"
+			        android:layout_width="0dp"
+			        android:layout_weight="1"
+			        android:layout_height="wrap_content"
+			        android:layout_gravity="center_horizontal"
+			        android:drawableLeft="@drawable/clipper"
+			        android:drawablePadding="@dimen/drawable_padding"
+			        android:layout_marginLeft="32dp"
+			        android:text="@string/web_clipper"
+			        android:onClick="onButtonClick"
+		        />
+			    
+			</LinearLayout>
+			
+			<LinearLayout 
+			    android:layout_width="match_parent"
+			    android:layout_height="wrap_content"
+			    android:orientation="horizontal"
+			    >
+			    <Button
+			        android:id="@+id/bFromGallery"
+			        style="@style/BigBorderButton"
+			        android:layout_width="0dp"
+			        android:layout_weight="1"
+			        android:layout_height="wrap_content"
+			        android:layout_gravity="center_horizontal"
+			        android:drawableLeft="@drawable/icon_gallery"
+			        android:drawablePadding="@dimen/drawable_padding"
+			        android:layout_marginRight="32dp"
+			        android:text="@string/from_gallery"
+			        android:onClick="onButtonClick"
+		        />
+			    
+			    <Button
+			        android:id="@+id/bPdfAnnotate"
+			        style="@style/BigBorderButton"
+			        android:layout_width="0dp"
+			        android:layout_weight="1"
+			        android:layout_height="wrap_content"
+			        android:layout_gravity="center_horizontal"
+			        android:drawableLeft="@drawable/icon_pdf"
+			        android:drawablePadding="@dimen/drawable_padding"
+			        android:layout_marginLeft="32dp"
+			        android:text="@string/pdf_annotate"
+			        android:onClick="onButtonClick"
+		        />
+			    
+			</LinearLayout>
+		    
+	</LinearLayout>
+	</FrameLayout>
+</LinearLayout>
+<LinearLayout android:layout_height="wrap_content"
+    	android:layout_width="match_parent"
+    	android:orientation="vertical"
+    	android:layout_alignParentBottom="true"
+        android:layout_centerInParent="true"
+        >
+		<LinearLayout  
+        android:orientation="horizontal"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        >
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.1" />
+
+        <Button
+		        android:id="@+id/bNewAccount"
+		        android:layout_width="0dp"
+		        android:layout_height="wrap_content"
+		        android:background="#00FFFFFF"
+		        android:text="@string/use_nimbus"
+		        android:textColor="#fff"
+		        android:textSize="@dimen/password_text"
+		        android:layout_weight="5"
+		        android:layout_marginLeft="6dp"
+		        android:layout_marginRight="6dp"
+		        android:onClick="onButtonClick"
+		        />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.1" />
+
+    </LinearLayout>
+
+    
+    
+    <ImageButton
+        android:id="@+id/ibSettings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/transparent"
+        android:contentDescription="@string/settings"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="32dp"
+        android:src="@drawable/settinggear"
+        android:onClick="onButtonClick" />
+</LinearLayout>
+    <ImageView
+        android:id="@+id/llauncher" 
+        android:layout_width="@dimen/logo_width"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="@dimen/logo_top_margin"
+        android:adjustViewBounds="true"
+        android:src="@drawable/nimbus_logo"
+        android:contentDescription="@string/app_name" />
+
+</RelativeLayout>

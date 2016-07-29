@@ -39,12 +39,13 @@ public class PrefsActivity extends PreferenceActivity implements AsyncTaskComple
 	@Override
 	  protected void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
-	    overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+	    //overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+	    overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
 	    addPreferencesFromResource(R.xml.layout_prefs);
 	    serverHelper.getInstance().setCallback(this,this);
 	    
 	    prefs = PreferenceManager.getDefaultSharedPreferences(this);
-	    if(serverHelper.getInstance().getSession().length()>0) {
+	    if(appSettings.sessionId.length()>0) {
 	    	remoteFolder=prefs.getString("remFolder", "My Notes");
 	    	sendRequest("notes:getFolders", "");
 	    }

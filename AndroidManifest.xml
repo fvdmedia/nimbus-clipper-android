@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.fvd.nimbus"
-    android:versionCode="23"
-    android:versionName="2.3" >
+    android:versionCode="55"
+    android:versionName="5.5" >
 
-    <uses-sdk android:minSdkVersion="8"
-        android:targetSdkVersion="10"
+    <uses-sdk android:minSdkVersion="12"
+        android:targetSdkVersion="15"
         />
 
     <uses-permission android:name="android.permission.INTERNET" />   
@@ -29,14 +29,15 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name="com.fvd.nimbus.MainActivity"
-            android:configChanges="orientation"
+            android:configChanges="orientation|screenSize"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.fvd.nimbus.Paint"
+        
+        <activity android:name="com.fvd.nimbus.PaintActivity"
             android:configChanges="orientation|screenSize"
 		    android:label="@string/app_name">
             <intent-filter>
@@ -49,6 +50,11 @@
         		<category android:name="android.intent.category.DEFAULT" />
         		<data android:mimeType="image/*" />
     		</intent-filter>
+    		<intent-filter>
+                <action android:name="com.onebit.nimbusnote.EDIT_PHOTO" />
+	            <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/*" />
+            </intent-filter>
 		</activity>
 		<activity
             android:name="com.fvd.nimbus.BrowseActivity"
@@ -69,7 +75,7 @@
         <activity 
     		android:name=".LoginDlg"
     		android:label="@string/login" 
-    		
+    		android:windowSoftInputMode="stateHidden"
             >
 		</activity>
 		<activity 
@@ -81,7 +87,6 @@
 		<activity 
     		android:name=".helpActivity"
     		android:label="@string/help"
-    		android:screenOrientation="portrait"
     		android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
     		>
 		</activity>
@@ -115,7 +120,9 @@
         
 		<activity 
     		android:name=".loginActivity"
-    		android:label="@string/login">
+    		android:label="@string/login"
+    		android:windowSoftInputMode="stateHidden"
+    		>
 		</activity>
 		
 		<activity 
@@ -124,7 +131,10 @@
     		android:windowSoftInputMode="stateHidden"
     		>
 		</activity>
-		
+		<activity android:name=".loginWithActivity"
+		    android:label="@string/preview"
+    		android:windowSoftInputMode="stateHidden">
+		</activity>
 		<activity 
     		android:name=".RestoreActivity"
     		android:label="@string/restore">
@@ -148,8 +158,15 @@
 		
 		<activity 
     		android:name=".MuPDFActivity"
-    		android:label="@string/restore"
+    		android:label="@string/app_name"
+    		android:configChanges="orientation|screenSize"
     		android:windowSoftInputMode="stateHidden">
+			<intent-filter>
+		        <action android:name="android.intent.action.VIEW" />
+		        <category android:name="android.intent.category.DEFAULT" />
+		        <category android:name="android.intent.category.BROWSABLE" />
+		        <data android:mimeType="application/pdf" />
+    </intent-filter>
 		</activity>
 		<activity 
     		android:name=".OutlineActivity"

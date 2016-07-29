@@ -19,39 +19,33 @@
 		/>
 
 	<LinearLayout
-	    android:layout_width="match_parent"
+	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
 	    android:layout_margin="14dp"
+	    android:layout_gravity="center"
 	    android:gravity="bottom"
 	    android:orientation="horizontal" >
 
     
     <Button
         android:id="@+id/bCancel"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/thin_button_selector"
-        android:minHeight="36dp"
-        android:layout_weight="1"
-        android:paddingLeft="@dimen/btn_radius"
-        android:paddingRight="@dimen/btn_radius"
+        android:background="@drawable/thin_orange_btn_selector"
+        android:minHeight="@dimen/thin_btn_min_height"
+        android:paddingLeft="@dimen/button_padding"
+        android:paddingRight="@dimen/button_padding"
         android:text="@string/cancel"
         android:textColor="@android:color/white"
-        android:textSize="14sp"
+        android:textSize="@dimen/password_text"
         />
     <Button
         android:id="@+id/bSave2Nimbus"
-        android:layout_width="0dp"
+        style="@style/DialogButton"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/password_text"
-        android:background="@drawable/thin_button_selector"
-        android:paddingLeft="@dimen/btn_radius"
-        android:paddingRight="@dimen/btn_radius"
-        android:minHeight="36dp"
-        android:layout_weight="1"
         android:text="@string/save"
-        android:textColor="@android:color/white"
-        android:textSize="14sp"
         />
     
 </LinearLayout>

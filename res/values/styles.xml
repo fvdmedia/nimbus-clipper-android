@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!--
         Base application theme, dependent on API level. This theme is replaced
@@ -101,4 +101,55 @@
     	<item name="android:shadowRadius">3</item>
     	<item name="android:gravity">center_horizontal</item>
   	</style>
+  	
+  	<style name="BorderButton">
+    	<item name="android:background">@drawable/simple_button_selector</item>
+    	<item name="android:minHeight">@dimen/thin_btn_min_height</item>
+    	<item name="android:textSize">@dimen/password_text</item>
+    	<item name="android:textColor">@android:color/white</item>
+    	<item name="android:paddingRight">@dimen/thin_btn_padding</item>
+    	<item name="android:paddingLeft">@dimen/thin_btn_padding</item>
+  	</style>
+  	
+  	
+  	
+  	<style name="DialogButton">
+    	<item name="android:background">@drawable/thin_button_selector</item>
+    	<item name="android:minHeight">@dimen/thin_btn_min_height</item>
+    	<item name="android:textSize">@dimen/password_text</item>
+    	<item name="android:textColor">@android:color/white</item>
+    	<item name="android:paddingRight">@dimen/thin_btn_padding</item>
+    	<item name="android:paddingLeft">@dimen/thin_btn_padding</item>
+  	</style>
+  	
+  	<style name="BigBorderButton">
+    	<item name="android:background">@drawable/button_selector</item>
+    	<item name="android:minHeight">@dimen/btn_min_height</item>
+    	<item name="android:textSize">@dimen/password_text</item>
+    	<item name="android:textColor">@drawable/button_text_color</item>
+    	<item name="android:paddingRight">@dimen/thin_btn_padding</item>
+    	<item name="android:paddingLeft">@dimen/thin_btn_padding</item>
+  	</style>
+  	
+  	<style name="xBorderButton">
+    	<item name="android:background">@drawable/border_btn_selector</item>
+    	<item name="android:minHeight">@dimen/xthin_btn_min_height</item>
+    	<item name="android:textSize">@dimen/password_text</item>
+    	<item name="android:textColor">@drawable/button_text_color</item>
+    	<item name="android:paddingRight">@dimen/thin_btn_padding</item>
+    	<item name="android:paddingLeft">@dimen/thin_btn_padding</item>
+  	</style>
+  	
+  	<style name="xRoundButton">
+    	<item name="android:background">@drawable/round_btn_selector</item>
+    	<item name="android:minHeight">@dimen/xthin_btn_min_height</item>
+    	<item name="android:textSize">@dimen/password_text</item>
+    	<item name="android:textColor">@drawable/button_text_color</item>
+    	
+  	</style>
+  	
+  	<style name="menu_labels_style">
+        <item name="android:background">@drawable/fab_label_background</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
 </resources>

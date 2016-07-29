@@ -21,6 +21,7 @@ public class ShotSuccess extends Activity implements OnClickListener{
         catch (Exception e){
         	e.printStackTrace();
         }
+        overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
         setContentView(R.layout.layout_shot_success);
         id = getIntent().getStringExtra("id").toString();
         

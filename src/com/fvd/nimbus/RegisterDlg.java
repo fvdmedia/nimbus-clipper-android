@@ -21,7 +21,8 @@ public class RegisterDlg extends Activity implements OnClickListener{
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+        //overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+        overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         try{
         	requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -62,13 +63,18 @@ public class RegisterDlg extends Activity implements OnClickListener{
 	
 	public void onClick(View v)
 	{
-		
 		switch (v.getId()) 
 		{
 		    case R.id.brRegister:
-		    	((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(this.getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+		    	try{
+		    		//((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(this.getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+		    		hideKeyboard();
+		    	}
+		    	catch (Exception e) {
+					// TODO: handle exception
+				}
 		    	String mail  = tv.getText().toString();
-		    	String pass = ((TextView)findViewById(R.id.etPassword)).getText().toString();
+		    	String pass = ((TextView)findViewById(R.id.etrPassword)).getText().toString();
 		    	if(mail.indexOf("@")==-1 || mail.indexOf(".")==-1){
 		    		Toast.makeText(getApplicationContext(), getString(R.string.invalid_email), Toast.LENGTH_LONG).show();
     			}
@@ -78,12 +84,20 @@ public class RegisterDlg extends Activity implements OnClickListener{
     			else{
     				Intent intent = new Intent();
     				intent.putExtra("userMail", tv.getText().toString());
-    				intent.putExtra("userPass", ((TextView)findViewById(R.id.etPassword)).getText().toString());
+    				intent.putExtra("userPass", ((TextView)findViewById(R.id.etrPassword)).getText().toString());
     				setResult(RESULT_OK, intent);
     				finish();
     			}
 		        break;
 		  }
+	}
+	
+	void hideKeyboard(){
+		InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+		if(imm!=null){
+			if(!imm.hideSoftInputFromWindow(findViewById(R.id.etrLogin).getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS))
+				if(!imm.hideSoftInputFromWindow(findViewById(R.id.etrPassword).getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS));
+		}
 	}
 
 }
