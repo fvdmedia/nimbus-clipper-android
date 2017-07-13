@@ -573,9 +573,12 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 				for (pdfShape shape : params[0]) {
 					//addMarkup(shape.getPoints().toArray(new PointF[shape.size()]), shape.getType());
 					if(shape.type!=Annotation.Type.TEXT){
-						ArrayList<PointF[]> arr = new ArrayList<PointF[]>();
+						/*ArrayList<PointF[]> arr = new ArrayList<PointF[]>();
 						arr.add(shape.getPoints().toArray(new PointF[shape.size()]));
-						mCore.addDrawAnnotation(mPageNumber,arr.toArray(new PointF[1][]), shape.type, shape.col_in);
+						mCore.addDrawAnnotation(mPageNumber,arr.toArray(new PointF[1][]), shape.type, shape.col_in);*/
+						PointF[][] p=new PointF[1][];
+						p[0]=(shape.getPoints().toArray(new PointF[shape.size()]));
+						mCore.addDrawAnnotation(mPageNumber,p, shape.type, shape.col_in);
 					}
 					else mCore.addTextAnnotation(mPageNumber, shape.text, shape.getX(), shape.getY());
 				}

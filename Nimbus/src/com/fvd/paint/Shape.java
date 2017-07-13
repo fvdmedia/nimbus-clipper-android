@@ -216,4 +216,11 @@ public class Shape {
 		final float  d=30/iScale;
 		return x>Math.min(closeRect.left, closeRect.right)-d && x<Math.max(closeRect.left, closeRect.right)+d && y>Math.min(closeRect.top, closeRect.bottom)-d && y<Math.max(closeRect.top, closeRect.bottom)+d;         
 	}
+	float angle=0;
+	public void rotate(float a, float px, float py) {
+		angle+=a;
+		Matrix m = new Matrix();
+		m.setRotate(angle,px,px);
+		path.transform(m);
+	}
 }

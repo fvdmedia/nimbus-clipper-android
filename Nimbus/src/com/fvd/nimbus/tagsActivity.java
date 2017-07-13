@@ -74,6 +74,7 @@ public class tagsActivity extends Activity implements OnClickListener{
 	String[] checkCatsName={};
 	String s_tags="";
 	DataExchange data;
+	String def_tag="androidclipper";
 	
 	/*private class TextAdapter extends ArrayAdapter<FolderItem> {
 
@@ -150,6 +151,7 @@ public class tagsActivity extends Activity implements OnClickListener{
 		Intent intent = getIntent();
 		data =(DataExchange)intent.getExtras().getSerializable("xdata");
 		folder_id=data.getId();// intent.getStringExtra("current");
+		def_tag=data.getTags();
 		((EditText)findViewById(R.id.fetTitle)).setText(data.getTitle());
 		if(folder_id==null || folder_id=="") folder_id="default";
 		
@@ -244,7 +246,11 @@ public class tagsActivity extends Activity implements OnClickListener{
     	        			tags.add(new tagItem(arr.getString(i), false));
     	        		}
     	        		//if(tags.size()>0) findViewById(R.id.ibtTags).setVisibility(View.VISIBLE);
-    	        		if(tags.size()==0) tags.add(new tagItem("androidclipper",false));
+    	        		if(tags.size()==0) {
+    	        			tags.add(new tagItem("androidclipper",false));
+    	        			tags.add(new tagItem("Document",false));
+    	        			
+    	        		}
 	            	}
 	            	((ListView)findViewById(R.id.itags)).setAdapter(new CheckArrayAdapter(tagsActivity.this));
 				}
@@ -364,7 +370,7 @@ public class tagsActivity extends Activity implements OnClickListener{
 					if(folder_id==null || folder_id=="") folder_id="default";
 			    	Intent intent = new Intent();
 			    	if(data==null) data = new DataExchange();
-			    	data.setTags(s_tags.length()>0?s_tags:"androidclipper");
+			    	data.setTags(s_tags.length()>0?s_tags:(def_tag!=""?def_tag:"androidclipper"));
 			    	data.setTitle(ttl);
 			    	data.setId(folder_id);
 			    	//BugReporter.Send("tagsActivity", String.format("%s. %s. %s", data.getId(), data.getTags(),  data.getTitle()));

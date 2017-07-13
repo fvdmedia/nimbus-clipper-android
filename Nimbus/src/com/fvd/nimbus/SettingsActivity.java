@@ -6,6 +6,7 @@ import com.fvd.utils.serverHelper;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.opengl.Visibility;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
@@ -33,10 +34,11 @@ public class SettingsActivity extends Activity{
         ((Button)findViewById(R.id.bsRateUs)).setOnClickListener(this);
         ((Button)findViewById(R.id.bsLicenses)).setOnClickListener(this);
         ((Button)findViewById(R.id.bsHelp)).setOnClickListener(this);*/
-        if(!appSettings.getInstance().getIsTablet())
+        if(!appSettings.getIsTablet())
         	setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         if (appSettings.sessionId.length() == 0) ((Button)findViewById(R.id.bsRegister)).setText(getResources().getString(R.string.login));
     	else ((Button)findViewById(R.id.bsRegister)).setText(getResources().getString(R.string.logout));
+        if(appSettings.pocket_code!="") findViewById(R.id.bsPocketOut).setVisibility(View.VISIBLE);
      }
 	
 	public void onButtonClick(View v) {
@@ -58,6 +60,10 @@ public class SettingsActivity extends Activity{
 		    	break;
 		    case R.id.bsLicenses:
 		    	setResult(RESULT_FIRST_USER+5, i);
+		    	break;
+		    case R.id.bsPocketOut:
+		    	appSettings.resetPocket(this);
+		    	//findViewById(R.id.bsPocketOut).setVisibility(View.GONE);
 		    	break;
 		}
 		finish();

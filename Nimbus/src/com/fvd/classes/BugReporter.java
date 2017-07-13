@@ -2,8 +2,6 @@ package com.fvd.classes;
 
 import java.net.URLEncoder;
 
-import org.apache.http.client.utils.URLEncodedUtils;
-
 import com.fvd.utils.AsyncTaskCompleteListener;
 import com.fvd.utils.HttpGetTask;
 import com.fvd.utils.appSettings;

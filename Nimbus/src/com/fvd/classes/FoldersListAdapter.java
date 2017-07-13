@@ -353,7 +353,7 @@ public class FoldersListAdapter extends ArrayAdapter<FolderListItem> {
                 return item.getTitle().compareToIgnoreCase(item2.getTitle());
             }
             return 0;*/
-        	return item.getTitle().compareToIgnoreCase(item2.getTitle());
+        	return item.getTitle().compareTo(item2.getTitle());
         }
     } 
 }

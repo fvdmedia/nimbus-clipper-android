@@ -9,6 +9,7 @@ public class DataExchange implements Serializable{
 	}
 	String content;
 	public String getContent() {
+		if (content==null) return "";
 		return content;
 	}
 	

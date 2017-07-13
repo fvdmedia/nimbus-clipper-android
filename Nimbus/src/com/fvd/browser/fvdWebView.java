@@ -243,15 +243,15 @@ OnTouchListener, OnLongClickListener{
 			try{
 				this.eval("javascript:android.longTouch();");
 				this.mScrolling = true;
-				return true;
+				return false;
 			}
 			catch (Exception e){
-				return true;
+				return false;
 			}
 		}
 		else {
 			Toast.makeText(ctx, getContext().getString(R.string.wait_load), Toast.LENGTH_LONG).show();
-			return true;
+			return false;
 		}
 		
 	}

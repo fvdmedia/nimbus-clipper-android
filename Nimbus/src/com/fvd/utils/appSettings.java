@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import android.R.string;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -23,7 +24,10 @@ public class appSettings {
 	public static String userPass ="";
 	public static String sessionId = "";
 	public static String service = "";
+	public static String pocket_code = "";
 	public static String defFolderId = "";
+	public static String img_path = "";
+	public static int photo_quality=90;
 	private static boolean isTablet=false;
 	public static appSettings getInstance(){
 		if (singleton == null)
@@ -46,9 +50,9 @@ public class appSettings {
 		service=srv;
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(c);
 		Editor e = prefs.edit();
-		e.putString("userMail", userMail);
-		e.putString("userPass", userPass);
-		e.putString("sessionId", sessionId);
+		e.putString("userMail", user);
+		e.putString("userPass", pass);
+		e.putString("sessionId", sess);
 		e.putString("service", srv);
 		e.commit();
 	}
@@ -58,6 +62,16 @@ public class appSettings {
 		Editor e = prefs.edit();
 		e.putString(k, v);
 		e.commit();
+	}
+	
+	public static void storePocket(Context c,String v) {
+		pocket_code=v;
+		prefsWriteString(c, "pocket_code", v);
+	}
+	
+	public static void resetPocket(Context c) {
+		pocket_code="";
+		prefsWriteString(c, "pocket_code", "");
 	}
 	
 	public static void SignOut(Context c){
@@ -70,12 +84,28 @@ public class appSettings {
 		
 	}
 	
-	public static void init(Context c) {
+	public static boolean getBoolean(Context c, String key, boolean def){
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(c);
-		userMail = prefs.getString("userMail", "");
-        userPass = prefs.getString("userPass", "");
-        sessionId = prefs.getString("sessionId", "");
-        service = prefs.getString("service", "");
+		return prefs.getBoolean(key, def);
+		
+	}
+	
+	static boolean inited=false;
+	
+	public static void init(Context c) {
+		initCache(c);
+		if(!inited){
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(c);
+			userMail = prefs.getString("userMail", "");
+	        userPass = prefs.getString("userPass", "");
+	        sessionId = prefs.getString("sessionId", "");
+	        service = prefs.getString("service", "");
+	        pocket_code = prefs.getString("pocket_code", "");
+	        img_path=prefs.getString("imgFolderPath", Environment.getExternalStorageDirectory().getPath() + "/"+SaveDir+"/");
+	        photo_quality=Integer.parseInt(prefs.getString("photoQuality", "90"));
+	        inited=true;
+		}
+		
 	}
 	
 	private void CheckDirectory(String path){
@@ -98,14 +128,16 @@ public class appSettings {
 		return f.exists();
 	}
 	
-	public static String saveTempBitmap(Bitmap bm){
+
+	
+	public static String saveTempBitmap(Bitmap bm, boolean isPhoto){
 		String savingPath=getSavingPath();
-		String	photoFileName=String.valueOf(System.currentTimeMillis())+"-tmp.png";
+		String	photoFileName=String.valueOf(System.currentTimeMillis())+"-tmp.jpg";
 		 	File file = new File(savingPath,photoFileName); 
 		 	try{
 		 		file.createNewFile();
 		 		FileOutputStream ostream = new FileOutputStream(file);
-		 		bm.compress(CompressFormat.PNG, 0, ostream);
+		 		bm.compress(CompressFormat.JPEG, 95, ostream);
 		 		ostream.flush();
 		 		ostream.close();
 		 	}
@@ -120,9 +152,47 @@ public class appSettings {
 		return  cacheDir + "/";//Environment.getExternalStorageDirectory().getPath() + "/"+SaveDir+"/"; 
 	}
 	
+	public static void initCache(Context ctx){
+		if(appSettings.cacheDir==""){
+			File ex=ctx.getExternalCacheDir();
+	        if (ex==null) ex=ctx.getCacheDir();
+	        if (ex==null) ex=Environment.getExternalStorageDirectory();
+	        if(ex!=null) appSettings.cacheDir=ex.getPath();
+		}
+	}
+	
+	public static void log(String text) {
+		File logFile = new File(Environment.getExternalStorageDirectory().getPath()+"/"+"nimbus_log.txt");
+		   if (!logFile.exists())
+		   {
+		      try
+		      {
+		         logFile.createNewFile();
+		      } 
+		      catch (IOException e)
+		      {
+		         // TODO Auto-generated catch block
+		         e.printStackTrace();
+		      }
+		   }
+		   try
+		   {
+		      //BufferedWriter for performance, true to set append to file flag
+		      BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, true)); 
+		      buf.append(text);
+		      buf.newLine();
+		      buf.close();
+		   }
+		   catch (IOException e)
+		   {
+		      // TODO Auto-generated catch block
+		      e.printStackTrace();
+		   }
+	}
+	
 	public static void appendLog(String text)
 	{       
-	   /*File logFile = new File(getSavingPath()+"nimbus.txt");
+	   /*File logFile = new File(Environment.getExternalStorageDirectory().getPath()+"/"+"nimbus.txt");
 	   if (!logFile.exists())
 	   {
 	      try

@@ -70,7 +70,7 @@ public class helpActivity extends Activity {
 				}
 			};
 			
-			flipper.setOnTouchListener(onTouchListener);
+			flipper/*findViewById(R.id.llRoot)*/.setOnTouchListener(onTouchListener);
 			
 			try{
 				initPagesList();
@@ -86,7 +86,7 @@ public class helpActivity extends Activity {
 			RadioButton radioBtn;
 			
 			int i = 0;
-			
+			boolean isfirst=true;
 			for (Map<String, Object> map : pages) {
 				pageView = getLayoutInflater().inflate(R.layout.layout_help_single, null);
 				
@@ -104,7 +104,8 @@ public class helpActivity extends Activity {
 				radioBtn = new RadioButton(this);
 				radioBtn.setButtonDrawable(R.drawable.help_radio_btn);
 				radioBtn.setBackgroundResource(0);
-				radioBtn.setPadding(20, 10, 20, 10);
+				radioBtn.setPadding(20, 10, 0, 10);
+				isfirst=false;
 				radioBtn.setOnCheckedChangeListener(new CheckedChangeListener(i));
 				
 				btnsGroup.addView(radioBtn);
@@ -215,9 +216,9 @@ public class helpActivity extends Activity {
 		@Override
 		public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
 
-			final int SWIPE_MIN_DISTANCE = 120;
+			final int SWIPE_MIN_DISTANCE = 50;
 			final int SWIPE_MAX_OFF_PATH = 250;
-			final int SWIPE_THRESHOLD_VELOCITY = 200; 
+			final int SWIPE_THRESHOLD_VELOCITY = 50; 
 
 			try {
 				if (Math.abs(e1.getY() - e2.getY()) > SWIPE_MAX_OFF_PATH)

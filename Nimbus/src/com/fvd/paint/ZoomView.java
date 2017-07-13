@@ -31,7 +31,7 @@ import android.widget.Toast;
 public class ZoomView extends View {
 
     static protected final boolean ScaleAtFocusPoint = false;
-    static final int maxSize=5000;
+    static final int maxSize=2000;
     int deviceOrientation=0;
     protected Bitmap background;
     protected Bitmap cache;
@@ -212,10 +212,14 @@ void fixCoords(){
 
 }
 
+public boolean canZoom(){
+	return true;
+}
+
 @Override 
 public boolean onTouchEvent(MotionEvent ev) {
 
-	mScaleDetector.onTouchEvent(ev);
+	if(canZoom()) mScaleDetector.onTouchEvent(ev);
 	gestureDetector.onTouchEvent(ev);
     if (onTouch(ev)) return true;
     
@@ -533,6 +537,7 @@ public void setBitmap(Bitmap b, int ra){
 	int w = b.getWidth();
 	int h = b.getHeight();
 	
+	
 	if(w>=h && w>maxSize){
 		scale =  (float)maxSize/w;
 		h=Math.round(h*maxSize/w);
@@ -544,7 +549,11 @@ public void setBitmap(Bitmap b, int ra){
 		h=maxSize;
 	}
 	
-	
+	if(ra==-1){
+		if(getWidth()>getHeight()&&w>h) rotate=false;
+		else if(getWidth()<getHeight()&&w<h) rotate=false;
+	}
+	if(ra==-1&&rotate) ra=90;
 	
 	if(scale!=1 || rotate){
 		background = PrepareBitmap(b, scale, (float)ra/*rotate?90.0f:0f*/);// rotate?RotateBitmap(b, 90.0f):b;
@@ -560,13 +569,15 @@ public void setBitmap(Bitmap b, int ra){
 	if (cache!=null) cache.recycle();
 	cache=Bitmap.createBitmap(background.getWidth(), background.getHeight(), background.getConfig());
 	cacheCanvas= new Canvas(cache);
+	//postInvalidate();
+	invalidate();
 	return;
 	
 }
 
 public void recycle() {
-	if(background!=null) background.recycle();
-	if(cache!=null) cache.recycle();
+	if(background!=null&&!background.isRecycled()) background.recycle();
+	if(cache!=null&&!cache.isRecycled()) cache.recycle();
 	cacheCanvas=null;
 }
 

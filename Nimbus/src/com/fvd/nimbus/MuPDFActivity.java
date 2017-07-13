@@ -3,8 +3,11 @@ package com.fvd.nimbus;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.text.BreakIterator;
@@ -45,6 +48,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -375,17 +379,32 @@ public class MuPDFActivity extends Activity implements OnClickListener, FilePick
 					// Handle view requests from the Transformer Prime's file manager
 					// Hopefully other file managers will use this same scheme, if not
 					// using explicit paths.
-					Cursor cursor = getContentResolver().query(uri, new String[]{"_data"}, null, null, null);
-					if (cursor.moveToFirst()) {
-						String str = cursor.getString(0);
+					//Cursor cursor = getContentResolver().query(uri, new String[]{"_data"}, null, null, null);
+					if (true /*cursor.moveToFirst()*/) {
+						String str = null;// cursor.getString(0);
 						String reason = null;
 						if (str == null) {
 							try {
 								InputStream is = getContentResolver().openInputStream(uri);
-								int len = is.available();
+								/*int len = is.available();
 								buffer = new byte[len];
 								is.read(buffer, 0, len);
 								is.close();
+								String name=getGalleryName(uri);
+								if(name!=""){
+									
+								}*/
+								String path=saveTmp(is,getGalleryName(uri));
+								is.close();
+								uri=Uri.parse(path);
+								/*ContentResolver cr = getContentResolver();
+								FileDescriptor fd=cr.openFileDescriptor(uri, "r").getFileDescriptor();
+								InputStream is = new FileInputStream(fd);
+								int len = is.available();
+								buffer = new byte[len];
+								is.read(buffer, 0, len);
+								is.close();*/
+								
 							}
 							catch (java.lang.OutOfMemoryError e)
 							{
@@ -448,6 +467,43 @@ public class MuPDFActivity extends Activity implements OnClickListener, FilePick
 
 		createUI(savedInstanceState);
 	}
+	
+	
+	String saveTmp(InputStream is, String fname) {
+    	String savingPath=appSettings.getSavingPath();
+		String	photoFileName=fname;
+		File file = new File(savingPath,photoFileName); 
+		try{		
+			OutputStream os=new FileOutputStream(file);
+			byte[] buffer = new byte[1024*500];
+			int len;
+			while ((len = is.read(buffer)) != -1) {
+			    os.write(buffer, 0, len);
+			}
+			os.close();
+		}
+		catch (Exception e){}
+    	return file.getPath();
+	}
+	
+	public String getGalleryName(Uri uri) {
+    	String picturePath=uri.toString();
+    	if(picturePath.startsWith("file:")){
+    		return helper.trimExt(picturePath.substring(picturePath.lastIndexOf("/")+1));
+    	}
+    	picturePath=null;
+    	String[] filePathColumn = { MediaStore.Images.Media.DISPLAY_NAME };
+    	try{
+	    	Cursor cursor = getContentResolver().query(uri,filePathColumn, null, null,   null);
+	    	cursor.moveToFirst();
+	    	int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+	    	picturePath = cursor.getString(columnIndex);
+	    	cursor.close();
+    	} catch (Exception e){}
+    	//if(picturePath!=null) picturePath=helper.trimExt(picturePath);
+    	return picturePath;
+	}
+	
 	
 	
 	@Override
@@ -648,8 +704,10 @@ void setBarConfig(int orientation){
 		
 		mSaveSD.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				
-				if(core.hasChanges()) {
+				if(mBottomBarSwitcher.getDisplayedChild()!=0){
+					return;
+				}
+				if(true || core.hasChanges()) {
 					new SaveTask(0).execute();
 			    }
 			}
@@ -657,6 +715,9 @@ void setBarConfig(int orientation){
 		
 		mSharePdf.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
+				if(mBottomBarSwitcher.getDisplayedChild()!=0){
+					return;
+				}
 				if(true || core.hasChanges()) {
 					new SaveTask(1).execute();
 				}
@@ -665,6 +726,9 @@ void setBarConfig(int orientation){
 		
 		mSaveNimbus.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
+				if(mBottomBarSwitcher.getDisplayedChild()!=0){
+					return;
+				}
 				if (appSettings.sessionId.length() == 0) {
 					showSettings();
 					if(core.hasChanges()) core.save();
@@ -672,7 +736,7 @@ void setBarConfig(int orientation){
 				else {
 					if(core.hasChanges()) new SaveTask(2).execute();
 				else {
-        					serverHelper.getInstance().sendRequest("notes:getFolders", "","");
+        				serverHelper.getInstance().sendRequest("notes:getFolders", "","");
 					}
 				}
 			}
@@ -1291,7 +1355,7 @@ void setBarConfig(int orientation){
 		case 1:
 			Intent share = new Intent(Intent.ACTION_SEND);
 			share.setType("application/pdf");
-			share.putExtra(Intent.EXTRA_STREAM, Uri.parse(mFilePath));
+			share.putExtra(Intent.EXTRA_STREAM, Uri.parse(mFilePath.startsWith("file:/")?mFilePath:("file://"+mFilePath)));
 			startActivity(Intent.createChooser(share, "Share PDF Document"));
 			break;
 		case 2:

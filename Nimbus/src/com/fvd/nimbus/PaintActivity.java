@@ -19,6 +19,7 @@ import org.json.JSONObject;
 
 import yuku.ambilwarna.AmbilWarnaDialog;
 import android.annotation.SuppressLint;
+import android.app.ActionBar.LayoutParams;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -39,12 +40,15 @@ import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.drawable.Drawable;
 import android.media.ExifInterface;
 import android.media.MediaScannerConnection;
+import android.net.IpPrefix;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
@@ -57,6 +61,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -74,10 +79,14 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.ViewAnimator;
 
+import com.fvd.classes.BugReporter;
 import com.fvd.classes.CircleButton;
+import com.fvd.classes.DataExchange;
 import com.fvd.classes.DrawerMenuAdapter;
+import com.fvd.cropper.R.string;
 import com.fvd.paint.DrawView;
 import com.fvd.utils.AsyncTaskCompleteListener;
+import com.fvd.utils.FileProviderCompat;
 import com.fvd.utils.appSettings;
 import com.fvd.utils.helper;
 import com.fvd.utils.prefsEditListener;
@@ -91,6 +100,8 @@ public class PaintActivity extends Activity implements OnClickListener, AsyncTas
 	private static final String TAG = "FingerPaint";
 	private static final int TAKE_PHOTO = 1;
 	private static final int TAKE_PICTURE = 2;
+	private static final int GET_FOLDERS = 7;
+	private static final int SIGN_IN = 8;
 	final int SHOW_SETTINGS=11;
 	protected static final String CONTENT_PHOTOS_URI_PREFIX = "content://com.google.android.apps.photos.contentprovider";
 	final String pColor="pColor";
@@ -100,9 +111,9 @@ public class PaintActivity extends Activity implements OnClickListener, AsyncTas
 	private int dColor =0;
 	private String userMail = "";
 	private String userPass ="";
-	private String sessionId = "";
+	//private String sessionId = "";
 	private SharedPreferences prefs;
-	private boolean saved = false;
+	//private boolean saved = false;
 	private int saveFormat=0;
  	private String domain="";
 	private boolean exitOnComplete = false;
@@ -113,7 +124,11 @@ public class PaintActivity extends Activity implements OnClickListener, AsyncTas
 	DrawerLayout drawer;
 	Context ctx;
 	boolean canChange=true;
+	//boolean isDocument=false;
+	String preName="Picture";
+	String defTag="androidclipper";
 	int ccolor;
+	String storeFileName=null;
 	int[] buttons={R.id.bEditPage,R.id.bToolShape,R.id.bToolText, R.id.bToolColor,R.id.bToolCrop, R.id.bErase};
 	
 	//private String[] mPlanetTitles;
@@ -132,6 +147,7 @@ public class PaintActivity extends Activity implements OnClickListener, AsyncTas
         	e.printStackTrace();
         }
         ctx = this;
+        appSettings.init(ctx);
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         dWidth= prefs.getInt("dWidth", 2); 
     	fWidth =prefs.getInt("fWidth", 1);
@@ -164,6 +180,13 @@ public class PaintActivity extends Activity implements OnClickListener, AsyncTas
 		
 		(( TextView ) findViewById(R.id.tvTextType)).setText(String.format("%d",40+fWidth*20));
 
+		//setSelectedFoot(1);
+		if(appSettings.cacheDir==""){
+			File ex=getExternalCacheDir();
+	        if (ex==null) ex=getCacheDir();
+	        if (ex==null) ex=Environment.getExternalStorageDirectory();
+	        if(ex!=null) appSettings.cacheDir=ex.getPath();
+		}
     	
     	findViewById(R.id.bUndo).setOnClickListener(this);
     	findViewById(R.id.btnBack).setOnClickListener(this);
@@ -278,41 +301,52 @@ public class PaintActivity extends Activity implements OnClickListener, AsyncTas
         
         userMail = prefs.getString("userMail", "");
         userPass = prefs.getString("userPass", "");
-        sessionId = prefs.getString("sessionId", "");
+        appSettings.sessionId = prefs.getString("sessionId", "");
         
-        appSettings.sessionId=sessionId;
+        //appSettings.sessionId=sessionId;
  	    appSettings.userMail=userMail;
  	    appSettings.userPass=userPass;
         
-        
+        FileProviderCompat.setContext(getApplicationContext());
  	    storePath="";
         Intent intent = getIntent();
         String action = intent.getAction();
         String type = intent.getType();
+        if(intent.hasExtra("mode")){
+        	int m=intent.getIntExtra("mode", 0);
+        	switch (m) {
+			case 0:
+				preName="Photo";
+				break;
+			case 1:
+				preName="Document";
+				defTag="Document";
+				break;
+			case 2:
+				preName="Card";
+				defTag="Document";
+				break;
+
+			default:
+				break;
+			}
+        }
         //storePath= intent.getPackage().getClass().toString();
         if((Intent.ACTION_VIEW.equals(action) || Intent.ACTION_SEND.equals(action) || "com.onebit.nimbusnote.EDIT_PHOTO".equals(action)) && type != null){
         	if (type.startsWith("image/")) {
+        		if ("com.onebit.nimbusnote.EDIT_PHOTO".equals(action)) storePath=" ";
         		Uri imageUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
         		if (imageUri==null) imageUri=intent.getData();
         		if (imageUri!=null){
-        			String url = Uri.decode(imageUri.toString());
-        			if(url.startsWith(CONTENT_PHOTOS_URI_PREFIX)){
-        				url=getPhotosPhotoLink(url);
-        			} //else url=Uri.decode(url);
-        			
-        			ContentResolver cr = getContentResolver();
-        			InputStream is;
-        			
-        			try {
-        				is = cr.openInputStream(Uri.parse(url));
-        				if ("com.onebit.nimbusnote.EDIT_PHOTO".equals(action)) storePath=" ";//getGalleryPath(Uri.parse(url));
+        			try{
+        				InputStream is =getContentResolver().openInputStream(imageUri);
+        				int orient = helper.getImageRotation(PaintActivity.this, imageUri);
         				Bitmap bmp = BitmapFactory.decodeStream(is);
         				if (bmp.getWidth()!=-1 && bmp.getHeight()!=-1)
-        					drawView.setBitmap(bmp,0);
-        			}
-        			catch (Exception e) {
-        				appSettings.appendLog("paint:onCreate  "+e.getMessage());
-        			}
+        					drawView.setBitmap(bmp,orient);
+        				is.close();
+        				
+        			}catch (Exception e){}
         		}
             } 
         }
@@ -325,30 +359,97 @@ public class PaintActivity extends Activity implements OnClickListener, AsyncTas
         	}
         	else {
         		String filePath = getIntent().getExtras().getString("path");
-            	boolean isTemp = getIntent().getExtras().getBoolean("temp");
+            	final boolean isTemp = getIntent().getExtras().getBoolean("temp");
             	domain =  getIntent().getExtras().getString("domain");
-            	if(domain==null) domain = serverHelper.getDate();
-	        	if(filePath.contains("://")){
+            	if(domain==null) domain = "";
+	        	if(filePath.startsWith("http")){
 	        		Bitmap bmp=helper.LoadImageFromWeb(filePath);
 	        		if (bmp!=null) {
 	        			drawView.setBitmap(bmp,0);
 	        		}
 	        	}
 	        	else {
-	        		File file = new File(filePath);
-	        		if (file.exists()){
-	        			try{
-	        				int orient = helper.getOrientationFromExif(filePath);
-	        				Bitmap bmp = helper.decodeSampledBitmap(filePath,1000,1000);
-	        				if (bmp!=null){
-	        					drawView.setBitmap(bmp,orient);
-	        				}
+	        		showProgress(true);
+	        		if(filePath.startsWith("/storage"))  filePath ="file://"+filePath;
+	        		final Uri u=Uri.parse(filePath);
+	        		storeFileName=getGalleryName(u);
+	        		/*try{
+		        		InputStream input = getContentResolver().openInputStream(u);
+	    			 	final int orient = helper.getImageRotation(PaintActivity.this, u);
+			 			final Bitmap b=BitmapFactory.decodeStream(input);
+	    			 	drawView.setVisibility(View.INVISIBLE);
+			 			drawView.setBitmap(b, orient);
+			 			drawView.setVisibility(View.VISIBLE);
+	        		} catch (Exception e){
+	        			
+	        		}*/
+	        		new Thread(new Runnable() {
+						
+						@Override
+						public void run() {
+							// TODO Auto-generated method stub
+							InputStream input=null;
+							try{
+				        		input = getContentResolver().openInputStream(u);
+				        		
+							} catch (Exception e){
+			        			
+			        		}
+							if(input!=null){
+				    			final int orient = helper.getImageRotation(PaintActivity.this, u);
+						 		final Bitmap bmp=BitmapFactory.decodeStream(input);
+						 		runOnUiThread(new Runnable() {
+									public void run() {
+										drawView.setVisibility(View.GONE);
+										if (bmp!=null){
+			        						drawView.setBitmap(bmp,orient);
+			        					}
+										drawView.setVisibility(View.VISIBLE);
+					        			showProgress(false);
+									}
+								});
+					 		
+							}
+			        		
+						}
+					}).start();
+	        		//final File file = new File(filePath);
+	        		
+	        		/*if (file.exists()){
+	        			{
+	        				showProgress(true);
+	        				new Thread(new Runnable() {
+								
+								@Override
+								public void run() {
+									// TODO Auto-generated method stub
+									try{
+										final int orient = helper.getOrientationFromExif(filePath);
+										final Bitmap bmp  = helper.decodeSampledBitmap(filePath,isTemp);
+										
+										runOnUiThread(new Runnable() {
+											public void run() {
+												drawView.setVisibility(View.GONE);
+												if (bmp!=null){
+					        						drawView.setBitmap(bmp,orient);
+					        					}
+												drawView.setVisibility(View.VISIBLE);
+							        			showProgress(false);
+							        			
+							        			//Toast.makeText(PaintActivity.this, "loaded", Toast.LENGTH_SHORT).show();
+											}
+										});
+									}
+									catch(Exception e){
+					        			appSettings.appendLog("paint.onCreate()  "+e.getMessage());
+					        		}
+					        			if (isTemp) file.delete();
+
+								}
+							}).start();
 	        			}
-	        			catch(Exception e){
-	        				appSettings.appendLog("paint.onCreate()  "+e.getMessage());
-	        			}
-	        			if (isTemp) file.delete();
-	        		}
+	        			
+	        		}*/
 	        	}
         	}
         }  
@@ -399,10 +500,33 @@ public class PaintActivity extends Activity implements OnClickListener, AsyncTas
 				       
 				}
 			}
+
+			@Override
+			public void onTouch(MotionEvent event, int act) {
+				// TODO Auto-generated method stub
+				if(act==MotionEvent.ACTION_DOWN){
+					if(findViewById(R.id.color_menu).getVisibility()!=View.GONE)
+            		{
+            			findViewById(R.id.color_menu).setVisibility(View.GONE);
+            			drawView.hideCrop();
+            			drawView.setCanDraw(true);
+                		//drawView.startEdit();
+		
+                		/*if (drawView.isDrawMode()) setSelectedFoot(1);
+                		else setSelectedFoot(0);*/
+            		}
+				}
+			}
         	
         });
         
         setColorButtons(dColor);
+        setSelectedFoot(1);
+        updateColorDialog(dWidth, fWidth, dColor);
+        drawView.startDraw();
+        ImageButton bs = (ImageButton)findViewById(R.id.bToolShape);
+        bs.setImageResource(R.drawable.draw_tools_06);
+        drawView.setShape(6);
         
         
         //mPlanetTitles = getResources().getStringArray(R.array.lmenu_paint);
@@ -412,15 +536,93 @@ public class PaintActivity extends Activity implements OnClickListener, AsyncTas
 		listView.setOnItemClickListener(this);*/
     }
     
+    /*public static Bitmap getCorrectlyOrientedImage(Context context, Uri photoUri) throws IOException {
+        int MAX_IMAGE_DIMENSION=2000;
+    	InputStream is = context.getContentResolver().openInputStream(photoUri);
+        BitmapFactory.Options dbo = new BitmapFactory.Options();
+        dbo.inJustDecodeBounds = true;
+        BitmapFactory.decodeStream(is, null, dbo);
+        is.close();
+
+        int rotatedWidth, rotatedHeight;
+        int orientation = getOrientation(context, photoUri);
+
+        if (orientation == 90 || orientation == 270) {
+            rotatedWidth = dbo.outHeight;
+            rotatedHeight = dbo.outWidth;
+        } else {
+            rotatedWidth = dbo.outWidth;
+            rotatedHeight = dbo.outHeight;
+        }
+
+        Bitmap srcBitmap;
+        is = context.getContentResolver().openInputStream(photoUri);
+        if (rotatedWidth > MAX_IMAGE_DIMENSION || rotatedHeight > MAX_IMAGE_DIMENSION) {
+            float widthRatio = ((float) rotatedWidth) / ((float) MAX_IMAGE_DIMENSION);
+            float heightRatio = ((float) rotatedHeight) / ((float) MAX_IMAGE_DIMENSION);
+            float maxRatio = Math.max(widthRatio, heightRatio);
+
+            // Create the bitmap from file
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inSampleSize = (int) maxRatio;
+            srcBitmap = BitmapFactory.decodeStream(is, null, options);
+        } else {
+            srcBitmap = BitmapFactory.decodeStream(is);
+        }
+        is.close();
+
+        if (orientation > 0) {
+            Matrix matrix = new Matrix();
+            matrix.postRotate(orientation);
+
+            srcBitmap = Bitmap.createBitmap(srcBitmap, 0, 0, srcBitmap.getWidth(),
+                    srcBitmap.getHeight(), matrix, true);
+        }
+
+        return srcBitmap;
+    }
+    
+    public static int getOrientation(Context context, Uri photoUri) {
+        
+        Cursor cursor = context.getContentResolver().query(photoUri,
+                new String[] { MediaStore.Images.ImageColumns.ORIENTATION }, null, null, null);
+
+        int result = -1;
+        if (null != cursor) {
+            if (cursor.moveToFirst()) {
+                result = cursor.getInt(0);
+            }
+            cursor.close();
+        }
+
+        return result;
+    }*/
+    
     public void onButtonClick(View v){
     	drawer.closeDrawer(GravityCompat.START);
 		Intent ip=new Intent();
 		switch (v.getId()) {
 		case R.id.lbTakePhoto:
-    		getPhoto();
+			drawView.postDelayed(new Runnable() {
+				
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+					getPhoto();
+				}
+			}, 350);
+    		
 			break;
 		case R.id.lbFromGallery:
-			getPicture();
+			drawView.postDelayed(new Runnable() {
+				
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+					getPicture();
+				}
+			}, 350);
+			
 			break;
 		case R.id.lbPdfAnnotate:
     		ip.setClassName("com.fvd.nimbus","com.fvd.nimbus.ChoosePDFActivity");
@@ -532,7 +734,7 @@ public class PaintActivity extends Activity implements OnClickListener, AsyncTas
     	 	            String finalString = "";
     	 	
     	 	            for(int i = 3 ; i < parts.length - 2 ; i ++){
-    	 	                if(!(i==parts.length - 3 && "ORIGINAL".equals(parts[i]))){
+    	 	                if(!(i==parts.length - 3 && parts[i].contains("ORIGINAL"))){
 	    	 	            	if(!finalString.isEmpty()){
 	    	 	                    finalString +="/";
 	    	 	                }
@@ -552,8 +754,8 @@ public class PaintActivity extends Activity implements OnClickListener, AsyncTas
     	//overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
     	if (prefs==null) prefs = PreferenceManager.getDefaultSharedPreferences(this);
     	serverHelper.getInstance().setCallback(this,this);
-    	if (sessionId.length()==0) sessionId = prefs.getString("sessionId", "");
-    	appSettings.sessionId=(sessionId);
+    	if (appSettings.sessionId.length()==0) appSettings.sessionId = prefs.getString("sessionId", "");
+    	//appSettings.sessionId=(sessionId);
     	exitOnComplete = false;
     	dColor =prefs.getInt(pColor, Color.RED);
     	drawView.setColour(dColor);
@@ -595,8 +797,11 @@ public class PaintActivity extends Activity implements OnClickListener, AsyncTas
             		{
             			findViewById(R.id.color_menu).setVisibility(View.GONE);
             			drawView.hideCrop();
-                		drawView.startEdit();
-                		setSelectedFoot(0);
+            			drawView.setCanDraw(true);
+                		//drawView.startEdit();
+		
+                		/*if (drawView.isDrawMode()) setSelectedFoot(1);
+                		else setSelectedFoot(0);*/
             			return true;
             		}
             		else if(findViewById(R.id.draw_tools).getVisibility()!=View.GONE)
@@ -608,7 +813,7 @@ public class PaintActivity extends Activity implements OnClickListener, AsyncTas
             			return false;
             		}else
             		if (!drawView.hideCrop()){
-            			if (!saved && storePath.length()==0) showDialog(0);
+            			if (drawView.hasChanged() && storePath.length()==0) showDialog(0);
             			else 
             				{
             					drawView.recycle();
@@ -739,7 +944,8 @@ public class PaintActivity extends Activity implements OnClickListener, AsyncTas
     {
     	Intent i = new Intent(getApplicationContext(), loginActivity.class);
     	i.putExtra("userMail", userMail==null?"":userMail);
-    	startActivityForResult(i, 11);
+    	i.putExtra("needresult", true);
+    	startActivityForResult(i, SIGN_IN);
     	//overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
     	overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
     }
@@ -1009,6 +1215,7 @@ public class PaintActivity extends Activity implements OnClickListener, AsyncTas
     	if(paletteButton_land!=null) paletteButton_land.setColor(c);
     	CircleButton p=(CircleButton)findViewById(R.id.bToolColor_land1);
     	if (p!=null) p.setColor(c);
+    	drawView.setCanDraw(true);
     }
     
     public void onClick(View v)
@@ -1023,12 +1230,12 @@ public class PaintActivity extends Activity implements OnClickListener, AsyncTas
     		((ImageButton)findViewById(R.id.bToolCrop)).setSelected(false);
     		drawView.startEdit();
     		setSelectedFoot(0);
-    		if (sessionId.length() == 0) showSettings();
+    		if (appSettings.sessionId.length() == 0) showSettings();
     		else {
     			v.postDelayed(new Runnable() {
         			@Override
         			public void run() {
-        				sendShot();
+        				getFolders();
         			}
         		},200);
     		}
@@ -1129,13 +1336,15 @@ public class PaintActivity extends Activity implements OnClickListener, AsyncTas
     		if(findViewById(R.id.color_menu).getVisibility()!=View.VISIBLE){
     		drawView.hideCrop();
     		showColorPopup(findViewById(R.id.bToolColor));
-    		setSelectedFoot(3);
+    		drawView.setCanDraw(false);
+    		//setSelectedFoot(3);
     		}
     		else{
     			findViewById(R.id.color_menu).setVisibility(View.GONE);
     			drawView.hideCrop();
-        		drawView.startEdit();
-        		setSelectedFoot(0);
+    			drawView.setCanDraw(true);
+        		//drawView.startEdit();
+        		//setSelectedFoot(0);
     		}
     		break;
     	case R.id.bErase:
@@ -1314,6 +1523,7 @@ public class PaintActivity extends Activity implements OnClickListener, AsyncTas
 			@Override
 			public void onCancel(AmbilWarnaDialog dialog) {
 				//Toast.makeText(getApplicationContext(), "cancel", Toast.LENGTH_SHORT).show();
+				drawView.setCanDraw(true);
 			}
 		});
 		dialog.show();
@@ -1366,19 +1576,26 @@ public void showSettingsPopup(View view) {
     public void getPhoto(){
     	try{
     		showProgress(true);
-    		photoFileName = String.valueOf(System.currentTimeMillis())+"-tmp.jpg";	
+    		/*photoFileName = String.valueOf(System.currentTimeMillis())+"-tmp.jpg";	
     		Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
     		File file = new File(appSettings.getInstance().SavingPath, photoFileName);
     		outputFileUri = Uri.fromFile(file);
     		intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
     		startActivityForResult(intent, TAKE_PHOTO);
     		//overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+    		overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);*/
+    		photoFileName = "temp.jpg";//String.valueOf(System.currentTimeMillis())+"-tmp.jpg";	
+    		Intent intent = new Intent(getApplicationContext(), com.fvd.cropper.ScannerActivity.class);
+    		intent.putExtra("fname", appSettings.SavingPath+"temp.jpg"/*String.valueOf(System.currentTimeMillis())+"-tmp.jpg"*/);
+    		//intent.putExtra("mode", prefs.getInt("scanMode", 1));
+    		startActivityForResult(intent, TAKE_PHOTO);
     		overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
     	}
     	catch (Exception e){
     		appSettings.appendLog("main:getPhoto  "+e.getMessage());
     		showProgress(false);
     	}
+    	
     }
     
     public void getPicture() {
@@ -1413,6 +1630,10 @@ public void showSettingsPopup(View view) {
 		return result;
 	}
     
+    String shot_parent = "default";
+	String shot_tag = "androidclipper";
+	String shot_title="";
+	
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     	ContentResolver cr;
@@ -1420,39 +1641,26 @@ public void showSettingsPopup(View view) {
     	if (requestCode == TAKE_PHOTO) {
     		showProgress(false);
         	if (resultCode == -1){
-        	try{
-        		if (data != null) {
-        			if (data.hasExtra("data")) {
-        				//Bitmap bm = ;
-        				drawView.setVisibility(View.INVISIBLE);
-        				drawView.recycle();
-        				drawView.setBitmap((Bitmap)data.getParcelableExtra("data"), 0);
-        				drawView.setVisibility(View.VISIBLE);
-        				
-        			}
+        		if(data!=null){
+        			 try { 
+         			 	Uri resultUri = data.getData();
+         			 	String drawString = resultUri.getPath();
+         			 	if(drawString.startsWith("/storage"))  resultUri=Uri.parse("file://"+drawString);
+         			 	storeFileName="PHOTO_tmp";
+      
+         			 	InputStream input =  getContentResolver().openInputStream(/*Uri.parse(drawString)*/resultUri);
+         			 	int orient = helper.getImageRotation(PaintActivity.this, resultUri/*Uri.parse(drawString)*/);
+ 			 			drawView.setVisibility(View.GONE);
+ 			 			drawView.recycle();
+ 			 			drawView.setBitmap(BitmapFactory.decodeStream(input), orient);
+ 			 			
+ 			 			drawView.setVisibility(View.VISIBLE);
+ 			 			drawView.forceRedraw();
+         		 } 
+         		 catch(Exception e){
+         			 appSettings.appendLog("main:onActivityResult  "+e.getMessage()); 
+         		}
         		}
-        		else {
-        			if(outputFileUri!=null){
-        				cr = getContentResolver();
-            			try {
-            				is = cr.openInputStream(outputFileUri);
-            				Bitmap bmp = BitmapFactory.decodeStream(is);
-            				if (bmp.getWidth()!=-1 && bmp.getHeight()!=-1){   
-            					drawView.setVisibility(View.INVISIBLE);
-            					drawView.recycle();
-            					drawView.setBitmap(bmp,0);
-            					drawView.setVisibility(View.VISIBLE);
-            				}
-            			}
-            			catch (Exception e) {
-            				appSettings.appendLog("paint:onCreate  "+e.getMessage());
-            			}
-        			}
-        		}
-        	}
-	        	catch (Exception e) {
-	        		appSettings.appendLog("main:onActivityResult: exception -  "+e.getMessage());
-	    		}
         	}
         	((ViewAnimator)findViewById(R.id.top_switcher)).setDisplayedChild(0);
           }
@@ -1463,22 +1671,59 @@ public void showSettingsPopup(View view) {
         		 try { 
         			 	Uri resultUri = data.getData();
         			 	String drawString = resultUri.getPath();
-        			 	InputStream input = getContentResolver().openInputStream(resultUri);
-   			 	
-			 			drawView.setVisibility(View.INVISIBLE);
+        			 	if(drawString.startsWith("/storage"))  resultUri=Uri.parse("file://"+drawString);
+        			 	storeFileName=getGalleryName(resultUri);
+        			 	//else  drawString="content:/"+drawString;
+        			 	InputStream input =  getContentResolver().openInputStream(/*Uri.parse(drawString)*/resultUri);
+        			 	int orient = helper.getImageRotation(PaintActivity.this, resultUri/*Uri.parse(drawString)*/);
+			 			drawView.setVisibility(View.GONE);
 			 			drawView.recycle();
-			 			drawView.setBitmap(BitmapFactory.decodeStream(input), 0);
-			 			//drawView.forceRedraw();
+			 			drawView.setBitmap(BitmapFactory.decodeStream(input), orient);
+			 			
 			 			drawView.setVisibility(View.VISIBLE);
+			 			drawView.forceRedraw();
         		 } 
         		 catch(Exception e){
         			 appSettings.appendLog("main:onActivityResult  "+e.getMessage()); 
-        			 
-        	  }
+        		}
         }
         	  ((ViewAnimator)findViewById(R.id.top_switcher)).setDisplayedChild(0);
+    } else if(requestCode==GET_FOLDERS){
+    	if (data!=null){
+			try{ 
+				DataExchange xdata=(DataExchange)data.getExtras().getSerializable("xdata");
+				shot_parent = xdata.getId();
+				shot_tag = xdata.getTags();
+				shot_title = xdata.getTitle();
+				clipData.setTitle(shot_title);
+				//clipData.setTags(tag);
+				if(appSettings.sessionId.length() == 0 || userPass.length()==0) showSettings();
+				else {
+					sendShotEx();
+					clipData.setContent("");
+				}
+			}
+			catch (Exception e){
+				BugReporter.Send("BrowseAct", e.getMessage());
+			}
+		}
+    } else if(requestCode==SIGN_IN){
+    	if(resultCode == -1 && appSettings.sessionId!=""){
+    		userMail=appSettings.userMail;
+    		userPass=appSettings.userPass;
+
+    		drawView.postDelayed(new Runnable() {
+				
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+					getFolders();
+				}
+			}, 350);
+    		
+    	}
     }
-          else if(requestCode==SHOW_SETTINGS){
+    else if(requestCode==SHOW_SETTINGS){
         	  switch (resultCode) {
         	  case RESULT_FIRST_USER+1:
           		Intent i = new Intent(getApplicationContext(), PrefsActivity.class);
@@ -1544,7 +1789,7 @@ public void showSettingsPopup(View view) {
 				break;
 			}
           }
-    	
+          else 	
     if (requestCode==3){
     		if (resultCode==RESULT_OK || resultCode==RESULT_FIRST_USER){
     			userMail=data.getStringExtra("userMail");
@@ -1554,9 +1799,9 @@ public void showSettingsPopup(View view) {
     		}
     	}else if (requestCode==11){
     		if(appSettings.sessionId!=""){
-    			sessionId=appSettings.sessionId;
+    			//sessionId=appSettings.sessionId;
     			userPass=appSettings.userPass;
-    			sendShot();
+    			getFolders();
     		}
     	}
     	else
@@ -1597,6 +1842,7 @@ public void showSettingsPopup(View view) {
 	    	
     	}
     }
+    
     
     public String getCurrDate()
     {
@@ -1640,7 +1886,11 @@ public void showSettingsPopup(View view) {
 		}
     }
     
-    private void sendShot(){
+    void getFolders(){
+    	serverHelper.getInstance().sendRequest("notes:getFolders", "","");
+    }
+    
+    private void sendShotEx(){
     	try{
     		Bitmap bm = drawView.getBitmap();
 			 if(bm!=null){
@@ -1708,6 +1958,25 @@ public void showSettingsPopup(View view) {
     			 else return "";
     			 
     }
+    
+   	public String getGalleryName(Uri uri) {
+        	String picturePath=uri.toString();
+        	if(picturePath.startsWith("file:")){
+        		return helper.trimExt(picturePath.substring(picturePath.lastIndexOf("/")+1));
+        	}
+        	picturePath=null;
+        	String[] filePathColumn = { MediaStore.Images.Media.DISPLAY_NAME };
+        	try{
+    	    	Cursor cursor = getContentResolver().query(uri,filePathColumn, null, null,   null);
+    	    	cursor.moveToFirst();
+    	    	int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+    	    	picturePath = cursor.getString(columnIndex);
+    	    	cursor.close();
+        	} catch (Exception e){}
+        	if(picturePath!=null) picturePath=helper.trimExt(picturePath);
+        	return picturePath;
+    }
+   	
     // used when trying to get an image path from the URI returned by the Gallery app
     public String getGalleryPath(Uri uri) {
     	String[] projection = { MediaStore.Images.Media.DATA };
@@ -1728,6 +1997,7 @@ public void showSettingsPopup(View view) {
     	findViewById(R.id.color_menu).setVisibility(View.GONE);
     	findViewById(R.id.text_field).setVisibility(View.GONE);
     	findViewById(R.id.draw_tools).setVisibility(View.GONE);
+    	drawView.setCanDraw(true);
     }
     
     private void showShotSuccess(String id)
@@ -1748,6 +2018,11 @@ public void showSettingsPopup(View view) {
     	overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
     }
     
+    String getNoteName(){
+    	return String.format("Document %s", serverHelper.getDate()/*DateFormat.getDateTimeInstance().format(new Date())*/);
+    }
+    
+    DataExchange clipData=new DataExchange();
     @SuppressLint("NewApi")
 	@Override
     public void onTaskComplete(String result, String action)
@@ -1761,11 +2036,11 @@ public void showSettingsPopup(View view) {
             	int error = root.getInt("errorCode");
             	if (error==0){
             		if (action.equalsIgnoreCase("user:auth")){
-            			sessionId = root.getJSONObject("body").getString("sessionid");
-            			appSettings.sessionId=(sessionId);
-            			appSettings.storeUserData(ctx, userMail, userPass, sessionId,""); 
+            			String ses = root.getJSONObject("body").getString("sessionid");
+            			//appSettings.sessionId=(sessionId);
+            			appSettings.storeUserData(ctx, userMail, userPass, ses,""); 
             			Toast.makeText(getApplicationContext(), "user authorized", Toast.LENGTH_LONG).show();
-            			sendShot();
+            			getFolders();
             		}
             		else if("screenshots:save".equals(action)){
             			
@@ -1777,6 +2052,28 @@ public void showSettingsPopup(View view) {
             		}
             		else if("user_register".equals(action)){
             			sendRequest("user:auth", String.format("\"email\":\"%s\",\"password\":\"%s\"",userMail,userPass));
+            		}else if(action.equalsIgnoreCase("notes:getfolders")){
+            			
+            			//ArrayList<FolderItem>items=new ArrayList<FolderItem>();
+            			//ArrayList<FolderListItem>items=new ArrayList<FolderListItem>();
+            			try{
+            					result = URLDecoder.decode(result,"UTF-16"); 
+            					clipData.setData(result);
+            	        		String cr=prefs.getString("remFolderId", "default");
+            	        		if(cr==null || cr=="") cr="default";
+            	        		clipData.setId(cr);
+            	        		clipData.setTitle(String.format("%s %s",preName, serverHelper.getDate()));
+            	        		clipData.setTags(defTag);
+            	        		Intent intent = new Intent(getApplicationContext(), tagsActivity.class);
+            	        		intent.putExtra("xdata", clipData);
+            	        		
+            	    	    	startActivityForResult(intent,GET_FOLDERS);
+            	    	    	overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
+            	    	    	clipData.setData("");
+            	        }
+            	        catch (Exception Ex){
+            	        	appSettings.appendLog("prefs:onTaskComplete "+Ex.getMessage());
+            	        }
             		}
             	}
             	else {
@@ -1797,7 +2094,9 @@ public void showSettingsPopup(View view) {
     
     private class CompressTask extends AsyncTask<Bitmap, Void, String>{
 		private ProgressDialog pd;
+		
 		private int mode =0;
+		Uri storeUri;
 		String buff = "";
 		public CompressTask(int imode)
 	    {
@@ -1816,21 +2115,28 @@ public void showSettingsPopup(View view) {
 
 		@Override
 		protected String doInBackground(Bitmap... params) {
-			String filename=String.valueOf(System.currentTimeMillis())+"-fvd."+(saveFormat==0?"png":"jpg");
+			String filename=(storeFileName==null?("IMG_"+String.valueOf(System.currentTimeMillis())):storeFileName)+(saveFormat==0?".png":".jpg");
+			String sPath="";
 			//storePath=" ";
 			try{
 			if(params[0]!=null){
-				 
-				if(this.mode<2){ 
-					//File file = storePath.length()>0?new File(storePath): new File(appSettings.getSavingPath(),filename);
-					File file = new File(appSettings.getSavingPath(),filename);
+				/*if(this.mode<2)*/{ 
+					sPath=this.mode==1?appSettings.getSavingPath():appSettings.img_path;
+					//sPath=appSettings.img_path;
+					File file = new File(sPath,filename);
+					storeUri=FileProviderCompat.fromFile(file);
 					if(storePath.length()>0) storePath=file.getAbsolutePath();
 					file.createNewFile();
 					FileOutputStream ostream = new FileOutputStream(file);
-					params[0].compress(saveFormat==0?CompressFormat.PNG:CompressFormat.JPEG, 90, ostream);
+					ByteArrayOutputStream bos = new ByteArrayOutputStream();
+					params[0].compress(saveFormat==0?CompressFormat.PNG:CompressFormat.JPEG, 95, bos);
+					
+					//params[0].compress(saveFormat==0?CompressFormat.PNG:CompressFormat.JPEG, 90, ostream);
+					ostream.write(bos.toByteArray());
+					
 					ostream.flush();
 					ostream.close();
-					/*if(this.mode==0){
+					if(this.mode!=1){
 						ContentValues image = new ContentValues();
 		                image.put(Images.Media.TITLE, "Nimbus");
 		                image.put(Images.Media.DISPLAY_NAME, filename);
@@ -1847,13 +2153,16 @@ public void showSettingsPopup(View view) {
 		                image.put(Images.Media.DATA, file.getAbsolutePath());
 		                Uri result = getContentResolver().insert(
 		                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI, image);
-					}*/
+					}
+					if(this.mode==2){
+						this.buff = bos.toString("iso-8859-1");
+					}
 				}
-				else {
+				/*else {
 					ByteArrayOutputStream bos = new ByteArrayOutputStream();
 					params[0].compress(saveFormat==0?CompressFormat.PNG:CompressFormat.JPEG, 90, bos);
 	     			this.buff = bos.toString("iso-8859-1");
-				}
+				}*/
 				params[0].recycle();
 				 
 			}
@@ -1871,7 +2180,7 @@ public void showSettingsPopup(View view) {
 		@Override
 		protected void onPostExecute(String result){
 		   super.onPostExecute(result);
-		   
+		   drawView.saved=true;
 		   
 		   pd.dismiss();
 		   if(this.mode==-1){
@@ -1881,25 +2190,25 @@ public void showSettingsPopup(View view) {
 		   if (this.mode==1){
 			   Intent share = new Intent(Intent.ACTION_SEND);
 			   share.setType("image/"+(saveFormat==0?"png":"jpeg"));
-			   share.putExtra(Intent.EXTRA_STREAM, Uri.parse(String.format("file://%s/%s",appSettings.getSavingPath(),result)/*appSettings.getInstance(null).getSavingPath()+filename*/));
+			   share.putExtra(Intent.EXTRA_STREAM, storeUri/*Uri.parse(String.format("file://%s/%s",sPath,result)*/);
 			   startActivity(Intent.createChooser(share, "Share Image"));
 		   }
 		   else if(this.mode==2){
-			   serverHelper.getInstance().uploadShot((domain!=null && domain!="")?String.format("Screenshot from %s", domain):"Screenshot", buff);
+			   serverHelper.getInstance().uploadShot((domain!=null && domain!="")?String.format("Screenshot from %s", domain):shot_title,shot_parent,shot_tag,  buff);
 		   }
 		   else {
 			   if(storePath.length()>0){
 				   Intent intent = new Intent();
 				   //intent.putExtra("path", storePath.charAt(0)=='/'?String.format("file:/%s", storePath):String.format("file://%s", storePath));
 				   //intent.putExtra("path", String.format("file://%s", storePath));
-				   intent.setData(Uri.parse(String.format("file://%s", storePath)));
+				   intent.setData(storeUri/*Uri.parse(String.format("file://%s", storePath))*/);
 				   setResult(RESULT_OK, intent);
 				   overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
 				   finish();  
 			   }
-			   else Toast.makeText(getApplicationContext(), "Saved to "+appSettings.getSavingPath(), Toast.LENGTH_LONG).show();
+			   else Toast.makeText(getApplicationContext(), "Saved to "+appSettings.img_path, Toast.LENGTH_LONG).show();
 		   }
-		   saved = true;
+		   //saved = true;
 		   if (exitOnComplete) finish();
 		}
 		
@@ -1912,6 +2221,7 @@ public void showSettingsPopup(View view) {
 		drawer.closeDrawer(GravityCompat.START);
 		switch (arg2) {
 		case 0:
+			
 			getPhoto();
 			break;
 		case 1:

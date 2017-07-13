@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.security.acl.LastOwnerException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -62,6 +63,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.net.ConnectivityManager;
+import android.net.IpPrefix;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.graphics.Bitmap;
@@ -108,14 +110,17 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
 	final int SHOW_SETTINGS=11;
 	final int DIALOG_CAPTURE = 1;
 	final int DIALOG_CLIP = 2;
+	final int DIALOG_FOLDERS = 7;
+	
+	final int TAKE_PHOTO=210;
+	final int TAKE_PICTURE=211;
 	String captureItems[] = { "view", "full" };
 	String clipItems[] = { "one", "two", "three", "four" };
 	
 	private fvdWebView wv;
 	private String lastUrl = "";
 	Menu myMenu = null;
-	/*static final String SaveDir= "Pictures";
-	private String SavingPath;*/
+
 	DrawerLayout drawer;
 	DataExchange clipData;
 	private AutoCompleteTextView urlField;
@@ -129,21 +134,17 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
 	//private String selText="";
 	Context ctx;
 	
-	private String userMail = "";
+	//private String userMail = "";
 	private String userPass ="";
-	private String sessionId = "";
+	//private String session_Id = "";
 	private Handler handler;
 	private boolean saveCSS = false;
 	private int clipMode=0;
 	private ProgressDialog progressDialog;
 	private SharedPreferences prefs;
 	String lastAction="";
-	//Animation animationFadeIn;
-	//Animation animationFadeOut;
-	//List<HistoryItem>  m_arrHistoryItems=new ArrayList<HistoryItem>();
+	String surl="";
 	List<String>  arrHistoryItems=new ArrayList<String>();
-	//ArrayAdapter<HistoryItem> adapter;
-	//ArrayAdapter<String> adapter;
 	boolean isInitNow = true;
 	
 	FloatingActionsMenu floatMenu;
@@ -163,9 +164,7 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
-        //overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
-        //overridePendingTransition(R.anim.activity_open_scale,R.anim.activity_close_translate);
+        
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         try{
         	requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -178,49 +177,39 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
         setContentView(R.layout.screen_browser);
         serverHelper.getInstance().setCallback(this,this);
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        lastUrl = prefs.getString("LAST_URL","");
+        lastUrl = "0".equals(prefs.getString("startNew", "1"))?"":prefs.getString("LAST_URL","");
         saveCSS = prefs.getString("clipStyle", "1").equals("1");
         ctx = this;
-        
-        //adapter = new TextAdapter(this);		
-        
-        /*Uri data = getIntent().getData();
-        if(data!=null){
-        	lastUrl=data.toString();
-        }*/
+        appSettings.init(ctx);
         Intent intent = getIntent();
         String action = intent.getAction();
         String type = intent.getType();
         if (Intent.ACTION_VIEW.equals(action) /*&& type != null*/) {
         	Uri data = intent.getData();
             if(data!=null){
-            	lastUrl=data.toString();
-            	appSettings.appendLog("browse:onCreate  "+lastUrl);
+            	surl=data.toString();
             }
         }
         else if(Intent.ACTION_SEND.equals(action) /*&& type != null*/){
         	if ("text/plain".equals(type)) {
-        		String surl=intent.getStringExtra(Intent.EXTRA_TEXT);
-        		if(surl.contains(" ")){
-        			String[] arr=surl.replace("\t", " ").split(" ");
-        			for (String s : arr) {
-						if(s.contains("://")){
-							lastUrl=s.trim();
-							break;
-						}
-					}
-        		} else if(surl.contains("://")) lastUrl=surl.trim();
-        		appSettings.appendLog("browse:onCreate  "+lastUrl);
+        		surl=intent.getStringExtra(Intent.EXTRA_TEXT);
             } 
         }
+        //surl="Kick NOW! Будущее ближе с Kickstarter / Geektimes https://m.geektimes.ru/company/pochtoy/blog/280580//";
+        if(surl.contains(" ")){
+			String[] arr=surl.replace("\t", " ").replace("\r", " ").replace("\n", " ").split(" ");
+			for (String s : arr) {
+				if(s.contains("://")){
+					lastUrl=s.trim();
+					break;
+				}
+			}
+		} else if(surl.contains("://")) lastUrl=surl.trim();
         
-       
         drawer=(DrawerLayout)findViewById(R.id.root);
 
-        View v=findViewById(R.id.wv);
         wv = (fvdWebView) findViewById(R.id.wv);
         wv.setEventsHandler(this);
-        //registerForContextMenu(wv); 
         urlField = ( AutoCompleteTextView )findViewById(R.id.etAddess);
         urlField.setSelectAllOnFocus(true);
         urlField.setOnEditorActionListener(new EditText.OnEditorActionListener() {
@@ -228,8 +217,6 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
             	if (actionId == EditorInfo.IME_ACTION_DONE)
                 {
-                    /*InputMethodManager imm = (InputMethodManager)v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);*/
                     onNavButtonClicked();
                     return true;
                 }
@@ -251,8 +238,6 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
 				case 0:
 					findViewById(R.id.bZoomStack).setVisibility(View.VISIBLE);
 					findViewById(R.id.bToggleMenu).setVisibility(View.GONE);
-
-					
 					break;
 				
 				default:
@@ -266,7 +251,7 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
         navButton = (ImageButton)findViewById(R.id.ibReloadWebPage);
         navButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
-            	//Toast.makeText(getApplicationContext(), "You made a mess", Toast.LENGTH_LONG).show();
+            	
             	onNavButtonClicked();
             }
         });
@@ -302,6 +287,45 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
             }
         });
         
+        
+        (findViewById(R.id.bgetPcket)).setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v) {
+            	clipMode =1;
+            	floatMenu.collapse();
+            	progressDialog = ProgressDialog.show(v.getContext(), "Nimbus Clipper", getString(R.string.please_wait), true, false);
+            	serverHelper.getInstance().getPocketRequest(wv.getUrl(), new AsyncTaskCompleteListener<String, String>() {
+					
+					@Override
+					public void onTaskComplete(String result, String adv) {
+						// TODO Auto-generated method stub
+						try{
+			            	progressDialog.dismiss();
+							serverHelper.getInstance().completed();
+							JSONObject root = new JSONObject(result);
+			            	if(root.has("responseCode")&&root.getInt("responseCode")==200){
+			            		
+			            		String title=root.getString("title");
+			            		String html=root.getString("article");
+			            		html="<style> img {border:0; font-size:100%; margin:0 0 18px 0; vertical-align:baseline; display:inline-block; max-width:100%; height:auto;} a {color:#19a1b9; text-decoration:none;} p {margin:0 0 1.5em 0; font-size:1em;} ul {margin:0 0 1.5em 1.5em;} ol {margin:0 0 1.5em 1.5em;} li {padding:0 0 0 20px; position:relative;} table{border-collapse:collapse; border-spacing:0; margin:0 0 1.5em 0;} td {border:1px solid #555; padding:10px; text-align:left; vertical-align:top;} th {border:1px solid #555; padding:10px; text-align:left; vertical-align:top;}  h1 {font-size:1.5em; margin:1.7em 0 0.7em 0;} h2 {font-size:1.4em; margin:1.7em 0 0.7em 0;} h3 {font-size:1.3em; margin:1.7em 0 0.5em 0;} h4 {font-size:1.2em; margin:1.7em 0 0.5em 0;} h5 {font-size:1.2em; margin:1.7em 0 0.3em 0;} h6 {font-size:1.1em; margin:1.7em 0 0.3em 0;} </style><div style=\"font: 18px Georgia,Arial,Helvetica,sans-serif; line-height:1.7;\">"+html+"</div>";
+			            		clipData.setContent(html);
+								clipData.setTitle(title);
+								
+								Intent i = new Intent(getApplicationContext(), previewActivity.class);
+		            	    	i.putExtra("url", wv.getUrl());
+		            	    	i.putExtra("title", wv.getTitle());
+		            	    	i.putExtra("content", clipData);
+		            	    	i.putExtra("pocket", true);
+		            	    	startActivityForResult(i,5);
+		            	    	overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
+		            	    	
+			            	}
+						}
+						catch(Exception e){}
+					}
+				});
+            }
+        });
+        
         findViewById(R.id.bTakeScreenshot).setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
             	//toggleTools();
@@ -313,9 +337,7 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
             		wv.setCanClip(false);
             	}
             	findViewById(R.id.bToggleMenu).setVisibility(View.GONE);
-            	/*screenCapture();
-            	findViewById(R.id.bToggleMenu).setVisibility(View.VISIBLE);*/
-            	
+            	            	
             	findViewById(R.id.bTakeScreenshot).postDelayed(new Runnable() {
 		            @Override
 		            public void run() {
@@ -326,9 +348,6 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
 		            }
 		        },10);
             	
-            	
-            	
-            	//showDialog(DIALOG_CAPTURE);
             }
         });
         
@@ -352,36 +371,16 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
 	        						int k=ss.indexOf("\"",j+11);
 	        						if(k>0) selHtml = selHtml.replace(selHtml.substring(j,k+1),"");
 	        					}
-	        					//selHtml="<DIV>"+selHtml.substring(ss.length());
 	        				}
 	        				clipData.setContent(selHtml);
 	        				clipData.setTitle(wv.getTitle());
 	        				
-	        				/*if (true){
-	        	    			
-	        	    			if(sessionId.length() == 0 || userPass.length()==0) showSettings();
-	        	    			else {
-	        	    				if(prefs.getBoolean("check_fast", false)){
-	        	    					sendNote(wv.getTitle(), clipData.getContent(), parent, tag);
-	        	    					clipData.setContent("");
-	        	    				}
-	        	    				else {
-	        	    				//serverHelper.getInstance().setCallback(this,this);
-	        	    				if(appSettings.sessionId.length()>0) {
-	        	    					serverHelper.getInstance().sendRequest("notes:getFolders", "","");
-	        	    					}
-	        	    				}
-	        	    			}
-	        	    			wv.endSelectionMode();
-	        	    		} */
-	        				
+        				
 		        			Intent i = new Intent(getApplicationContext(), previewActivity.class);
 		        	    	i.putExtra("content", clipData);
 		        	    	startActivityForResult(i,5);
-		        	    	//overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
 		        	    	overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
 	        			}
-	        			//clipData.setContent("");
             		}
             		catch (Exception e){
             			BugReporter.Send("onEndSelection", e.getMessage());
@@ -409,15 +408,9 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
         
         progressBar = (ProgressBar) findViewById(R.id.progressbar);
         
-        //CookieSyncManager.createInstance(this);
-        
-        //webSettings.setLoadsImagesAutomatically(imgOn);
-        userMail = prefs.getString("userMail", "");
+        appSettings.userMail = prefs.getString("userMail", "");
         userPass = prefs.getString("userPass", "");
-        sessionId = prefs.getString("sessionId", "");
-        
-        appSettings.sessionId=sessionId;
- 	    appSettings.userMail=userMail;
+        appSettings.sessionId = prefs.getString("sessionId", "");
  	    appSettings.userPass=userPass;
         
         if("1".equals(prefs.getString("userAgent", "1"))){
@@ -425,12 +418,10 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
         }
         else wv.setUserAgent(deskAgent);
         
-        final Activity activity = this;
-        //lastUrl="file:///android_asset/android.html";
+        //final Activity activity = this;
+        
         if (lastUrl.length()>0){
-        	//wv.navigate(lastUrl);
-        	
-        	//if(!urlField.getText().toString().equals(wv.getUrl()))
+        	lastUrl=lastUrl.replace("[", "").replace("]", "");
         	urlField.setText(lastUrl);
         	openURL();
         }
@@ -441,13 +432,6 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
 			public void onItemClick(AdapterView<?> parent, View v,
 					int position, long id) {
 				// TODO Auto-generated method stub
-				/*String item = (String)parent.getItemAtPosition(position);
-				
-				Toast.makeText(
-						getApplicationContext(),
-						"Вы выбрали "
-								+ item,
-						Toast.LENGTH_SHORT).show();*/
 				openURL();
 				
 			}
@@ -455,31 +439,23 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
           
         urlField.addTextChangedListener(this);
         parent = prefs.getString("remFolderId", "default");
-        
-        
-        
-        /*ListView listView = (ListView) findViewById(R.id.left_drawer);
-        listView.setAdapter(new DrawerMenuAdapter(this,getResources().getStringArray(R.array.lmenu_browser)));
-		listView.setOnItemClickListener(this);*/
     }
     
-    private class DrawerItemClickListener implements ListView.OnItemClickListener {
+    /*private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             //selectItem(position);
         }
-    }
+    }*/
     
     
     
     private void showSettings()
     {
     	Intent i = new Intent(getApplicationContext(), loginActivity.class/* LoginDlg.class*/);
-    	i.putExtra("userMail", userMail==null?"":userMail);
-    	startActivityForResult(i, 11);
-    	//overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+    	i.putExtra("userMail", appSettings.userMail==null?"":appSettings.userMail);
+    	startActivityForResult(i, 22);
     	overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
-    	//startActivity(i);
     }
     
     public void onButtonClick(View v){
@@ -487,29 +463,23 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
 		Intent ip=new Intent();
 		switch (v.getId()) {
 		case R.id.lbTakePhoto:
-    		ip.putExtra("act", "photo");
-    		ip.setClassName("com.fvd.nimbus","com.fvd.nimbus.PaintActivity");
-    		startActivity(ip);
+			getPhoto();
 			break;
 		case R.id.lbFromGallery:
-			ip.putExtra("act", "picture");
-    		ip.setClassName("com.fvd.nimbus","com.fvd.nimbus.PaintActivity");
-    		startActivity(ip);
+			getPicture();
 			break;
 		case R.id.lbPdfAnnotate:
     		ip.setClassName("com.fvd.nimbus","com.fvd.nimbus.ChoosePDFActivity");
     		startActivity(ip);
 			break;
 		case R.id.libSettings:
-    		Intent inten = new Intent(getApplicationContext(), SettingsActivity.class);
-        	startActivityForResult(inten,SHOW_SETTINGS);
+    		Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
+        	startActivityForResult(intent,SHOW_SETTINGS);
         	overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
     		return;
 		default:
 			break;
 		}
-		overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
-		finish();
     }
     
     private void showArticleSuccess()
@@ -526,12 +496,9 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
 		default:
 			break;
 		}
-    	Intent i = new Intent(getApplicationContext(), ArticleSuccess.class);
-    	i.putExtra("mode", extra);
-    	startActivityForResult(i, 4);
-    	//overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
-    	overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
-    	//startActivity(i);
+    	
+    	Toast.makeText(this, String.format(getString(R.string.save_article_mask), extra), Toast.LENGTH_SHORT).show();
+  	
     }
     
     private void showArticleDlg(String url)
@@ -539,9 +506,7 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
     	Intent i = new Intent(getApplicationContext(), ArticleDlg.class);
     	i.putExtra("url", url);
     	startActivity(i);
-    	//overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
     	overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
-    	//startActivity(i);
     }
     
     void messageBox(String msg){
@@ -557,7 +522,6 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
     		ContextMenuInfo menuInfo) 
     {
     	super.onCreateContextMenu(menu, v, menuInfo);
-    	//if (wv.getInjected()) return;
     	menu.add(Menu.NONE, IDM_OPEN, Menu.NONE, "Save Page");
     	menu.add(Menu.NONE, IDM_SAVE, Menu.NONE, "Save Image");
     	menu.add(Menu.NONE, IDM_SAVE, Menu.NONE, "Take Screenshot");
@@ -583,8 +547,6 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
     public void screenCapture(/*boolean full*/)
     {
     	View v = super.findViewById(R.id.wvWrapper);  
-    	/*if(full)  v = super.findViewById(R.id.wv);
-    	else v = super.findViewById(R.id.wvWrapper);*/
     	 if( v != null) 
     	 { 
     		 Bitmap bm = Bitmap.createBitmap(v.getWidth(), v.getHeight(), Bitmap.Config.RGB_565);
@@ -594,27 +556,14 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
     		 if(bm!=null){
     			 try
     			 {
-    				 /*String filename=String.valueOf(System.currentTimeMillis())+"-tmp.png";
-    				 File file = new File(appSettings.getInstance(null).getSavingPath(),filename);              
-    				 file.createNewFile();
-    				 FileOutputStream ostream = new FileOutputStream(file);
-    				 bm.compress(CompressFormat.PNG, 100, ostream);
-    				 ostream.flush();
-    				 ostream.close();*/
-    				 String filename=appSettings.saveTempBitmap(bm);
+    				 String filename=appSettings.saveTempBitmap(bm,false);
     				 if(filename!=null && filename.length()>0){
     					 Intent iPaint = new Intent();
-    					 /*ByteArrayOutputStream stream = new ByteArrayOutputStream();
-    	    	     		bm.compress(Bitmap.CompressFormat.PNG, 100, stream);
-    	    	     		byte[] byteArray = stream.toByteArray();*/
-    					 //iPaint.putExtra("shot", byteArray);
-    					 Toast.makeText(getApplicationContext(), "Saved as "+filename, Toast.LENGTH_LONG).show();
     					 iPaint.putExtra("temp", true);
-    					 iPaint.putExtra("path", filename);
+    					 iPaint.putExtra("path", "file://"+filename);
     					 iPaint.putExtra("domain", getDomainName(lastUrl));
     					 iPaint.setClassName("com.fvd.nimbus","com.fvd.nimbus.PaintActivity");
     					 startActivity(iPaint);
-    					 //overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
     					 overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
     				 }
     				 
@@ -708,52 +657,26 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
     private void openURL()
     {
         String strUrl = urlField.getText().toString();
-
         if (strUrl != null && strUrl.length() > 0)
         {
-            if (strUrl.toLowerCase().startsWith("http") == false && strUrl.length() != 0)
+            if (strUrl.length() != 0 && strUrl.toLowerCase().startsWith("http") == false)
             {
-                /*if (strUrl.startsWith("www.") == false)
-                {
-                    strUrl = "www." + strUrl;
-                }*/
-
                 strUrl = "http://" + strUrl;
-
                 urlField.setText(strUrl);
             }
             wv.navigate(strUrl);
-            //FVDOptions.setStringOption(FVDOptions.LAST_VISITED_URL, strUrl);
             setNavButtonState(NavButtonState.NBS_STOP);
         }
 
         wv.requestFocus();
     }
     
-    /*
-     protected void onStart();
-     
-     protected void onRestart();
-
-     protected void onResume();
-
-     protected void onPause();
-
-     protected void onStop();
-
-     protected void onDestroy();
-     */
-    
+   
     @Override
     protected void onResume(){
     	super.onResume();
-    	//overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
-    	//overridePendingTransition(R.anim.activity_open_scale,R.anim.activity_close_translate);
-    	//overridePendingTransition(R.anim.activity_open_scale,R.anim.activity_close_translate);
     	if (prefs==null) prefs = PreferenceManager.getDefaultSharedPreferences(this);
     	serverHelper.getInstance().setCallback(this,this);
-    	if (sessionId.length()==0) sessionId = prefs.getString("sessionId", "");
-    	appSettings.sessionId=(sessionId);
     }
     
     @Override
@@ -791,15 +714,9 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
     		  //wv.loadUrl("javascript:android.clearSelection();");
     		  return true;
     	  }
-    	  /*if (wv.canGoBack()){
-    		  wv.goBack();
-    		  return true;
-    	  }*/
-    	  //overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
     	  overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
       }
       else if (keyCode == KeyEvent.KEYCODE_HOME) {
-    	  //overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
     	  overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
     	  finish();
       }
@@ -822,31 +739,18 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
       case R.id.om_settings:
     	  	Intent i = new Intent(getApplicationContext(), PrefsActivity.class);
       		startActivityForResult(i,6);
-      		//overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
       		overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
     	  break;
       case R.id.om_home:
-    	  //overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
     	  overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
     	  finish();
     	  break;
-      /*case R.id.om_login:
-    	  selBuff="";
-    	  showSettings();
-    	  break;  */
       }
    
       return true;
     }
     
-    /*private void saveSettings(Boolean val)
-    {
-      SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-      SharedPreferences.Editor editor = settings.edit();
-      editor.putBoolean("IMGMODE", val);
-      editor.commit();
-    }*/
-    
+   
     private String getScriptContent(String sfile){
 		String result="";
 		InputStream is;
@@ -864,9 +768,7 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
 	}
 	
 	private String getScripts(){
-		if (scripts.length()==0) scripts = getScriptContent("jq.js")/*+getScriptContent("rangy-core.js") */+getScriptContent("Article.js") +getScriptContent("android.selection.js")/*+getScriptContent("jq.js")*/;
-		//String result=/*getScriptContent("jquery.js")+getScriptContent("randy-core.js")+getScriptContent("randy-serializer.js")+*/getScriptContent("android.selection.js");
-		//return result;
+		if (scripts.length()==0) scripts = getScriptContent("jq.js")+getScriptContent("Article.js") +getScriptContent("android.selection.js");
 		return scripts;
 	}
 	
@@ -875,29 +777,25 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
 	@Override
     public void onTaskComplete(String result, String action)
     {
-        /*if (progressDialog != null)
-            progressDialog.dismiss();*/
         	try{
             	JSONObject root = new JSONObject(result);
             	int error = root.getInt("errorCode");
             	if (error == 0){
             		if (action.equalsIgnoreCase("user:auth")){
-            			sessionId = root.getJSONObject("body").getString("sessionid");
+            			String session_Id = root.getJSONObject("body").getString("sessionid");
             					Editor e=prefs.edit();
-            					e.putString("userMail", userMail);
+            					e.putString("userMail", user_mail);
                 	    		e.putString("userPass", userPass);
-                	    		e.putString("sessionId", sessionId);
+                	    		e.putString("sessionId", session_Id);
                 	    		e.commit();
                 	    		
-                	   appSettings.sessionId=sessionId;
-                	   appSettings.userMail=userMail;
+                	   appSettings.sessionId=session_Id;
+                	   appSettings.userMail=user_mail;
                 	   appSettings.userPass=userPass;
             			if(lastAction!="") {
             				serverHelper.getInstance().sendRequest(lastAction, "","");
             			} else
             			if(clipData!=null && clipData.getContent().length()>0){
-                    	    /*sendNote(wv.getTitle(), clipData.getContent(),parent,tag);
-                    	    clipData.setContent("");*/
             				if(prefs.getBoolean("check_fast", false)){
             					sendNote(clipData.getTitle(), clipData.getContent(), parent, tag);
             					clipData.setContent("");
@@ -909,25 +807,9 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
             					}
             				}
                     	}
-            			/*else if(selBuff.length()>0){
-                    	    
-            				if(prefs.getBoolean("check_fast", false)){
-            					sendNote(wv.getTitle(), selBuff, parent, tag);
-                				selBuff="";
-            				}
-            				else {
-            				serverHelper.getInstance().setCallback(this,this);
-            				if(appSettings.sessionId.length()>0) {
-            					serverHelper.getInstance().sendRequest("notes:getFolders", "","");
-            					}
-            				}
-                    	}*/
-            			
             		}
             		else if(action.equalsIgnoreCase("notes:getfolders")){
             			
-            			//ArrayList<FolderItem>items=new ArrayList<FolderItem>();
-            			//ArrayList<FolderListItem>items=new ArrayList<FolderListItem>();
             			try{
             					result = URLDecoder.decode(result,"UTF-16"); 
             	        		clipData.setData(result);
@@ -938,12 +820,8 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
             	        		clipData.setTags("androidclipper");
             	        		Intent intent = new Intent(getApplicationContext(), tagsActivity.class);
             	        		intent.putExtra("xdata", clipData);
-            	        		/*intent.putExtra("current", cr);
-            	        		intent.putExtra("title", wv.getTitle());
-            	        		intent.putExtra("tags", "androidclipper");*/
             	        		
-            	    	    	startActivityForResult(intent,7);
-            	    	    	//overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+            	    	    	startActivityForResult(intent,DIALOG_FOLDERS);
             	    	    	overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
             	    	    	clipData.setData("");
             	        }
@@ -964,7 +842,7 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
             			//Toast.makeText(getApplicationContext(), "The fragment was successfully saved to your Nimbus account", Toast.LENGTH_LONG).show();
             		}
             		else if("user_register".equals(action)){
-            			sendRequest("user:auth", String.format("\"email\":\"%s\",\"password\":\"%s\"",userMail,userPass));
+            			sendRequest("user:auth", String.format("\"email\":\"%s\",\"password\":\"%s\"",user_mail,userPass));
             		}
             	} else 
             		{	
@@ -1078,12 +956,77 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
         }
     }
 	
+    String user_mail;
 	@Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     	// if statement prevents force close error when picture isn't selected
 		if (progressDialog != null){
             progressDialog.dismiss();
 			}
+		if (requestCode == TAKE_PHOTO) {
+	    	  boolean isCropResult=false;
+	    	if (resultCode == -1){
+		    	try{
+		    		if (data != null) {
+		    			Uri resultUri = data.getData();
+		    			
+						if(resultUri!=null){
+							String drawString = resultUri.getPath();
+							if(drawString.startsWith("/storage"))  drawString ="file://"+drawString;
+		    			 	else drawString = resultUri.toString();
+							
+							if (drawString.length() > 0 && drawString.indexOf("/exposed_content/")==-1)
+		    			 	{
+		    			 		try{
+		    			 			Intent iPaint = new Intent();
+		    			 			iPaint.putExtra("path", drawString);
+		    			 			iPaint.setClassName("com.fvd.nimbus","com.fvd.nimbus.PaintActivity");
+		    			 			startActivity(iPaint);
+		    			 			overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
+		    			 			finish();
+		    			 		}
+		    			 		catch (Exception e){}
+		    			 	}
+						}
+		    		}
+		    	}
+		    	catch (Exception e) {
+		    		appSettings.appendLog("main:onActivityResult: exception -  "+e.getMessage());
+				}
+	    	}
+	      }
+	      else if (requestCode == TAKE_PICTURE){
+		    	  if(resultCode == -1 && data!=null){
+		    		  boolean temp = false;
+		    		  
+		    		 try { 
+		    			 	Uri resultUri = data.getData();
+		    			 	String drawString = resultUri.getPath();
+		    			 	if(drawString.startsWith("/storage"))  drawString ="file://"+drawString;
+		    			 	else drawString = resultUri.toString();
+	
+		    			 	
+		    			 	if (drawString.length() > 0 && drawString.indexOf("/exposed_content/")==-1)
+		    			 	{
+		    			 		try{
+		    			 			Intent iPaint = new Intent();
+		    			 			iPaint.putExtra("temp", temp);
+		    			 			iPaint.putExtra("path", drawString);
+		    			 			iPaint.setClassName("com.fvd.nimbus","com.fvd.nimbus.PaintActivity");
+		    			 			startActivity(iPaint);
+		    			 			overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
+		    			 			finish();
+		    			 		}
+		    			 		catch (Exception e){}
+		    			 	}
+	
+		    		 } 
+		    		 catch(Exception e){
+		    			 appSettings.appendLog("main:onActivityResult  "+e.getMessage()); 
+		    	  }
+		      } 
+	      }
+	      else
 		if (requestCode==6){
 			serverHelper.getInstance().setCallback(this,this);
 			saveCSS = prefs.getString("clipStyle", "1").equals("1");
@@ -1097,12 +1040,12 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
 		else
     	if (requestCode==3){
     		if (resultCode==RESULT_OK|| resultCode==RESULT_FIRST_USER){
-    			userMail=data.getStringExtra("userMail");
+    			user_mail=data.getStringExtra("userMail");
     			userPass=data.getStringExtra("userPass");
     				//sendRequest("user:auth", String.format("\"email\":\"%s\",\"password\":\"%s\"",userMail,userPass));
     			if(resultCode==RESULT_OK)	
-    				sendRequest("user:auth", String.format("\"email\":\"%s\",\"password\":\"%s\"",userMail,userPass));
-    			else serverHelper.getInstance().sendOldRequest("user_register", String.format("{\"action\": \"user_register\",\"email\":\"%s\",\"password\":\"%s\",\"_client_software\": \"ff_addon\"}",userMail,userPass), "");
+    				sendRequest("user:auth", String.format("\"email\":\"%s\",\"password\":\"%s\"",user_mail,userPass));
+    			else serverHelper.getInstance().sendOldRequest("user_register", String.format("{\"action\": \"user_register\",\"email\":\"%s\",\"password\":\"%s\",\"_client_software\": \"ff_addon\"}",user_mail,userPass), "");
     		}
     	}
     	else if (requestCode==4){
@@ -1115,7 +1058,7 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
     	else if (requestCode==5){
     		if (resultCode==RESULT_OK){
     			DataExchange cl = (DataExchange) data.getExtras().getSerializable("content");
-    			if(sessionId.length() == 0 || userPass.length()==0) showSettings();
+    			if(appSettings.sessionId.length() == 0 || userPass.length()==0) showSettings();
     			else {
     				if(prefs.getBoolean("check_fast", false)){
     					sendNote(wv.getTitle(), cl.getContent(), parent, tag);
@@ -1130,9 +1073,9 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
     			}
     		} 
     		wv.endSelectionMode();
-    	}else if (requestCode==11){
+    	}else if (requestCode==22){
     		if(appSettings.sessionId!=""){
-    			sessionId=appSettings.sessionId;
+    			//session_Id=appSettings.sessionId;
     			userPass=appSettings.userPass;
     			if(lastAction!="") {
     				serverHelper.getInstance().sendRequest(lastAction, "","");
@@ -1151,7 +1094,7 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
             	}
     		}
     	}
-    	else if(requestCode==7){
+    	else if(requestCode==DIALOG_FOLDERS){
     		
     		if (resultCode==RESULT_OK && data!=null){
     			try{ 
@@ -1161,7 +1104,7 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
 					String xtitle = xdata.getTitle();
 					clipData.setTitle(xtitle);
 					//clipData.setTags(tag);
-					if(sessionId.length() == 0 || userPass.length()==0) showSettings();
+					if(appSettings.sessionId.length() == 0 || userPass.length()==0) showSettings();
 					else {
 						sendNote(xtitle, clipData.getContent(), parent, tag);
 						clipData.setContent("");
@@ -1184,12 +1127,14 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
         		if(appSettings.sessionId.length() == 0) showLogin();
       		else {
       			appSettings.sessionId="";
+      			//session_Id="";
       			//serverHelper.getInstance().setSessionId(appSettings.sessionId);
-      			Editor e = prefs.edit();
+      			/*Editor e = prefs.edit();
       			e.putString("userMail", userMail);
           	    e.putString("userPass", "");
           	    e.putString("sessionId", appSettings.sessionId);
-          	    e.commit();
+          	    e.commit();*/
+          	    appSettings.storeUserData(this, appSettings.userMail, "", "", "");
       			showLogin();
       			}
         		break;	
@@ -1243,7 +1188,7 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
 	private void showLogin()
     {
     	Intent i = new Intent(getApplicationContext(), loginActivity.class);
-    	i.putExtra("userMail", userMail==null?"":userMail);
+    	i.putExtra("userMail",appSettings.userMail==null?"":appSettings.userMail);
     	startActivity(i);
     	//overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
     	overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
@@ -1265,7 +1210,7 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
 			if(plainText.equals("action:savePage")){
 				if(html.length()>0){
 					
-            		if (sessionId.length() == 0) {
+            		if (appSettings.sessionId.length() == 0) {
             			clipData.setContent(html);
             			clipData.setTitle(wv.getTitle());
             			showSettings();
@@ -1584,31 +1529,62 @@ public class BrowseActivity extends Activity implements AsyncTaskCompleteListene
 		if(floatMenu.isExpanded()) floatMenu.collapse();
 	}
 
+	
+	public void getPicture() {
+    	try{
+			Intent fileChooserIntent = new Intent();
+			fileChooserIntent.addCategory(Intent.CATEGORY_OPENABLE);
+			fileChooserIntent.setType("image/*");
+			fileChooserIntent.setAction(Intent.ACTION_GET_CONTENT);
+			startActivityForResult(Intent.createChooser(fileChooserIntent, "Select Picture"), TAKE_PICTURE);
+		}
+		catch (Exception e) {
+			appSettings.appendLog("main:onClick  "+e.getMessage());
+		}
+	}
+	
+	public void getPhoto(){
+    	try{
+    		Intent intent = new Intent(getApplicationContext(), com.fvd.cropper.ScannerActivity.class);
+    		intent.putExtra("fname", appSettings.SavingPath+"temp.jpg"/*String.valueOf(System.currentTimeMillis())+"-tmp.jpg"*/);
+    		//intent.putExtra("mode", prefs.getInt("scanMode", 1));
+    		startActivityForResult(intent, TAKE_PHOTO);
+    		overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
+    	}
+    	catch (Exception e){
+    		appSettings.appendLog("main:getPhoto  "+e.getMessage());
+    	}
+    	
+    }
+	
 	@Override
 	public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
 		drawer.closeDrawer(GravityCompat.START);
 		Intent ip=new Intent();
 		switch (arg2) {
 		case 0:
-    		ip.putExtra("act", "photo");
+    		/*ip.putExtra("act", "photo");
     		ip.setClassName("com.fvd.nimbus","com.fvd.nimbus.PaintActivity");
-    		startActivity(ip);
+    		startActivity(ip);*/
+			getPhoto();
 			break;
 		case 1:
-			ip.putExtra("act", "picture");
+			/*ip.putExtra("act", "picture");
     		ip.setClassName("com.fvd.nimbus","com.fvd.nimbus.PaintActivity");
-    		startActivity(ip);
+    		startActivity(ip);*/
+			getPicture();
 			break;
 		case 2:
     		ip.setClassName("com.fvd.nimbus","com.fvd.nimbus.ChoosePDFActivity");
     		startActivity(ip);
+    		overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
+    		finish();
 			break;
 
 		default:
 			break;
 		}
-		overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
-		finish();
+		
 		
 	}
 	

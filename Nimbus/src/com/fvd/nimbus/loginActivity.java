@@ -33,6 +33,7 @@ public class loginActivity extends Activity implements OnClickListener,AsyncTask
 	private String userMail = "";
 	private String userPass ="";
 	private SharedPreferences prefs;
+	boolean needResult=false;
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,18 +46,17 @@ public class loginActivity extends Activity implements OnClickListener,AsyncTask
         }
         
         setContentView(R.layout.screen_login);
-        //overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+        
         overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
         serverHelper.getInstance().setCallback(this,this);
-        if (!appSettings.getInstance().getIsTablet())
+        if (!appSettings.getIsTablet())
         	setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        
         userMail = getIntent().getStringExtra("userMail").toString();
+        
+        needResult=getIntent().hasExtra("needresult");
+
         tv=(TextView)findViewById(R.id.etUsername);
-        /*tv.setFocusableInTouchMode(true);
-        tv.setFocusable(true);*/
-        /*tv.requestFocus();*/
         tv.setText(userMail);
         tv.setOnKeyListener(new OnKeyListener() {           
             @Override
@@ -69,9 +69,8 @@ public class loginActivity extends Activity implements OnClickListener,AsyncTask
             }
         });
         
-        Button btnSave=(Button)findViewById(R.id.bLogin);
         
-        btnSave.setOnClickListener(this);
+        findViewById(R.id.bLogin).setOnClickListener(this);
         findViewById(R.id.bNewAccount).setOnClickListener(this);
         findViewById(R.id.bFLogin).setOnClickListener(this);
         findViewById(R.id.bGLogin).setOnClickListener(this);
@@ -84,13 +83,14 @@ public class loginActivity extends Activity implements OnClickListener,AsyncTask
 	    	if (resultCode == RESULT_OK){
 				userMail=data.getStringExtra("userMail");
     			userPass=data.getStringExtra("userPass");
-    			serverHelper.getInstance().sendOldRequest("user_register", String.format("{\"action\": \"user_register\",\"email\":\"%s\",\"password\":\"%s\",\"_client_software\": \"ff_addon\"}",userMail,userPass), "");
+    			serverHelper.getInstance().sendOldRequest("user_register", String.format("{\"action\": \"user_register\",\"email\":%s,\"password\":%s,\"_client_software\": \"ff_addon\"}",JSONObject.quote(userMail),JSONObject.quote(userPass)), "");
 	    	}
 	      }
 	 }
 
 	public void onClick(View v)
 	{
+		//JSONObject j;
 		Intent i;
 		switch (v.getId()) 
 		{
@@ -103,14 +103,14 @@ public class loginActivity extends Activity implements OnClickListener,AsyncTask
     			else if(userPass.length()==0){
     				Toast.makeText(getApplicationContext(), getString(R.string.incorrect_password), Toast.LENGTH_LONG).show();
     			}
-    			else 
-    				sendRequest("user:auth", String.format("\"email\":\"%s\",\"password\":\"%s\"",userMail,userPass));
-		        break;
+    			else {
+    				sendRequest("user:auth",String.format("\"email\":%s,\"password\":%s",JSONObject.quote(userMail),JSONObject.quote(userPass)));
+    			}
+    			break;
 		    case R.id.bNewAccount:
 		    	i = new Intent(getApplicationContext(), RegisterDlg.class);
 		    	i.putExtra("userMail", userMail==null?"":userMail);
 		    	startActivityForResult(i, 1);
-		    	//overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
 		    	overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
 		    	break;
 		    case R.id.bFLogin:
@@ -154,8 +154,12 @@ public class loginActivity extends Activity implements OnClickListener,AsyncTask
         	    		appSettings.userPass = userPass;
         	    		editor.commit();
         	    		Toast.makeText(getApplicationContext(), "user authorized", Toast.LENGTH_LONG).show();
-        	    		//overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+
         	    		overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
+        	    		if(needResult){
+        	    			Intent i=new Intent();
+        	    			setResult(RESULT_OK, i);
+        	    		}
         	    		finish();
         	    		
             		}

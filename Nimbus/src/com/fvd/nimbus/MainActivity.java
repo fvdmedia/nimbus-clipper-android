@@ -48,8 +48,10 @@ import android.widget.Button;
 import android.widget.PopupWindow;
 import android.widget.Toast;
 
+
 import com.fvd.utils.AppRate;
 import com.fvd.utils.AsyncTaskCompleteListener;
+import com.fvd.utils.helper;
 import com.fvd.utils.prefsEditListener;
 import com.fvd.utils.appSettings;
 import com.fvd.utils.serverHelper;
@@ -325,13 +327,19 @@ public class MainActivity extends Activity implements AsyncTaskCompleteListener<
     public void getPhoto(){
     	try{
     		
-    		photoFileName = String.valueOf(System.currentTimeMillis())+"-tmp.jpg";	
+    		/*photoFileName = String.valueOf(System.currentTimeMillis())+"-tmp.jpg";	
     		Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
     		File file = new File(appSettings.getInstance().SavingPath, photoFileName);
     		outputFileUri = Uri.fromFile(file);
     		intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
     		startActivityForResult(intent, TAKE_PHOTO);
-    		//overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+    		overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);*/
+    		
+    		photoFileName = "temp.jpg";//String.valueOf(System.currentTimeMillis())+"-tmp.jpg";	
+    		Intent intent = new Intent(getApplicationContext(), com.fvd.cropper.ScannerActivity.class);
+    		intent.putExtra("fname", appSettings.getInstance().SavingPath+"temp.jpg"/*String.valueOf(System.currentTimeMillis())+"-tmp.jpg"*/);
+    		//intent.putExtra("mode", prefs.getInt("scanMode", 1));
+    		startActivityForResult(intent, TAKE_PHOTO);
     		overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);
     	}
     	catch (Exception e){
@@ -349,27 +357,59 @@ public class MainActivity extends Activity implements AsyncTaskCompleteListener<
 	@Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
       if (requestCode == TAKE_PHOTO) {
+    	  boolean isCropResult=false;
     	if (resultCode == -1){
     	try{
     		if (data != null) {
-    			if (data.hasExtra("data")) {
-    				Bitmap bm = data.getParcelableExtra("data");
-    				photoFileName = appSettings.saveTempBitmap(bm);
-    				bm.recycle();
-    			}
+    			Uri resultUri = data.getData();
+    			
+				if(resultUri!=null){
+					String drawString = resultUri.getPath();
+					if(drawString.startsWith("/storage"))  drawString ="file://"+drawString;
+    			 	else drawString = resultUri.toString();
+					
+					if (drawString.length() > 0 && drawString.indexOf("/exposed_content/")==-1)
+    			 	{
+    			 		try{
+    			 			Intent iPaint = new Intent();
+    			 			iPaint.putExtra("path", drawString);
+    			 			iPaint.setClassName("com.fvd.nimbus","com.fvd.nimbus.PaintActivity");
+    			 			startActivity(iPaint);
+    			 		}
+    			 		catch (Exception e)
+    			 		{
+    			 			
+    			 		}
+    			 	}
+				}
     		}
-    		else {
+    		/*else {
     			if(outputFileUri!=null) photoFileName = outputFileUri.getPath();
     			else photoFileName = getImagePath();
     		}
     		
+    		
     		if(appSettings.isFileExists(photoFileName)){
-    			Intent iPaint = new Intent();
-        		iPaint.putExtra("temp", true);
-        		iPaint.putExtra("path", photoFileName);
-        		iPaint.setClassName("com.fvd.nimbus","com.fvd.nimbus.PaintActivity");
-        		startActivity(iPaint);
-    		}
+    			if(isCropResult){
+    				Intent iPaint = new Intent();
+    				iPaint.putExtra("temp", true);
+    				iPaint.putExtra("path", "file://"+photoFileName);
+    				//iPaint.putExtra("isDocument", true);
+    				if(data.hasExtra("mode")) iPaint.putExtra("mode", data.getIntExtra("mode", 0));
+    				iPaint.setClassName("com.fvd.nimbus","com.fvd.nimbus.PaintActivity");
+    				startActivity(iPaint);
+    			} else {
+    				Intent intent = new Intent(getApplicationContext(),com.fvd.cropper.CropImageActivity.class);
+            		intent.putExtra(com.fvd.cropper.CropImageActivity.IMAGE_PATH, photoFileName);
+                    intent.putExtra(com.fvd.cropper.CropImageActivity.SCALE, true);
+
+                    intent.putExtra(com.fvd.cropper.CropImageActivity.ASPECT_X, 0);
+                    intent.putExtra(com.fvd.cropper.CropImageActivity.ASPECT_Y, 0);
+            		startActivityForResult(intent, TAKE_PHOTO);
+    			}
+    			
+    		}*/
+
     		showProgress(false);
     	}
     	catch (Exception e) {
@@ -386,7 +426,9 @@ public class MainActivity extends Activity implements AsyncTaskCompleteListener<
     		 try { 
     			 	Uri resultUri = data.getData();
     			 	String drawString = resultUri.getPath();
-    			 	String galleryString = getGalleryPath(resultUri);
+    			 	if(drawString.startsWith("/storage"))  drawString ="file://"+drawString;
+    			 	else drawString = resultUri.toString();
+    			 	/*String galleryString = !drawString.startsWith("/storage")?getGalleryPath(resultUri):resultUri.getPath();
     			 	if (galleryString != null && galleryString.length()>0)
     			 	{
     			 		drawString = galleryString;
@@ -394,9 +436,7 @@ public class MainActivity extends Activity implements AsyncTaskCompleteListener<
     			 	else {
     			 		try{
     			 			InputStream input = getApplicationContext().getContentResolver().openInputStream(resultUri);
-    			 			Bitmap bm = BitmapFactory.decodeStream(input);
-    			 			drawString = appSettings.saveTempBitmap(bm);
-    			 			bm.recycle();
+    			 			drawString = helper.saveTmp(input);
     			 			temp=true;
     			 			
     			 		}
@@ -404,7 +444,7 @@ public class MainActivity extends Activity implements AsyncTaskCompleteListener<
     			 			drawString = "";
     			 			showProgress(false);
     			 		}
-    			 	}
+    			 	}*/
     			 	
     			 	if (drawString.length() > 0 && drawString.indexOf("/exposed_content/")==-1)
     			 	{
@@ -533,12 +573,15 @@ public class MainActivity extends Activity implements AsyncTaskCompleteListener<
 	}
     
     public String getGalleryPath(Uri uri) {
+    	String picturePath=null;
     	String[] filePathColumn = { MediaStore.Images.Media.DATA };
-    	Cursor cursor = getContentResolver().query(uri,filePathColumn, null, null,   null);
-    	cursor.moveToFirst();
-    	int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-    	String picturePath = cursor.getString(columnIndex);
-    	cursor.close();
+    	try{
+	    	Cursor cursor = getContentResolver().query(uri,filePathColumn, null, null,   null);
+	    	cursor.moveToFirst();
+	    	int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+	    	picturePath = cursor.getString(columnIndex);
+	    	cursor.close();
+    	} catch (Exception e){}
     	return picturePath;
     }
     
@@ -601,10 +644,10 @@ public class MainActivity extends Activity implements AsyncTaskCompleteListener<
     
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
         if (outputFileUri != null) {
             outState.putString("cameraImageUri", outputFileUri.getPath());
         }
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -618,7 +661,7 @@ public class MainActivity extends Activity implements AsyncTaskCompleteListener<
     private void showLogin()
     {
     	Intent i = new Intent(getApplicationContext(), loginActivity.class);
-    	i.putExtra("userMail", userMail==null?"":userMail);
+    	i.putExtra("userMail", appSettings.userMail==null?"":appSettings.userMail);
     	startActivity(i);
     	//overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
     	overridePendingTransition(R.anim.carbon_slide_in,R.anim.carbon_slide_out);

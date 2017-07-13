@@ -67,6 +67,11 @@ public class HttpGetTask extends AsyncTask<String, Void, String>
     		result = post(params[2], params[3],params[4],"");
     	}
     	else 
+        	if (params[0].equalsIgnoreCase("XPOST")){
+        		action = params[1];
+        		result = pocketPost(params[1], params[2], params[3]=="1");
+        	}
+    	else 
     	if (params[0].equalsIgnoreCase("UPLOAD")){
         		action = params[1];
         		result = post(params[2], params[3],params[4],params[5]);
@@ -156,6 +161,53 @@ public class HttpGetTask extends AsyncTask<String, Void, String>
 			httppost.setEntity(new StringEntity(data));
 		}
 		
+			HttpResponse response = getHttpClient().execute(httppost);
+			InputStream content = response.getEntity().getContent();
+			Header contentEncoding = response.getFirstHeader("Content-Encoding");
+			if (contentEncoding != null){
+				if(contentEncoding.getValue().equalsIgnoreCase("gzip")) {
+					content = new GZIPInputStream(content);	
+				}
+				else if(contentEncoding.getValue().equalsIgnoreCase("deflate")) {
+						content = new InflaterInputStream(content);	
+				}
+			}
+			
+			ByteArrayOutputStream bout =new ByteArrayOutputStream(512);
+			try{
+				int b;
+		    	while ((b = content.read()) != -1) {
+		    		bout.write(b);
+		    	}
+		    	content.close();
+		    	bout.close();
+		    	result =new String(bout.toByteArray());
+			}
+			catch (Exception ex){
+				ex.printStackTrace();
+			}
+	
+		} catch (ClientProtocolException e) {
+			e.printStackTrace();
+			return result.toString();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return result.toString();
+		}
+		return result;
+    }
+    
+@SuppressWarnings("deprecation")
+private String pocketPost(String url, String data, boolean json){
+    	
+    	String result="";
+    	try {
+			HttpPost httppost = new HttpPost(url/*+"&rand="+String.valueOf(System.currentTimeMillis())*/);
+			if(json) httppost.addHeader("X-Accept","application/json");
+			httppost.addHeader("Cache-Control", "no-store, no-cache, must-revalidate");
+			httppost.addHeader("Connection", "close");
+			httppost.addHeader("Content-type","application/json; charset=UTF-8");
+			httppost.setEntity(new ByteArrayEntity(data.getBytes("UTF-8")));
 			HttpResponse response = getHttpClient().execute(httppost);
 			InputStream content = response.getEntity().getContent();
 			Header contentEncoding = response.getFirstHeader("Content-Encoding");

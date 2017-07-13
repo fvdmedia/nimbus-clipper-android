@@ -88,8 +88,9 @@ public class DrawView extends ZoomView {
     boolean canDrag=false;
     boolean zooming=false;
     boolean doCreate = false;
+    boolean canDraw = false;
     int maskIndex=-1;
-    ScaleGestureDetector mScaleDetector;
+    //ScaleGestureDetector mScaleDetector;
    
     private long currentId=0;
 
@@ -108,6 +109,8 @@ public class DrawView extends ZoomView {
 		sharedConstructing(context);
 	}
 	
+    
+    
 	public DrawView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		ctx = context;
@@ -134,6 +137,9 @@ public class DrawView extends ZoomView {
 		sharedConstructing(context);
 	}
 	
+	public void setCanDraw(boolean b){
+		canDraw =b;
+	}
 	
 	public void setSelChangeListener(shapeSelectionListener listener){
 		doSelChange=listener;
@@ -144,6 +150,28 @@ public class DrawView extends ZoomView {
 		forceRedraw();
 	}
 	
+	public boolean saved=false;
+	public boolean hasChanged(){
+		//return !(maskIndex<1&&shapes.size()==1);
+		return !saved && (maskIndex>0||shapes.size()>1);
+	}
+	
+	@Override
+	public boolean canZoom(){
+		return mode!=Mode.DRAW;
+	}
+	
+	public boolean isDrawMode(){
+		return mode==Mode.DRAW;
+	}
+	
+	@Override
+	public void recycle() {
+		try{
+		clear();
+			super.recycle();
+		} catch (Exception e){}
+	}
 	public void clear(){
 		hideCrop();
 		while(shapes.size()>1){
@@ -166,7 +194,15 @@ public class DrawView extends ZoomView {
 	
 	@Override
 	public void setAngle(float a){
+		
 		super.setAngle(a);
+		/*float cx=getWidth()/2;
+		float cy=getHeight()/2;
+		for (Shape shape : shapes) {
+			shape.rotate(a, cx,cy);
+		}*/
+		
+				
 		clear();
 	}
 	// used to set drawing colour
@@ -515,7 +551,12 @@ public class DrawView extends ZoomView {
 	@Override
 	public boolean onTouch(MotionEvent event) {
 		boolean result = false;
-		
+		if(!canDraw){
+			if(doSelChange!=null) doSelChange.onTouch(event,event.getAction() & MotionEvent.ACTION_MASK);
+			//if((event.getAction() & MotionEvent.ACTION_MASK)==MotionEvent.ACTION_UP) canDraw=true;
+			drag.set(-1,-1);
+			return true;
+		}
 		boolean needRedraw = false;
 		float x = event.getX() / saveScale + dRect.left - lShift + cropRect.left;
         float y = event.getY() / saveScale + dRect.top - tShift + cropRect.top;
@@ -563,7 +604,7 @@ public class DrawView extends ZoomView {
             	}
             	break;
             case MotionEvent.ACTION_MOVE:
-            			
+            		if(drag.x==-1 && drag.y==-1) return true;	
             		if (mode == Mode.EDIT) {
             			final int pointerIndex = event.findPointerIndex(pid);
             			if (pointerIndex!=-1){
@@ -652,44 +693,7 @@ public class DrawView extends ZoomView {
             			}
             			
             			if (b && shapes.size()>0){
-            			/*switch(currShape){
-            			case FreeHand:
-            				((FreeHand)shapes.get(shapes.size() - 1)).setEnd(x, y);
-            				break;
-            			case Eraser:
-            				((Eraser)shapes.get(shapes.size() - 1)).setEnd(x, y);
-            				break;
-            			case Line:
-            				((Line)shapes.get(shapes.size() - 1)).setEnd(x,y);
-            				break;
-            			case Arrow:
-            				((Arrow)shapes.get(shapes.size() - 1)).setEnd(x,y);
-            				break;	
-            			case Rectangle:
-            				((Rectangle)shapes.get(shapes.size() - 1)).setEnd(x,y);
-            				break;
-            			case Circle:
-            				((Circle)shapes.get(shapes.size() - 1)).setEnd(x,y);
-            				break;	
-            			case Oval:
-            				((Oval)shapes.get(shapes.size() - 1)).setEnd(x,y);
-            				break;	
-            			case RoundRect:
-            				((RoundRect)shapes.get(shapes.size() - 1)).setEnd(x,y);
-            				break;
-            			case MaskRect:
-            				((MaskRect)shapes.get(maskIndex)).setEnd(x,y);
-            				break;	
-            			case CropRect:
-            				((CropRect)shapes.get(0)).setEnd(x,y);
-            				break;
-            			case PixelMask:
-            				//((PixelMask)shapes.get(shapes.size() - 1)).setEnd(x,y);
-            				((PixelMask)shapes.get(maskIndex)).setEnd(x,y);
-            				break;	
-        					default:
-        					break;
-            			}*/
+            			
             				switch(currShape){
                 			case FreeHand:
                 			case Eraser:
@@ -757,7 +761,7 @@ public class DrawView extends ZoomView {
             		catch (Exception e){
             			//Log.e("nimbus",e.getMessage());
             		}
-            		mode = Mode.EDIT;
+            		//mode = Mode.EDIT;
             		needRedraw = true;
             	}
             	else if(mode==Mode.DRAW && currShape==ShapeType.MaskRect){
@@ -794,7 +798,10 @@ public class DrawView extends ZoomView {
                 break;
         }
         
-        if (needRedraw) forceRedraw();
+        if (needRedraw) {
+        	saved=false;
+        	forceRedraw();
+        }
         
         return result; // indicate event was handled
 	}

@@ -10,6 +10,7 @@ import org.json.JSONObject;
 
 import com.fvd.nimbus.R;
 
+import android.R.string;
 import android.app.ProgressDialog;
 import android.content.Context;
 //import android.util.Log;
@@ -87,6 +88,31 @@ public class serverHelper implements AsyncTaskCompleteListener<String, String>{
 			onProcess=true;
 		}
 	}
+static final String pocket_key="57845-81d972abbed06f44c5c9d59d";	
+public void getPocketRequest(String url, AsyncTaskCompleteListener<String, String> callback){
+		
+		if(!onProcess){
+			String action = String.format("https://text.getpocket.com/v3/text?images=1&consumer_key=%s&url=%s", pocket_key,urlDataEncode(url));
+			//progressDialog = ProgressDialog.show(ctx, "Nimbus Clipper", ctx.getString(R.string.please_wait), true, false);
+			new HttpGetTask(callback).execute(new String[] {"GET",action});
+			//progressDialog = ProgressDialog.show(ctx, action.equals("notes:update")?ctx.getString(R.string.uploading_to_Nimbus):"Nimbus Clipper", ctx.getString(R.string.please_wait), true, false);
+			progressDialog=null;
+			onProcess=true;
+		}
+}
+
+public static String buildPocketQuery(String params) {
+	return String.format("{\"consumer_key\":\"%s\", %s }", pocket_key,params);
+}
+
+public void postPocket(String url, String data, boolean json, AsyncTaskCompleteListener<String, String> callback) {
+	if(!onProcess){
+		new HttpGetTask(callback).execute(new String[] {"XPOST",url,data,json?"1":"0"});
+		//progressDialog = ProgressDialog.show(ctx, action.equals("notes:update")?ctx.getString(R.string.uploading_to_Nimbus):"Nimbus Clipper", ctx.getString(R.string.please_wait), true, false);
+		progressDialog=null;
+		onProcess=true;
+	}
+}
 	
 public void sendCallbackRequestP(String action, String data,AsyncTaskCompleteListener<String, String> callback){
 		
@@ -254,9 +280,11 @@ public void sendCallbackRequestP(String action, String data,AsyncTaskCompleteLis
 		}
 	}
 	
-	public void uploadShot(String title, String buff){
+	public void uploadShot(String title, String parent, String tag, String buff){
 		if (!onProcess){
 			shotTitle = title;
+			shot_parent=parent;
+			shot_tag=tag;
 			final String CRLF = "\r\n";
 			final String FIELD_MASK = "--%s" + CRLF + "Content-Disposition: form-data; name=\"%s\"" + CRLF + CRLF+"%s"+CRLF;
 			String boundary = getRandomString(12);
@@ -270,7 +298,7 @@ public void sendCallbackRequestP(String action, String data,AsyncTaskCompleteLis
 		}
 		
 	}
-	String urlDataEncode(String s){
+	public static String urlDataEncode(String s){
 		try{
 		return URLEncoder.encode(s,"UTF-8");
 		}
@@ -297,6 +325,9 @@ public void sendCallbackRequestP(String action, String data,AsyncTaskCompleteLis
 	}
 	
 	String pdf_noteid="";
+	String shot_parent="default";
+    String shot_tag="";
+	String shot_noteid="";
 	
 	@Override
     public void onTaskComplete(String result, String action)
@@ -307,16 +338,30 @@ public void sendCallbackRequestP(String action, String data,AsyncTaskCompleteLis
             	int error = root.getInt("errorCode");
            		if (action.equalsIgnoreCase("upload")){
            			if(error==0){
-            			String fileId = root.getJSONObject("body").getJSONObject("files").getString("File");
-            			//String bodyMask = "\"screen\": {\"tempname\":\"%s\", \"type\": \"uploadcare\"}";
-            			String bodyMask = "\"screen\": {\"tempname\":\"%s\", \"type\": \"uploadcare\", \"title\": \"%s\",\"parent_id\": \"default\"}";
-            			String data = String.format(bodyMask, fileId, urlEncode(shotTitle));
+            			/*String fileId = root.getJSONObject("body").getJSONObject("files").getString("File");
+            			String bodyMask = "\"screen\": {\"tempname\":\"%s\", \"type\": \"uploadcare\", \"title\": \"%s\",\"parent_id\": \"%s\", \"tags\": [\"androidclipper\"]}";
+            			String data = String.format(bodyMask, fileId, urlEncode(shotTitle), shot_parent);
             			new HttpGetTask(this).execute(new String[] {"POST","screenshots:save", appSettings.sessionId,"https://sync.everhelper.me/",buildRequest("screenshots:save",data),""});
+            			onProcess=true;*/
+           				String fileId = root.getJSONObject("body").getJSONObject("files").getString("File");
+            			//appSettings.appendLog(String.format("2. receive file id: %s\r\n", fileId));
+            			String bodyMask = "\"store\": { \"notes\" : [{\"global_id\": \"%s\", \"parent_id\": \"%s\", \"date_updated_user\": \"%d\" , \"type\": \"note\", \"title\": \"%s\", \"text\": \"<img src=\'#attacheloc:%s#\'/>\", \"text_short\": \"\", \"display_name\": \"\", \"url\": \"\", \"location_lat\": \"0\", \"location_lng\": \"0\", \"index\": 0, \"attachements\": [{\"global_id\": \"%s\", \"type\": \"file\", \"tempname\": \"%s\",\"display_name\": \"%s\", \"in_list\": \"0\"}], \"todo\": [], \"tags\": [%s] }]}";
+            			shot_noteid = getRandomString(16);
+            			String img_id= getRandomString(16);
+            			String[] tags=shot_tag.split(",");
+            			String ta="";
+            			for (String t : tags) {
+            				ta+=((ta.length()>0?",":"") +"\""+t.trim()+"\"");
+            			}
+            			String data = String.format(bodyMask, shot_noteid, shot_parent, System.currentTimeMillis() / 1000L ,urlEncode(shotTitle),img_id, img_id, fileId,"",ta);
+            			//appSettings.appendLog(String.format("3. send note: id=%s\r\n\r\n%s\r\n\r\n",pdf_noteid, data));
+            			new HttpGetTask(this).execute(new String[] {"POST","screenshots:save", appSettings.sessionId,"https://sync.everhelper.me/",buildRequest("notes:update",data),""});
             			onProcess=true;
            			}
            			else {
            				if (progressDialog != null){
                             progressDialog.dismiss();
+                            progressDialog=null;
                			}
            				
                			if (callback!=null) callback.onTaskComplete(result,action);
@@ -325,17 +370,18 @@ public void sendCallbackRequestP(String action, String data,AsyncTaskCompleteLis
            		else if (action.equalsIgnoreCase("upload_pdf")){
            			if(error==0){
             			String fileId = root.getJSONObject("body").getJSONObject("files").getString("File");
-            			appSettings.appendLog(String.format("2. receive file id: %s\r\n", fileId));
+            			//appSettings.appendLog(String.format("2. receive file id: %s\r\n", fileId));
             			String bodyMask = "\"store\": { \"notes\" : [{\"global_id\": \"%s\", \"parent_id\": \"%s\", \"date_updated_user\": \"%d\" , \"type\": \"note\", \"title\": \"%s\", \"text\": \"\", \"text_short\": \"\", \"display_name\": \"\", \"url\": \"\", \"location_lat\": \"0\", \"location_lng\": \"0\", \"index\": 0, \"attachements\": [{\"global_id\": \"%s\", \"type\": \"file\", \"tempname\": \"%s\",\"display_name\": \"%s\", \"in_list\": \"1\"}], \"todo\": [], \"tags\": [\"androidclipper\"] }]}";
             			pdf_noteid = getRandomString(16);
             			String data = String.format(bodyMask, pdf_noteid, pdf_parent, System.currentTimeMillis() / 1000L ,urlEncode(pdf_title), getRandomString(16), fileId,urlEncode(pdf_title));
-            			appSettings.appendLog(String.format("3. send note: id=%s\r\n\r\n%s\r\n\r\n",pdf_noteid, data));
+            			//appSettings.appendLog(String.format("3. send note: id=%s\r\n\r\n%s\r\n\r\n",pdf_noteid, data));
             			new HttpGetTask(this).execute(new String[] {"POST","notes:update", appSettings.sessionId,"https://sync.everhelper.me/",buildRequest("notes:update",data),""});
             			onProcess=true;
            			}
            			else {
            				if (progressDialog != null){
                             progressDialog.dismiss();
+                            progressDialog=null;
                			}
            				
                			if (callback!=null) callback.onTaskComplete(result,action);
@@ -344,6 +390,7 @@ public void sendCallbackRequestP(String action, String data,AsyncTaskCompleteLis
            		else if("notes:update".equalsIgnoreCase(action)){
            			if (progressDialog != null){
                         progressDialog.dismiss();
+                        progressDialog=null;
            			}
            			appSettings.appendLog(String.format("4. receive ans: id=%s\r\n",pdf_noteid));
            			if (callback!=null) callback.onTaskComplete("{\"errorCode\":0,\"global_id\":\""+pdf_noteid+"\"}",action);
@@ -351,6 +398,7 @@ public void sendCallbackRequestP(String action, String data,AsyncTaskCompleteLis
            		else if ("notes:share".equalsIgnoreCase(action)){
            			if (progressDialog != null){
                         progressDialog.dismiss();
+                        progressDialog=null;
            			}
            			if(error==0){
            				String url=root.getJSONObject("body").getString(noteId);
@@ -364,7 +412,15 @@ public void sendCallbackRequestP(String action, String data,AsyncTaskCompleteLis
            		else 
            			{	
            				if (progressDialog != null){
-                        progressDialog.dismiss();
+           					try{
+           						if(progressDialog.isShowing()) progressDialog.dismiss();
+               					progressDialog=null;
+           					}catch (Exception x){
+           						
+           					}
+           				}
+           				if ("screenshots:save".equalsIgnoreCase(action)){
+           					result=String.format("{\"errorCode\":0,\"body\":{\"global_id\":\"%s\"}}", shot_noteid);
            				}
            				if (callback!=null) callback.onTaskComplete(result,action);
            			}
@@ -372,6 +428,7 @@ public void sendCallbackRequestP(String action, String data,AsyncTaskCompleteLis
             catch (Exception Ex){
             	if (progressDialog != null){
                     progressDialog.dismiss();
+                    progressDialog=null;
        			}
        			if (callback!=null) callback.onTaskComplete("",action);
             }
